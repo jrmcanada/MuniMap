@@ -4,7 +4,7 @@ Phase 4 of `docs/masterplan.md`. Owner answers are in Resolved questions at the 
 
 ## Goal
 
-Fill the 5% strip along the bottom of the screen: the date and time, how many municipalities we cover, a rotating ticker, and the data credits. The strip is already reserved in `src/routes/+page.svelte`.
+Fill the 7% strip along the bottom of the screen (raised from 5% by the owner on 2026-10-23 so the logo can be larger): the date and time, how many municipalities we cover, a rotating ticker, and the data credits. The strip is already reserved in `src/routes/+page.svelte`.
 
 ## What the bar shows
 

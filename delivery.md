@@ -2,13 +2,12 @@
 
 ## Current state (2026-10-23)
 
-- Phases 0 to 4 (scaffold, map, radar, municipality panel, status bar) are merged to `main`.
-- Four municipalities were added and merged (54 in all). Branch `feat/faster-rotation-and-pin-select`: the panel rotates every 20 seconds, and clicking a pin shows that municipality for 60 seconds before the rotation resumes with the next one. The Managed Municipality logo is also in the lower left corner of the status strip (`src/lib/assets/tmm-logo.png`). Typecheck, lint, 70 unit tests, 3 e2e tests and build pass; checked live.
+- Phases 0 to 4 (scaffold, map, radar, municipality panel, status bar) are merged to `main`, plus 54 municipalities, the 20 second rotation, click a pin to jump to it, and the logo. The bottom strip is now 7% of the screen (was 5%) so the logo can be larger.
 
 ## Next action
 
-1. Open the PR for `feat/faster-rotation-and-pin-select` and merge it.
-2. Write `docs/specs/05-kiosk/spec.md` (Phase 5: full screen, hidden cursor, long run recovery).
+1. Open the PR for `feat/kiosk-spec` (the 7% strip and the Phase 5 spec) and merge it.
+2. Owner answers the five questions at the end of `docs/specs/05-kiosk/spec.md`, then run spec-reviewer and build Phase 5.
 3. Phase 6 is the Netlify deploy, which needs an explicit go from the owner.
 
 ## Decisions
@@ -26,7 +25,6 @@
 
 ## Open questions
 
-- The logo is about 42px tall at 1080p, so its wordmark is small. A taller bottom strip (for example 7% instead of 5%) would let it grow; that also shrinks the map and panel.
 - To add a municipality: add it to `municipalities.md` and `src/lib/data/municipalities.ts`, then rerun `scripts/build-municipality-data.mjs` with the Statistics Canada CSV (the link is at the top of the script). The tests that count municipalities need the new total.
 - Dawson and Head, Clara, Maria coordinates are the least certain matches.
 - Radar colours are GeoMet defaults; tuning to the blue and gold palette is a later pass.

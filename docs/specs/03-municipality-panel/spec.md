@@ -41,7 +41,7 @@ Weather warnings from Environment Canada show as a banner at the top of the pane
 - The district and census figures are in the generated `src/lib/data/municipality-facts.json`, keyed by municipality name and typed in `src/lib/data/facts.ts`. `municipalities.ts` is unchanged.
 - Logic under `#lib/weather/` (nearest site, API response parsing, cache) and `#lib/panel/` (rotation order, timing). The Svelte panel only renders what they give it.
 - The nearest site for each municipality is worked out once at build time and stored, so the app never downloads the full site list.
-- The route's layout becomes map (75%), panel (20%) and a reserved strip for the Phase 4 status bar (5%).
+- The route's layout becomes map (75%), panel (20%) and a reserved strip for the Phase 4 status bar (7%, raised from 5% by the owner on 2026-10-23 to give the logo room).
 - No new dependencies expected.
 - Tests: rotation covers every municipality once per lap, the nearest site table has an entry for every municipality within 100 km, the parser handles a missing field, the cache expires correctly, and sunrise and sunset match a known date and place.
 
@@ -51,7 +51,7 @@ Status bar and ticker (Phase 4). Forecast charts. Historical weather. French.
 
 ## Defaults from spec review (change if you disagree)
 
-- **Layout:** a 5% strip along the bottom is reserved for the Phase 4 status bar. Above it, the map and the panel share the width 75 to 20, so the map is about 79% of the width and the panel about 21%. Grid tracks are fixed, and panel content is clipped (`overflow: hidden`), so nothing in the panel can resize the map and trigger a radar refetch. Panel text sizes scale with the panel's width.
+- **Layout:** a 7% strip along the bottom is reserved for the Phase 4 status bar. Above it, the map and the panel share the width 75 to 20, so the map is about 79% of the width and the panel about 21%. Grid tracks are fixed, and panel content is clipped (`overflow: hidden`), so nothing in the panel can resize the map and trigger a radar refetch. Panel text sizes scale with the panel's width.
 - **Clock:** the rotation steps on a monotonic clock (`performance.now`), checked once a second, so clock changes and daylight saving never skip or repeat a municipality. In a hidden tab the rotation catches up on return by jumping to the right municipality. A new lap never starts with the municipality that ended the last one.
 - **Map highlight:** `MapView` takes a `highlight` prop (the municipality name). The ring snaps to the new pin, with no fade, and is a static larger ring under reduced motion. The label has its own colour tokens. Placement is a pure function (right of the pin, flipped left near the right edge, nudged to stay inside the map). It may cover a neighbouring pin where several sit close together, which is accepted.
 - **Scripts:** `scripts/build-municipality-data.mjs` writes `src/lib/data/municipality-facts.json` (district, census figures, nearest forecast site). The output is committed. The census CSV is downloaded by hand (instructions are at the top of the script) and not committed. The 7 name mappings between our names and the census names live in the script. The script stops if any name has no unique Ontario match or a site is farther than 100 km.
