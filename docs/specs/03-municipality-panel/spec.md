@@ -37,7 +37,7 @@ Weather warnings from Environment Canada show as a banner at the top of the pane
 
 ## Technical notes
 
-- `src/lib/data/municipalities.ts` gains `district`, and a new generated file holds the census figures keyed by municipality name. Both are static.
+- The district and census figures are in the generated `src/lib/data/municipality-facts.json`, keyed by municipality name and typed in `src/lib/data/facts.ts`. `municipalities.ts` is unchanged.
 - Logic under `#lib/weather/` (nearest site, API response parsing, cache) and `#lib/panel/` (rotation order, timing). The Svelte panel only renders what they give it.
 - The nearest site for each municipality is worked out once at build time and stored, so the app never downloads the full site list.
 - The route's layout becomes map (75%), panel (20%) and a reserved strip for the Phase 4 status bar (5%).
