@@ -2,6 +2,8 @@
 	import { onMount } from 'svelte';
 	import { municipalities } from '#lib/data/municipalities.js';
 	import ontarioMap from '#lib/data/ontario-map.json';
+	import { beat } from '#lib/kiosk/heartbeat.js';
+	import { radarRequestSize } from '#lib/kiosk/radarSize.js';
 	import { nearestPin } from './hit.js';
 	import { RadarFeed } from '#lib/radar/feed.js';
 	import { formatRadarTime } from '#lib/radar/format.js';
@@ -84,7 +86,13 @@
 
 		feed.stop();
 		player.reset();
-		feed.start({ bbox: canvasBbox(projection, width, height), width, height });
+		// Frames are fetched, decoded and held at a capped size, then drawn stretched to the canvas.
+		const request = radarRequestSize(width, height);
+		feed.start({
+			bbox: canvasBbox(projection, width, height),
+			width: request.width,
+			height: request.height
+		});
 		start();
 	}
 
@@ -125,9 +133,19 @@
 		canvas.style.cursor = pinAt(event) >= 0 ? 'pointer' : '';
 	}
 
+	let drawFailed = false;
+
 	function loop(time: number) {
-		draw(time / 1000, true);
+		// The next frame is booked first, so one bad draw can't stop the map for good.
 		frame = requestAnimationFrame(loop);
+		try {
+			draw(time / 1000, true);
+			beat();
+		} catch (error) {
+			// Logged once, not 60 times a second. With no heartbeat the kiosk watchdog reloads the page.
+			if (!drawFailed) console.error('Map draw failed', error);
+			drawFailed = true;
+		}
 	}
 
 	/** Animates, or draws one still frame when the visitor prefers reduced motion. */

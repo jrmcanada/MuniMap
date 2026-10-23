@@ -114,25 +114,27 @@
 </article>
 
 <style>
+	/* Every size here is a multiple of --u, which MunicipalityPanel sets. Used on its own, the card
+	   has no sizes. */
 	.card {
 		display: flex;
 		flex-direction: column;
-		gap: 3.5cqw;
+		gap: calc(var(--u) * 3.5);
 		height: 100%;
 		overflow: hidden;
-		font-size: 5.2cqw;
+		font-size: calc(var(--u) * 5.2);
 		color: var(--panel-text);
 	}
 
 	.heading {
 		display: flex;
 		flex-direction: column;
-		gap: 0.5cqw;
+		gap: calc(var(--u) * 0.5);
 	}
 
 	.name {
 		margin: 0;
-		font-size: 9.5cqw;
+		font-size: calc(var(--u) * 9.5);
 		line-height: 1.1;
 		font-weight: 700;
 		overflow-wrap: anywhere;
@@ -147,15 +149,15 @@
 	}
 
 	.district {
-		font-size: 5.4cqw;
+		font-size: calc(var(--u) * 5.4);
 	}
 
 	.warning {
 		margin: 0;
-		padding: 1.5cqw 2.5cqw;
-		border-radius: 1.5cqw;
+		padding: calc(var(--u) * 1.5) calc(var(--u) * 2.5);
+		border-radius: calc(var(--u) * 1.5);
 		font-weight: 600;
-		font-size: 4.7cqw;
+		font-size: calc(var(--u) * 4.7);
 		color: var(--warning-text);
 		background: var(--warning-other);
 	}
@@ -176,19 +178,19 @@
 		display: grid;
 		grid-template-columns: auto 1fr;
 		align-items: center;
-		gap: 0 3cqw;
+		gap: 0 calc(var(--u) * 3);
 	}
 
 	.icon {
 		grid-row: span 2;
-		width: 16cqw;
-		height: 16cqw;
+		width: calc(var(--u) * 16);
+		height: calc(var(--u) * 16);
 		object-fit: contain;
 	}
 
 	.temperature {
 		margin: 0;
-		font-size: 20cqw;
+		font-size: calc(var(--u) * 20);
 		line-height: 1;
 		font-weight: 700;
 	}
@@ -197,7 +199,7 @@
 		grid-column: 1 / -1;
 		display: flex;
 		flex-direction: column;
-		gap: 0.5cqw;
+		gap: calc(var(--u) * 0.5);
 	}
 
 	.details p {
@@ -206,13 +208,13 @@
 
 	.condition {
 		font-weight: 600;
-		font-size: 6.1cqw;
+		font-size: calc(var(--u) * 6.1);
 	}
 
 	.forecast {
 		display: flex;
 		flex-direction: column;
-		gap: 1.5cqw;
+		gap: calc(var(--u) * 1.5);
 		margin: 0;
 		padding: 0;
 		list-style: none;
@@ -221,7 +223,7 @@
 	.period {
 		display: grid;
 		grid-template-columns: 1fr auto;
-		gap: 0 2cqw;
+		gap: 0 calc(var(--u) * 2);
 	}
 
 	.period-name {
@@ -246,23 +248,24 @@
 	.census {
 		display: grid;
 		grid-template-columns: 1fr 1fr;
-		gap: 3cqw;
+		gap: calc(var(--u) * 3);
 		margin: 0;
 	}
 
 	dd {
 		margin: 0;
-		font-size: 7cqw;
+		font-size: calc(var(--u) * 7);
 		font-weight: 600;
 	}
 
 	.note {
-		font-size: 4.2cqw;
+		font-size: calc(var(--u) * 4.2);
 		font-weight: 400;
 	}
 
 	.footer {
 		margin-top: auto;
-		font-size: 4cqw;
+		/* The page sets --credit-size so the status bar's credits are exactly this size. */
+		font-size: var(--credit-size, calc(var(--u) * 4));
 	}
 </style>

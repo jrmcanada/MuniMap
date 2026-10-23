@@ -75,7 +75,7 @@ News, company announcements, a scrolling marquee, sound, anything needing a new 
 - **Own lines:** `tickerMessages.ts` exports `string[]`. Blank lines are ignored. Ids are positional. Lines should follow `docs/Writing.md`.
 - **If no live fact is available** the ticker shows the census facts, the radar line and your own lines.
 - **Clock:** always Toronto time, whatever the municipality on the panel, formatted like the radar label ("10:48 pm"). Checked once a second.
-- **Credits:** two lines, broken before "Map": "Weather and radar: Environment Canada. Census: Statistics Canada." then "Map: Natural Earth. Open Government Licence, Canada." The credits column is as wide as its text needs, and the ticker takes the rest. The map caption keeps only the radar time, and hides when there is none.
+- **Credits:** two lines, broken before "Map": "Weather and radar: Environment Canada. Census: Statistics Canada." then "Map: Natural Earth. Open Government Licence, Canada." The credits are the same size as the credit line at the foot of the panel (one shared size, `--credit-size`, set on the page; owner request, 2026-10-23). The credits column is as wide as its text needs, and the ticker takes the rest. The map caption keeps only the radar time, and hides when there is none.
 - **Root element:** `StatusBar.svelte` is the page's footer element and sets its own grid placement across both columns.
 
 ## Resolved questions (owner, 2026-10-22)

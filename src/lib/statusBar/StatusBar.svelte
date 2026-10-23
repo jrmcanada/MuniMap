@@ -151,7 +151,8 @@
 	}
 
 	.credits {
-		font-size: max(11px, 22cqh);
+		/* The same size as the credit line at the foot of the panel, set once on the page. */
+		font-size: var(--credit-size, 11px);
 		line-height: 1.15;
 		color: var(--panel-muted);
 		white-space: nowrap;
