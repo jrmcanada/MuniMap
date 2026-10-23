@@ -16,6 +16,10 @@ export interface MapColors {
 	water: string;
 	pin: string;
 	pinGlow: string;
+	highlight: string;
+	label: string;
+	labelHalo: string;
+	fontFamily: string;
 }
 
 export interface PinPoint {

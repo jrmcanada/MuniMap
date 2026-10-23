@@ -6,9 +6,19 @@
 	import { formatRadarTime } from '#lib/radar/format.js';
 	import { RadarPlayer } from '#lib/radar/player.js';
 	import { canvasBbox } from '#lib/radar/wms.js';
-	import { drawBase, drawPins, drawRadar, readColors, readRadarOpacity } from './draw.js';
+	import {
+		drawBase,
+		drawHighlight,
+		drawPins,
+		drawRadar,
+		readColors,
+		readRadarOpacity
+	} from './draw.js';
 	import { createProjection, projectPlaces } from './projection.js';
 	import type { MapColors, MapData, PinPoint } from './types.js';
+
+	/** Name of the municipality to ring and label, or null for none. */
+	let { highlight = null }: { highlight?: string | null } = $props();
 
 	// ontario-map.json: Natural Earth (public domain) 50m provinces and states plus 10m lakes,
 	// cut to the Ontario region, coordinates rounded to 2 decimals, minified.
@@ -81,6 +91,12 @@
 		if (time !== radarTime) radarTime = time;
 
 		drawPins(ctx, pins, colors, seconds, animate);
+
+		const marked = municipalities.findIndex((municipality) => municipality.name === highlight);
+		if (marked >= 0) {
+			const { name } = municipalities[marked];
+			drawHighlight(ctx, pins[marked], name, colors, { width, height }, seconds, animate);
+		}
 	}
 
 	function loop(time: number) {
@@ -94,6 +110,12 @@
 		if (motionQuery.matches) draw(0, false);
 		else frame = requestAnimationFrame(loop);
 	}
+
+	// The loop picks up a new highlight on its own; a still frame has to be redrawn.
+	$effect(() => {
+		void highlight;
+		if (motionQuery?.matches) draw(0, false);
+	});
 
 	onMount(() => {
 		ctx = canvas.getContext('2d')!;
