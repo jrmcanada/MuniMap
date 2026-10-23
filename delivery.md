@@ -3,11 +3,11 @@
 ## Current state (2026-10-23)
 
 - Phases 0 to 4 (scaffold, map, radar, municipality panel, status bar) are merged to `main`.
-- Four municipalities were added (Clearview, Georgian Bluffs, St. Joseph, Huron Shores), bringing the list to 54 on branch `feat/add-municipalities`. All checks pass. Clearview and Georgian Bluffs are in southern Ontario, so the map now crops wider to include them.
+- Four municipalities were added and merged (54 in all). Branch `feat/faster-rotation-and-pin-select`: the panel rotates every 20 seconds, and clicking a pin shows that municipality for 60 seconds before the rotation resumes with the next one. Typecheck, lint, 70 unit tests, 3 e2e tests and build pass; checked live.
 
 ## Next action
 
-1. Open the PR for `feat/add-municipalities` and merge it.
+1. Open the PR for `feat/faster-rotation-and-pin-select` and merge it.
 2. Write `docs/specs/05-kiosk/spec.md` (Phase 5: full screen, hidden cursor, long run recovery).
 3. Phase 6 is the Netlify deploy, which needs an explicit go from the owner.
 

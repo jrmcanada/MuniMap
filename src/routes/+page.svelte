@@ -5,31 +5,47 @@
 	import MapView from '#lib/map/MapView.svelte';
 	import MunicipalityPanel from '#lib/panel/MunicipalityPanel.svelte';
 	import { Rotation } from '#lib/panel/rotation.js';
+	import { PanelSchedule } from '#lib/panel/schedule.js';
 	import StatusBar from '#lib/statusBar/StatusBar.svelte';
 	import { WeatherCache } from '#lib/weather/cache.js';
 	import type { SiteWeather } from '#lib/weather/types.js';
 
-	const SLOT_MS = 30_000;
+	const SLOT_MS = 20_000;
+	/** How long a municipality stays up after someone clicks its pin. */
+	const HOLD_MS = 60_000;
 	/** The next municipality's weather is fetched this long after the current one appears. */
-	const PREFETCH_MS = 25_000;
+	const PREFETCH_MS = 15_000;
 	/** How often the status bar's weather for every forecast site is topped up. */
 	const WARM_UP_MS = 5 * 60_000;
 
 	const rotation = new Rotation(municipalities.map((municipality) => municipality.name));
 	const cache = new WeatherCache();
 	// A monotonic clock, so clock changes and daylight saving never skip or repeat a municipality.
-	const startedAt = performance.now();
+	const schedule = new PanelSchedule(SLOT_MS, HOLD_MS, performance.now());
 
 	let slot = $state(0);
+	let pinned = $state<string | null>(null);
 	let weather = $state<SiteWeather | null>(null);
 
 	const current = $derived(
-		municipalities.find((municipality) => municipality.name === rotation.at(slot))!
+		municipalities.find((municipality) => municipality.name === (pinned ?? rotation.at(slot)))!
 	);
+
+	function syncSchedule() {
+		slot = schedule.slot;
+		pinned = schedule.pinnedName;
+	}
+
+	/** A click on a pin: show that municipality now, then carry on with the rotation. */
+	function showMunicipality(name: string) {
+		schedule.pin(name, performance.now());
+		syncSchedule();
+	}
 
 	onMount(() => {
 		const timer = setInterval(() => {
-			slot = Math.floor((performance.now() - startedAt) / SLOT_MS);
+			schedule.tick(performance.now());
+			syncSchedule();
 		}, 1000);
 		return () => clearInterval(timer);
 	});
@@ -81,7 +97,7 @@
 
 <main class="screen">
 	<section class="map-area">
-		<MapView highlight={current.name} />
+		<MapView highlight={current.name} onSelect={showMunicipality} />
 	</section>
 	<MunicipalityPanel municipality={current} {weather} />
 	<StatusBar peekWeather={(siteId) => cache.peek(siteId)} />

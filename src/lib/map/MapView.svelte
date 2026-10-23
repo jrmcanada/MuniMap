@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import { municipalities } from '#lib/data/municipalities.js';
 	import ontarioMap from '#lib/data/ontario-map.json';
+	import { nearestPin } from './hit.js';
 	import { RadarFeed } from '#lib/radar/feed.js';
 	import { formatRadarTime } from '#lib/radar/format.js';
 	import { RadarPlayer } from '#lib/radar/player.js';
@@ -17,8 +18,18 @@
 	import { createProjection, projectPlaces } from './projection.js';
 	import type { MapColors, MapData, PinPoint } from './types.js';
 
-	/** Name of the municipality to ring and label, or null for none. */
-	let { highlight = null }: { highlight?: string | null } = $props();
+	/** How close a click or tap has to land to a pin to count, in CSS pixels. */
+	const HIT_RADIUS = 16;
+
+	let {
+		highlight = null,
+		onSelect
+	}: {
+		/** Name of the municipality to ring and label, or null for none. */
+		highlight?: string | null;
+		/** Called with the name of the municipality whose pin was clicked. */
+		onSelect?: (name: string) => void;
+	} = $props();
 
 	// ontario-map.json: Natural Earth (public domain) 50m provinces and states plus 10m lakes,
 	// cut to the Ontario region, coordinates rounded to 2 decimals, minified.
@@ -99,6 +110,21 @@
 		}
 	}
 
+	function pinAt(event: MouseEvent): number {
+		const rect = canvas.getBoundingClientRect();
+		const point = { x: event.clientX - rect.left, y: event.clientY - rect.top };
+		return nearestPin(pins, point, HIT_RADIUS);
+	}
+
+	function select(event: MouseEvent) {
+		const index = pinAt(event);
+		if (index >= 0) onSelect?.(municipalities[index].name);
+	}
+
+	function showPointer(event: MouseEvent) {
+		canvas.style.cursor = pinAt(event) >= 0 ? 'pointer' : '';
+	}
+
 	function loop(time: number) {
 		draw(time / 1000, true);
 		frame = requestAnimationFrame(loop);
@@ -151,7 +177,9 @@
 		role="img"
 		aria-label="Map of client municipalities in Ontario"
 	>
-		<canvas bind:this={canvas} aria-hidden="true"></canvas>
+		<!-- Pointer only: the panel already steps through every municipality without any input. -->
+		<canvas bind:this={canvas} aria-hidden="true" onclick={select} onpointermove={showPointer}
+		></canvas>
 	</div>
 	{#if radarTime}<p class="caption">{radarTime}</p>{/if}
 </div>

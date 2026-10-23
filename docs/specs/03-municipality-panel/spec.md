@@ -4,7 +4,7 @@ Phase 3 of `docs/masterplan.md`. Owner answers are in Resolved questions at the 
 
 ## Goal
 
-A panel in the right 20% of the screen that cycles through the 54 municipalities, 30 seconds each. Each one shows live weather and a few census facts. The matching pin is marked on the map, so the panel and the map read as one thing.
+A panel in the right 20% of the screen that cycles through the 54 municipalities, 20 seconds each. Each one shows live weather and a few census facts. The matching pin is marked on the map, so the panel and the map read as one thing.
 
 ## Sources
 
@@ -28,9 +28,10 @@ Weather warnings from Environment Canada show as a banner at the top of the pane
 ## Behaviour
 
 - **Order:** a fixed shuffled order, reshuffled each full lap, so neighbours on the map don't always follow each other and a long running screen doesn't feel on rails.
-- **Timing:** 30 seconds each, a short crossfade between municipalities. A lap is 25 minutes.
+- **Timing:** 20 seconds each (changed from 30 by the owner, 2026-10-23), a short crossfade between municipalities. A lap is 18 minutes.
+- **Click a pin:** clicking or tapping a pin on the map jumps the panel to that municipality and rings it on the map. It stays for 60 seconds, and clicking another pin restarts the 60 seconds on that one. Then the rotation resumes with the next municipality in its order, and gives it a full 20 seconds. A click counts if it lands within 16 pixels of a pin; where pins crowd together the nearest one wins. The pointer turns into a hand over a pin. This is a pointer shortcut: the rotation still shows every municipality with no input.
 - **Map link:** the current municipality's pin gets a larger, brighter ring and its name label. All other pins stay as they are. Only one label is ever on the map, so labels can't overlap each other. The label goes to the right of the pin, flips to the left near the right edge of the map, and nudges up or down to stay inside it.
-- **Fetching:** weather for the next municipality is fetched about 5 seconds before it appears, then refreshed whenever the municipality comes round again. Sites shared by several municipalities (Sault Ste. Marie serves at least 5) are fetched once and cached for 10 minutes.
+- **Fetching:** weather for the next municipality is fetched about 5 seconds before it appears (15 seconds into the current 20), then refreshed whenever the municipality comes round again. Sites shared by several municipalities (Sault Ste. Marie serves at least 5) are fetched once and cached for 10 minutes.
 - **Failures:** if weather can't be fetched, the panel keeps showing the census facts and the sunrise and sunset and drops the weather block, with no error text. If cached weather is less than 2 hours old it stays, with its observation time shown. Older than that, it is dropped.
 - **Reduced motion:** no crossfade, and the pin ring doesn't pulse.
 - **Language:** English only.
@@ -51,7 +52,7 @@ Status bar and ticker (Phase 4). Forecast charts. Historical weather. French.
 ## Defaults from spec review (change if you disagree)
 
 - **Layout:** a 5% strip along the bottom is reserved for the Phase 4 status bar. Above it, the map and the panel share the width 75 to 20, so the map is about 79% of the width and the panel about 21%. Grid tracks are fixed, and panel content is clipped (`overflow: hidden`), so nothing in the panel can resize the map and trigger a radar refetch. Panel text sizes scale with the panel's width.
-- **Timing:** the rotation steps on a monotonic clock (`performance.now`), checked once a second, so clock changes and daylight saving never skip or repeat a municipality. In a hidden tab the rotation catches up on return by jumping to the right municipality. A new lap never starts with the municipality that ended the last one.
+- **Clock:** the rotation steps on a monotonic clock (`performance.now`), checked once a second, so clock changes and daylight saving never skip or repeat a municipality. In a hidden tab the rotation catches up on return by jumping to the right municipality. A new lap never starts with the municipality that ended the last one.
 - **Map highlight:** `MapView` takes a `highlight` prop (the municipality name). The ring snaps to the new pin, with no fade, and is a static larger ring under reduced motion. The label has its own colour tokens. Placement is a pure function (right of the pin, flipped left near the right edge, nudged to stay inside the map). It may cover a neighbouring pin where several sit close together, which is accepted.
 - **Scripts:** `scripts/build-municipality-data.mjs` writes `src/lib/data/municipality-facts.json` (district, census figures, nearest forecast site). The output is committed. The census CSV is downloaded by hand (instructions are at the top of the script) and not committed. The 7 name mappings between our names and the census names live in the script. The script stops if any name has no unique Ontario match or a site is farther than 100 km.
 - **Sunrise and sunset:** a small NOAA algorithm in `#lib/weather/sun.ts`, no library, tested against a known date and place.

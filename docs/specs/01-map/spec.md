@@ -23,7 +23,7 @@ A full-screen map of Ontario with one pin for each of the 54 client municipaliti
 - `/` renders the map filling the left 75% of the viewport width, full height.
 - The map is fitted to the area and keeps its aspect ratio. It redraws on resize and on high DPI screens without blurring.
 - Every municipality in the data file gets a pin.
-- No user interaction.
+- No user interaction in this phase. Clicking a pin arrives with the panel (spec `03`).
 
 ## Data
 
