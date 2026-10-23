@@ -2,6 +2,7 @@
 	import type { Municipality } from '#lib/data/municipalities.js';
 	import { municipalityFacts } from '#lib/data/facts.js';
 	import { formatClockTime } from '#lib/radar/format.js';
+	import { formatDegrees } from '#lib/weather/format.js';
 	import { sunTimes } from '#lib/weather/sun.js';
 	import { localDate, timeZoneAt } from '#lib/weather/timeZone.js';
 	import type { SiteWeather } from '#lib/weather/types.js';
@@ -20,7 +21,6 @@
 
 	let iconFailed = $state(false);
 
-	const degrees = (celsius: number) => `${Math.round(celsius)}°`;
 	const number = new Intl.NumberFormat('en-CA');
 	const decimal = new Intl.NumberFormat('en-CA', { maximumFractionDigits: 1 });
 
@@ -54,11 +54,11 @@
 			{#if current.iconUrl && !iconFailed}
 				<img class="icon" src={current.iconUrl} alt="" onerror={() => (iconFailed = true)} />
 			{/if}
-			<p class="temperature">{degrees(current.temperatureC)}</p>
+			<p class="temperature">{formatDegrees(current.temperatureC)}</p>
 			<div class="details">
 				{#if current.condition}<p class="condition">{current.condition}</p>{/if}
 				{#if current.feelsLikeC !== undefined}
-					<p>Feels like {degrees(current.feelsLikeC)}</p>
+					<p>Feels like {formatDegrees(current.feelsLikeC)}</p>
 				{/if}
 				{#if wind}<p>{wind}</p>{/if}
 				{#if current.humidityPercent !== undefined}
@@ -76,7 +76,7 @@
 					{#if period.temperatureC !== undefined}
 						<span class="period-temperature">
 							{period.temperatureKind === 'low' ? 'Low' : 'High'}
-							{degrees(period.temperatureC)}
+							{formatDegrees(period.temperatureC)}
 						</span>
 					{/if}
 					{#if period.summary}<span class="period-summary">{period.summary}</span>{/if}
