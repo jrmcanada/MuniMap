@@ -39,8 +39,8 @@ function inputs(readings: (number | null)[], extra: Partial<FactInputs> = {}): F
 	return {
 		municipalities: names.map(place),
 		office: { city: 'Sudbury', longitude: -80.99, latitude: 46.49 },
-		// Town 0 is 100 km away, Town 1 is 200 km, and so on; driving is worked out at 100 km/h.
-		trips: Object.fromEntries(names.map((name, i) => [name, { driveKm: 100 * (i + 1) }])),
+		// Town 0 is 90 km away, Town 1 is 180 km, and so on; driving is worked out at 90 km/h.
+		trips: Object.fromEntries(names.map((name, i) => [name, { driveKm: 90 * (i + 1) }])),
 		landmarks: [
 			{ municipality: 'Town 1', text: 'Town 1 has a giant goose.' },
 			{ municipality: 'Town 2', text: 'Town 2 has a giant moose.' }
@@ -183,32 +183,32 @@ describe('factSlots, travel and place facts', () => {
 	const slots = () => factSlots(inputs(Array(10).fill(null)));
 
 	it('works out the drive, cycle and walk from the office to a random municipality', () => {
-		// random() of 0 picks Town 0: 100 km by road, so 1 hour at 100 km/h.
+		// random() of 0 picks Town 0: 90 km by road, so 1 hour at 90 km/h.
 		expect(textOf(slots(), 'drive')).toBe(
-			"It's about a 1 hour drive from our Sudbury office to Town 0, 100 km by road."
+			"It's about a 1 hour drive from our Sudbury office to Town 0, 90 km by road."
 		);
 		expect(textOf(slots(), 'cycle')).toBe(
-			'Cycling from our Sudbury office to Town 0 would take about 5 hours at 20 km/h, without stopping.'
+			'Cycling from our Sudbury office to Town 0 would take about 4 hours 30 minutes at 20 km/h, without stopping.'
 		);
 		expect(textOf(slots(), 'walk')).toBe(
-			'Walking from our Sudbury office to Town 0 would take about 20 hours at 5 km/h, without a break.'
+			'Walking from our Sudbury office to Town 0 would take about 18 hours at 5 km/h, without a break.'
 		);
 	});
 
 	it('picks a different municipality for a different random number', () => {
 		const picked = factSlots(inputs(Array(10).fill(null), { random: () => 0.95 }));
-		expect(textOf(picked, 'drive')).toContain('to Town 9, 1,000 km by road');
+		expect(textOf(picked, 'drive')).toContain('to Town 9, 900 km by road');
 		expect(textOf(picked, 'drive')).toContain('10 hour drive');
 	});
 
 	it('tells very long trips in days', () => {
 		const far = inputs(Array(10).fill(null), { random: () => 0.95 });
-		expect(textOf(factSlots(far), 'walk')).toContain('about 8.3 days');
+		expect(textOf(factSlots(far), 'walk')).toContain('about 7.5 days');
 	});
 
 	it('names the farthest and closest municipality by road', () => {
 		expect(textOf(slots(), 'farthest')).toBe(
-			'Town 9 is the farthest of our municipalities from Sudbury: 1,000 km, about a 10 hour drive.'
+			'Town 9 is the farthest of our municipalities from Sudbury: 900 km, about a 10 hour drive.'
 		);
 		expect(textOf(slots(), 'closest')).toContain('Town 0 is the closest to our Sudbury office');
 	});

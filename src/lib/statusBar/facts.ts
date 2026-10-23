@@ -41,7 +41,7 @@ const MIN_TEMPERATURE_SITES = 8;
 const WALKING_KMH = 5;
 const CYCLING_KMH = 20;
 /** Driving time is worked out at this steady speed, not taken from the routing service. */
-const DRIVING_KMH = 100;
+const DRIVING_KMH = 90;
 
 const travelMinutes = (km: number, kmh: number) => (km / kmh) * 60;
 /** Land area of the City of Toronto, 2021 census, for scale. */
