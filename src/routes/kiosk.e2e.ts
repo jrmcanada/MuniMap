@@ -87,3 +87,24 @@ for (const [width, height] of SCREENS) {
 		expect(clipped).toEqual({ card: false, barSideways: false, page: false });
 	});
 }
+
+test('zooms the map at the pointer with the mouse wheel', async ({ page }) => {
+	const errors: string[] = [];
+	page.on('pageerror', (error) => errors.push(error.message));
+	await page.goto('/');
+	const canvas = page.locator('canvas').first();
+	await expect(canvas).toBeVisible();
+
+	const before = await canvas.screenshot();
+	const box = (await canvas.boundingBox())!;
+	await page.mouse.move(box.x + box.width * 0.6, box.y + box.height * 0.6);
+	await page.mouse.wheel(0, -400);
+	await page.waitForTimeout(300);
+	const zoomed = await canvas.screenshot();
+	expect(zoomed.equals(before)).toBe(false);
+
+	// Scrolling back out returns the full view.
+	await page.mouse.wheel(0, 4000);
+	await page.waitForTimeout(300);
+	expect(errors).toEqual([]);
+});

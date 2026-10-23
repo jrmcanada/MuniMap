@@ -17,11 +17,15 @@
 		readColors,
 		readRadarOpacity
 	} from './draw.js';
-	import { createProjection, projectPlaces } from './projection.js';
+	import type { GeoProjection } from 'd3-geo';
+	import { createProjection, projectPlaces, zoomProjection } from './projection.js';
 	import type { MapColors, MapData, PinPoint } from './types.js';
+	import { FULL_VIEW, wheelFactor, zoomAt, type View } from './view.js';
 
 	/** How close a click or tap has to land to a pin to count, in CSS pixels. */
 	const HIT_RADIUS = 16;
+	/** How long after the last wheel turn the map returns to the full view. */
+	const ZOOM_RESET_MS = 30_000;
 
 	let {
 		highlight = null,
@@ -51,6 +55,11 @@
 	let height = 0;
 	let frame = 0;
 	let resizeTimer: ReturnType<typeof setTimeout>;
+	let zoomResetTimer: ReturnType<typeof setTimeout>;
+	let baseProjection: GeoProjection;
+	let ratio = 1;
+	let view: View = FULL_VIEW;
+	let baseStale = false;
 
 	let radarTime = $state<string | null>(null);
 
@@ -68,36 +77,66 @@
 		// One rounded size feeds the projection, the radar request and the canvas, so they line up.
 		width = Math.round(rect.width);
 		height = Math.round(rect.height);
-		const ratio = window.devicePixelRatio || 1;
+		ratio = window.devicePixelRatio || 1;
 		canvas.width = Math.round(width * ratio);
 		canvas.height = Math.round(height * ratio);
 		ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
 
-		const projection = createProjection(width, height, municipalities);
-		pins = projectPlaces(projection, municipalities);
-
-		// Land never moves, so it is drawn once here and copied each frame.
+		baseProjection = createProjection(width, height, municipalities);
+		clearTimeout(zoomResetTimer);
+		view = FULL_VIEW;
 		base = document.createElement('canvas');
 		base.width = canvas.width;
 		base.height = canvas.height;
-		const baseCtx = base.getContext('2d')!;
-		baseCtx.setTransform(ratio, 0, 0, ratio, 0, 0);
-		drawBase(baseCtx, mapData, projection, colors);
+		renderBase();
 
 		feed.stop();
 		player.reset();
 		// Frames are fetched, decoded and held at a capped size, then drawn stretched to the canvas.
+		// They always cover the full view; zooming enlarges them rather than fetching again.
 		const request = radarRequestSize(width, height);
 		feed.start({
-			bbox: canvasBbox(projection, width, height),
+			bbox: canvasBbox(baseProjection, width, height),
 			width: request.width,
 			height: request.height
 		});
 		start();
 	}
 
+	/** Redraws the land and pin positions for the current view. Land never animates, so this runs only on a change. */
+	function renderBase() {
+		const projection = zoomProjection(baseProjection, view);
+		pins = projectPlaces(projection, municipalities);
+		const baseCtx = base!.getContext('2d')!;
+		baseCtx.setTransform(1, 0, 0, 1, 0, 0);
+		baseCtx.clearRect(0, 0, base!.width, base!.height);
+		baseCtx.setTransform(ratio, 0, 0, ratio, 0, 0);
+		drawBase(baseCtx, mapData, projection, colors);
+		baseStale = false;
+	}
+
+	function zoom(event: WheelEvent) {
+		// Stops the browser zooming the whole page on ctrl + wheel or a trackpad pinch.
+		event.preventDefault();
+		const rect = canvas.getBoundingClientRect();
+		const point = { x: event.clientX - rect.left, y: event.clientY - rect.top };
+		view = zoomAt(view, point, wheelFactor(event.deltaY), { width, height });
+		baseStale = true;
+		// A wall display has nobody to zoom back out, so the full view returns after a quiet spell.
+		clearTimeout(zoomResetTimer);
+		zoomResetTimer = setTimeout(resetZoom, ZOOM_RESET_MS);
+		if (motionQuery.matches) draw(0, false);
+	}
+
+	function resetZoom() {
+		view = FULL_VIEW;
+		baseStale = true;
+		if (motionQuery.matches) draw(0, false);
+	}
+
 	function draw(seconds: number, animate: boolean) {
 		if (!base) return;
+		if (baseStale) renderBase();
 		ctx.save();
 		ctx.setTransform(1, 0, 0, 1, 0, 0);
 		ctx.drawImage(base, 0, 0);
@@ -105,7 +144,13 @@
 
 		const now = Date.now();
 		const radar = animate ? player.frameAt(seconds, now) : player.newestFrame(now);
-		if (radar) drawRadar(ctx, radar.image, width, height, radarOpacity);
+		if (radar) {
+			ctx.save();
+			ctx.translate(view.x, view.y);
+			ctx.scale(view.k, view.k);
+			drawRadar(ctx, radar.image, width, height, radarOpacity);
+			ctx.restore();
+		}
 		const time = radar ? formatRadarTime(radar.time) : null;
 		if (time !== radarTime) radarTime = time;
 
@@ -168,6 +213,8 @@
 		motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
 		motionQuery.addEventListener('change', start);
 		layout();
+		// Not passive, so zoom() can stop the page zooming too.
+		canvas.addEventListener('wheel', zoom, { passive: false });
 
 		// The observer also fires once on attach, when nothing has changed.
 		const observer = new ResizeObserver(() => {
@@ -181,6 +228,8 @@
 		return () => {
 			cancelAnimationFrame(frame);
 			clearTimeout(resizeTimer);
+			clearTimeout(zoomResetTimer);
+			canvas.removeEventListener('wheel', zoom);
 			motionQuery.removeEventListener('change', start);
 			observer.disconnect();
 			feed.dispose();
