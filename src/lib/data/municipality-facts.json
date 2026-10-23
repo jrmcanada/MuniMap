@@ -1,0 +1,488 @@
+{
+	"Baldwin": {
+		"district": "Sudbury District",
+		"population": 579,
+		"populationChangePercent": -4.3,
+		"landAreaKm2": 82.49,
+		"densityPerKm2": 7,
+		"siteId": "on-146",
+		"siteName": "Killarney"
+	},
+	"Billings": {
+		"district": "Manitoulin District",
+		"population": 753,
+		"populationChangePercent": 24.9,
+		"landAreaKm2": 208.81,
+		"densityPerKm2": 3.6,
+		"siteId": "on-144",
+		"siteName": "Gore Bay"
+	},
+	"Brethour": {
+		"district": "Timiskaming District",
+		"population": 105,
+		"populationChangePercent": -15.3,
+		"landAreaKm2": 81.97,
+		"densityPerKm2": 1.3,
+		"siteId": "on-136",
+		"siteName": "Earlton"
+	},
+	"Burpee and Mills": {
+		"district": "Manitoulin District",
+		"population": 382,
+		"populationChangePercent": 11.4,
+		"landAreaKm2": 217.33,
+		"densityPerKm2": 1.8,
+		"siteId": "on-144",
+		"siteName": "Gore Bay"
+	},
+	"Calvin": {
+		"district": "Nipissing District",
+		"population": 557,
+		"populationChangePercent": 7.9,
+		"landAreaKm2": 140.13,
+		"densityPerKm2": 4,
+		"siteId": "on-139",
+		"siteName": "North Bay"
+	},
+	"Carling": {
+		"district": "Parry Sound District",
+		"population": 1491,
+		"populationChangePercent": 32.5,
+		"landAreaKm2": 244.32,
+		"densityPerKm2": 6.1,
+		"siteId": "on-103",
+		"siteName": "Parry Sound"
+	},
+	"Casey": {
+		"district": "Timiskaming District",
+		"population": 341,
+		"populationChangePercent": -7.3,
+		"landAreaKm2": 80.8,
+		"densityPerKm2": 4.2,
+		"siteId": "on-22",
+		"siteName": "Temiskaming Shores"
+	},
+	"Chamberlain": {
+		"district": "Timiskaming District",
+		"population": 311,
+		"populationChangePercent": -6.3,
+		"landAreaKm2": 110.81,
+		"densityPerKm2": 2.8,
+		"siteId": "on-136",
+		"siteName": "Earlton"
+	},
+	"Charlton and Dack": {
+		"district": "Timiskaming District",
+		"population": 686,
+		"populationChangePercent": 0,
+		"landAreaKm2": 92.74,
+		"densityPerKm2": 7.4,
+		"siteId": "on-136",
+		"siteName": "Earlton"
+	},
+	"Cockburn Island": {
+		"district": "Manitoulin District",
+		"population": 16,
+		"populationChangePercent": 0,
+		"landAreaKm2": 168.9,
+		"densityPerKm2": 0.1,
+		"siteId": "on-21",
+		"siteName": "Blind River"
+	},
+	"Dawson": {
+		"district": "Rainy River District",
+		"population": 399,
+		"populationChangePercent": -14.7,
+		"landAreaKm2": 343.42,
+		"densityPerKm2": 1.2,
+		"siteId": "on-166",
+		"siteName": "Sioux Narrows"
+	},
+	"Dubreuilville": {
+		"district": "Algoma District",
+		"population": 576,
+		"populationChangePercent": -6,
+		"landAreaKm2": 87.53,
+		"densityPerKm2": 6.6,
+		"siteId": "on-138",
+		"siteName": "Wawa"
+	},
+	"East Ferris": {
+		"district": "Nipissing District",
+		"population": 4946,
+		"populationChangePercent": 1.7,
+		"landAreaKm2": 151.94,
+		"densityPerKm2": 32.6,
+		"siteId": "on-139",
+		"siteName": "North Bay"
+	},
+	"Espanola": {
+		"district": "Sudbury District",
+		"population": 5185,
+		"populationChangePercent": 2.7,
+		"landAreaKm2": 81,
+		"densityPerKm2": 64,
+		"siteId": "on-146",
+		"siteName": "Killarney"
+	},
+	"Evanturel": {
+		"district": "Timiskaming District",
+		"population": 502,
+		"populationChangePercent": 11.8,
+		"landAreaKm2": 89.21,
+		"densityPerKm2": 5.6,
+		"siteId": "on-136",
+		"siteName": "Earlton"
+	},
+	"Fauquier-Strickland": {
+		"district": "Cochrane District",
+		"population": 467,
+		"populationChangePercent": -12.9,
+		"landAreaKm2": 1010.45,
+		"densityPerKm2": 0.5,
+		"siteId": "on-142",
+		"siteName": "Kapuskasing"
+	},
+	"Gauthier": {
+		"district": "Timiskaming District",
+		"population": 151,
+		"populationChangePercent": 9.4,
+		"landAreaKm2": 87.98,
+		"densityPerKm2": 1.7,
+		"siteId": "on-76",
+		"siteName": "Kirkland Lake"
+	},
+	"Gordon-Barrie Island": {
+		"district": "Manitoulin District",
+		"population": 613,
+		"populationChangePercent": 25.1,
+		"landAreaKm2": 263.44,
+		"densityPerKm2": 2.3,
+		"siteId": "on-144",
+		"siteName": "Gore Bay"
+	},
+	"Harley": {
+		"district": "Timiskaming District",
+		"population": 524,
+		"populationChangePercent": -4.9,
+		"landAreaKm2": 92.34,
+		"densityPerKm2": 5.7,
+		"siteId": "on-136",
+		"siteName": "Earlton"
+	},
+	"Head, Clara, Maria": {
+		"district": "Renfrew County",
+		"population": 267,
+		"populationChangePercent": 7.7,
+		"landAreaKm2": 719.2,
+		"densityPerKm2": 0.4,
+		"siteId": "on-83",
+		"siteName": "Deep River"
+	},
+	"Hilliard": {
+		"district": "Timiskaming District",
+		"population": 215,
+		"populationChangePercent": 3.9,
+		"landAreaKm2": 91.27,
+		"densityPerKm2": 2.4,
+		"siteId": "on-136",
+		"siteName": "Earlton"
+	},
+	"Hilton Beach": {
+		"district": "Algoma District",
+		"population": 198,
+		"populationChangePercent": 15.8,
+		"landAreaKm2": 2.52,
+		"densityPerKm2": 78.6,
+		"siteId": "on-162",
+		"siteName": "Sault Ste. Marie"
+	},
+	"Hilton Township": {
+		"district": "Algoma District",
+		"population": 382,
+		"populationChangePercent": 24.4,
+		"landAreaKm2": 114.77,
+		"densityPerKm2": 3.3,
+		"siteId": "on-162",
+		"siteName": "Sault Ste. Marie"
+	},
+	"Hornepayne": {
+		"district": "Algoma District",
+		"population": 968,
+		"populationChangePercent": -1.2,
+		"landAreaKm2": 203.04,
+		"densityPerKm2": 4.8,
+		"siteId": "on-78",
+		"siteName": "Hornepayne"
+	},
+	"Hudson": {
+		"district": "Timiskaming District",
+		"population": 530,
+		"populationChangePercent": 5.4,
+		"landAreaKm2": 90.28,
+		"densityPerKm2": 5.9,
+		"siteId": "on-22",
+		"siteName": "Temiskaming Shores"
+	},
+	"Ignace": {
+		"district": "Kenora District",
+		"population": 1206,
+		"populationChangePercent": 0.3,
+		"landAreaKm2": 72.13,
+		"densityPerKm2": 16.7,
+		"siteId": "on-156",
+		"siteName": "Ignace"
+	},
+	"James": {
+		"district": "Timiskaming District",
+		"population": 348,
+		"populationChangePercent": -17.1,
+		"landAreaKm2": 85.4,
+		"densityPerKm2": 4.1,
+		"siteId": "on-136",
+		"siteName": "Earlton"
+	},
+	"Jocelyn": {
+		"district": "Algoma District",
+		"population": 314,
+		"populationChangePercent": 0.3,
+		"landAreaKm2": 130.43,
+		"densityPerKm2": 2.4,
+		"siteId": "on-162",
+		"siteName": "Sault Ste. Marie"
+	},
+	"Johnson": {
+		"district": "Algoma District",
+		"population": 749,
+		"populationChangePercent": -0.3,
+		"landAreaKm2": 119.47,
+		"densityPerKm2": 6.3,
+		"siteId": "on-162",
+		"siteName": "Sault Ste. Marie"
+	},
+	"Joly": {
+		"district": "Parry Sound District",
+		"population": 293,
+		"populationChangePercent": -3.6,
+		"landAreaKm2": 193.95,
+		"densityPerKm2": 1.5,
+		"siteId": "on-31",
+		"siteName": "Burk's Falls"
+	},
+	"Kerns": {
+		"district": "Timiskaming District",
+		"population": 330,
+		"populationChangePercent": -7.8,
+		"landAreaKm2": 90.66,
+		"densityPerKm2": 3.6,
+		"siteId": "on-136",
+		"siteName": "Earlton"
+	},
+	"Laird": {
+		"district": "Algoma District",
+		"population": 1121,
+		"populationChangePercent": 7.1,
+		"landAreaKm2": 103.25,
+		"densityPerKm2": 10.9,
+		"siteId": "on-162",
+		"siteName": "Sault Ste. Marie"
+	},
+	"Lake of the Woods": {
+		"district": "Rainy River District",
+		"population": 308,
+		"populationChangePercent": 33.9,
+		"landAreaKm2": 746.24,
+		"densityPerKm2": 0.4,
+		"siteId": "on-166",
+		"siteName": "Sioux Narrows"
+	},
+	"Latchford": {
+		"district": "Timiskaming District",
+		"population": 355,
+		"populationChangePercent": 13.4,
+		"landAreaKm2": 152.26,
+		"densityPerKm2": 2.3,
+		"siteId": "on-22",
+		"siteName": "Temiskaming Shores"
+	},
+	"MacDonald, Meredith and Aberdeen": {
+		"district": "Algoma District",
+		"population": 1513,
+		"populationChangePercent": -6,
+		"landAreaKm2": 163.26,
+		"densityPerKm2": 9.3,
+		"siteId": "on-162",
+		"siteName": "Sault Ste. Marie"
+	},
+	"Markstay-Warren": {
+		"district": "Sudbury District",
+		"population": 2708,
+		"populationChangePercent": 2,
+		"landAreaKm2": 505.92,
+		"densityPerKm2": 5.4,
+		"siteId": "on-65",
+		"siteName": "West Nipissing"
+	},
+	"Matachewan": {
+		"district": "Timiskaming District",
+		"population": 268,
+		"populationChangePercent": 19.1,
+		"landAreaKm2": 539.56,
+		"densityPerKm2": 0.5,
+		"siteId": "on-76",
+		"siteName": "Kirkland Lake"
+	},
+	"Mattawan": {
+		"district": "Nipissing District",
+		"population": 153,
+		"populationChangePercent": -5,
+		"landAreaKm2": 200.12,
+		"densityPerKm2": 0.8,
+		"siteId": "on-139",
+		"siteName": "North Bay"
+	},
+	"McKellar": {
+		"district": "Parry Sound District",
+		"population": 1419,
+		"populationChangePercent": 27.7,
+		"landAreaKm2": 176.07,
+		"densityPerKm2": 8.1,
+		"siteId": "on-35",
+		"siteName": "Dunchurch"
+	},
+	"Nairn": {
+		"district": "Sudbury District",
+		"population": 373,
+		"populationChangePercent": 9.1,
+		"landAreaKm2": 159.18,
+		"densityPerKm2": 2.3,
+		"siteId": "on-174",
+		"siteName": "Sudbury (Greater)"
+	},
+	"Opasatika": {
+		"district": "Cochrane District",
+		"population": 200,
+		"populationChangePercent": -11.5,
+		"landAreaKm2": 327.09,
+		"densityPerKm2": 0.6,
+		"siteId": "on-73",
+		"siteName": "Hearst"
+	},
+	"Plummer": {
+		"district": "Algoma District",
+		"population": 757,
+		"populationChangePercent": 14.7,
+		"landAreaKm2": 219.24,
+		"densityPerKm2": 3.5,
+		"siteId": "on-162",
+		"siteName": "Sault Ste. Marie"
+	},
+	"Prince": {
+		"district": "Algoma District",
+		"population": 975,
+		"populationChangePercent": -3.5,
+		"landAreaKm2": 84.98,
+		"densityPerKm2": 11.5,
+		"siteId": "on-162",
+		"siteName": "Sault Ste. Marie"
+	},
+	"St. Charles": {
+		"district": "Sudbury District",
+		"population": 1357,
+		"populationChangePercent": 6.9,
+		"landAreaKm2": 314.46,
+		"densityPerKm2": 4.3,
+		"siteId": "on-65",
+		"siteName": "West Nipissing"
+	},
+	"Tarbutt": {
+		"district": "Algoma District",
+		"population": 573,
+		"populationChangePercent": 7.3,
+		"landAreaKm2": 52.79,
+		"densityPerKm2": 10.9,
+		"siteId": "on-162",
+		"siteName": "Sault Ste. Marie"
+	},
+	"Tehkummah": {
+		"district": "Manitoulin District",
+		"population": 450,
+		"populationChangePercent": 3.2,
+		"landAreaKm2": 131.7,
+		"densityPerKm2": 3.4,
+		"siteId": "on-144",
+		"siteName": "Gore Bay"
+	},
+	"Thornloe": {
+		"district": "Timiskaming District",
+		"population": 92,
+		"populationChangePercent": -17.9,
+		"landAreaKm2": 6.59,
+		"densityPerKm2": 14,
+		"siteId": "on-136",
+		"siteName": "Earlton"
+	},
+	"Val Rita-Harty": {
+		"district": "Cochrane District",
+		"population": 757,
+		"populationChangePercent": -0.7,
+		"landAreaKm2": 378.89,
+		"densityPerKm2": 2,
+		"siteId": "on-142",
+		"siteName": "Kapuskasing"
+	},
+	"Wawa": {
+		"district": "Algoma District",
+		"population": 2705,
+		"populationChangePercent": -6.9,
+		"landAreaKm2": 411.89,
+		"densityPerKm2": 6.6,
+		"siteId": "on-138",
+		"siteName": "Wawa"
+	},
+	"White River": {
+		"district": "Algoma District",
+		"population": 557,
+		"populationChangePercent": -13.6,
+		"landAreaKm2": 95.55,
+		"densityPerKm2": 5.8,
+		"siteId": "on-67",
+		"siteName": "White River"
+	},
+	"Clearview": {
+		"district": "Simcoe County",
+		"population": 14814,
+		"populationChangePercent": 4.7,
+		"landAreaKm2": 556.37,
+		"densityPerKm2": 26.6,
+		"siteId": "on-150",
+		"siteName": "Collingwood"
+	},
+	"Georgian Bluffs": {
+		"district": "Grey County",
+		"population": 11100,
+		"populationChangePercent": 5.9,
+		"landAreaKm2": 599.96,
+		"densityPerKm2": 18.5,
+		"siteId": "on-7",
+		"siteName": "Owen Sound"
+	},
+	"St. Joseph": {
+		"district": "Algoma District",
+		"population": 1426,
+		"populationChangePercent": 15,
+		"landAreaKm2": 127.65,
+		"densityPerKm2": 11.2,
+		"siteId": "on-162",
+		"siteName": "Sault Ste. Marie"
+	},
+	"Huron Shores": {
+		"district": "Algoma District",
+		"population": 1860,
+		"populationChangePercent": 11.8,
+		"landAreaKm2": 451.87,
+		"densityPerKm2": 4.1,
+		"siteId": "on-21",
+		"siteName": "Blind River"
+	}
+}

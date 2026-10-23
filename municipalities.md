@@ -7,6 +7,7 @@ Carling
 Casey
 Chamberlain
 Charlton and Dack
+Clearview
 Cockburn Island
 Dawson
 Dubreuilville
@@ -15,6 +16,7 @@ Espanola
 Evanturel
 Fauquier-Strickland
 Gauthier
+Georgian Bluffs
 Gordon-Barrie Island
 Harley
 Head, Clara, Maria
@@ -23,6 +25,7 @@ Hilton Beach
 Hilton Township
 Hornepayne
 Hudson
+Huron Shores
 Ignace
 James
 Jocelyn
@@ -42,6 +45,7 @@ Opasatika
 Plummer
 Prince
 St. Charles
+St. Joseph
 Tarbutt
 Tehkummah
 Thornloe

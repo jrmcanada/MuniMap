@@ -1,7 +1,14 @@
 import { geoPath, type GeoProjection } from 'd3-geo';
-import type { MapColors, MapData, PinPoint } from './types.js';
+import { placeLabel } from './label.js';
+import type { HighwayData, MapColors, MapData, PinPoint } from './types.js';
 
 const PIN_RADIUS = 4;
+const OFFICE_RADIUS = 9;
+const HIGHLIGHT_RADIUS = 11;
+const HIGHLIGHT_BREATH = 2;
+const HIGHLIGHT_LINE_WIDTH = 2.5;
+const LABEL_SIZE_RATIO = 0.013;
+const LABEL_MIN_SIZE = 14;
 const PULSE_SECONDS = 6;
 const PULSE_MAX_SCALE = 3;
 
@@ -13,15 +20,39 @@ export function readColors(element: Element): MapColors {
 		land: read('--map-land'),
 		neighbour: read('--map-neighbour'),
 		border: read('--map-border'),
+		highway: read('--map-highway'),
+		office: read('--map-office'),
 		water: read('--map-water'),
 		pin: read('--map-pin'),
-		pinGlow: read('--map-pin-glow')
+		pinGlow: read('--map-pin-glow'),
+		highlight: read('--map-highlight'),
+		label: read('--map-label'),
+		labelHalo: read('--map-label-halo'),
+		fontFamily: style.fontFamily
 	};
+}
+
+export function readRadarOpacity(element: Element): number {
+	return Number(getComputedStyle(element).getPropertyValue('--map-radar-opacity'));
+}
+
+/** Draws one radar frame stretched over the canvas, which it was fetched to fit. */
+export function drawRadar(
+	ctx: CanvasRenderingContext2D,
+	image: ImageBitmap,
+	width: number,
+	height: number,
+	opacity: number
+): void {
+	ctx.globalAlpha = opacity;
+	ctx.drawImage(image, 0, 0, width, height);
+	ctx.globalAlpha = 1;
 }
 
 export function drawBase(
 	ctx: CanvasRenderingContext2D,
 	data: MapData,
+	highways: HighwayData,
 	projection: GeoProjection,
 	colors: MapColors
 ): void {
@@ -45,6 +76,62 @@ export function drawBase(
 		path(feature);
 		ctx.fill();
 	}
+
+	ctx.lineWidth = 1.25;
+	ctx.strokeStyle = colors.highway;
+	ctx.beginPath();
+	for (const feature of highways.features) path(feature);
+	ctx.stroke();
+}
+
+/** Marks the company office with a diamond, drawn larger than a client pin so it stands apart. */
+export function drawOffice(
+	ctx: CanvasRenderingContext2D,
+	office: PinPoint,
+	colors: MapColors
+): void {
+	ctx.beginPath();
+	ctx.moveTo(office.x, office.y - OFFICE_RADIUS);
+	ctx.lineTo(office.x + OFFICE_RADIUS, office.y);
+	ctx.lineTo(office.x, office.y + OFFICE_RADIUS);
+	ctx.lineTo(office.x - OFFICE_RADIUS, office.y);
+	ctx.closePath();
+	ctx.fillStyle = colors.office;
+	ctx.fill();
+	ctx.lineWidth = 2;
+	ctx.strokeStyle = colors.labelHalo;
+	ctx.stroke();
+}
+
+/** Rings the pin the panel is showing and writes its name beside it. */
+export function drawHighlight(
+	ctx: CanvasRenderingContext2D,
+	pin: PinPoint,
+	name: string,
+	colors: MapColors,
+	size: { width: number; height: number },
+	seconds: number,
+	animate: boolean
+): void {
+	const breath = animate ? (Math.sin(seconds * 2) + 1) * HIGHLIGHT_BREATH : 0;
+	ctx.lineWidth = HIGHLIGHT_LINE_WIDTH;
+	ctx.strokeStyle = colors.highlight;
+	ctx.beginPath();
+	ctx.arc(pin.x, pin.y, HIGHLIGHT_RADIUS + breath, 0, Math.PI * 2);
+	ctx.stroke();
+
+	const fontSize = Math.max(LABEL_MIN_SIZE, size.width * LABEL_SIZE_RATIO);
+	ctx.font = `600 ${fontSize}px ${colors.fontFamily}`;
+	ctx.textBaseline = 'top';
+	const box = { width: ctx.measureText(name).width, height: fontSize };
+	const spot = placeLabel(pin, box, size.width, size.height);
+
+	ctx.lineJoin = 'round';
+	ctx.lineWidth = fontSize / 4;
+	ctx.strokeStyle = colors.labelHalo;
+	ctx.strokeText(name, spot.x, spot.y);
+	ctx.fillStyle = colors.label;
+	ctx.fillText(name, spot.x, spot.y);
 }
 
 /** Draws every pin. Each one pulses on its own offset so they never beat in sync. */
