@@ -14,7 +14,7 @@ Left to right:
 1. **Date and time**, in Toronto time, without seconds: "Thursday, October 22, 2026" and "10:48 pm".
 2. **Municipalities:** "54 municipalities". The count comes from the list, never typed in.
 3. **Ticker:** one fact at a time, 8 seconds each, with a short fade. A fact is a single line that fits the bar.
-4. **Credits**, small, at the right: "Weather and radar: Environment Canada. Census: Statistics Canada. Open Government Licence, Canada." This replaces the radar credit that sits on the map today. The radar time label stays on the map.
+4. **Credits**, small, at the right, on two lines: "Weather and radar: Environment Canada. Census: Statistics Canada." and "Map: Natural Earth. Open Government Licence, Canada." This replaces the radar credit that sits on the map today. The radar time label stays on the map.
 
 ## Ticker facts
 
@@ -75,7 +75,7 @@ News, company announcements, a scrolling marquee, sound, anything needing a new 
 - **Own lines:** `tickerMessages.ts` exports `string[]`. Blank lines are ignored. Ids are positional. Lines should follow `docs/Writing.md`.
 - **If no live fact is available** the ticker shows the census facts, the radar line and your own lines.
 - **Clock:** always Toronto time, whatever the municipality on the panel, formatted like the radar label ("10:48 pm"). Checked once a second.
-- **Credits:** "Weather and radar: Environment Canada. Census: Statistics Canada. Map: Natural Earth. Open Government Licence, Canada." The map caption keeps only the radar time, and hides when there is none.
+- **Credits:** two lines, broken before "Map": "Weather and radar: Environment Canada. Census: Statistics Canada." then "Map: Natural Earth. Open Government Licence, Canada." The credits column is as wide as its text needs, and the ticker takes the rest. The map caption keeps only the radar time, and hides when there is none.
 - **Root element:** `StatusBar.svelte` is the page's footer element and sets its own grid placement across both columns.
 
 ## Resolved questions (owner, 2026-10-22)
