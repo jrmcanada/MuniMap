@@ -1,4 +1,4 @@
-// Builds src/lib/data/office-trips.json: the driving distance and time from the Sudbury office to
+// Builds src/lib/data/office-trips.json: the driving distance from the Sudbury office to
 // each client municipality, for the status bar's travel facts. Rerun when municipalities change.
 //
 //   node scripts/build-office-trips.mjs
@@ -21,7 +21,7 @@ const places = [
 	latitude: Number(latitude)
 }));
 const [, officeLongitude, officeLatitude] =
-	read('src/lib/data/office.ts').match(/longitude: (-?[\d.]+), latitude: (-?[\d.]+)/) ?? [];
+	read('src/lib/data/office.ts').match(/longitude: (-?[\d.]+),\s*latitude: (-?[\d.]+)/) ?? [];
 if (!places.length || !officeLongitude) throw new Error('Could not read the data files');
 
 const points = [
@@ -29,7 +29,7 @@ const points = [
 	...places
 ];
 const coordinates = points.map((point) => `${point.longitude},${point.latitude}`).join(';');
-const url = `https://router.project-osrm.org/table/v1/driving/${coordinates}?sources=0&annotations=duration,distance`;
+const url = `https://router.project-osrm.org/table/v1/driving/${coordinates}?sources=0&annotations=distance`;
 
 const response = await fetch(url);
 if (!response.ok) throw new Error(`OSRM answered ${response.status}`);
@@ -38,10 +38,9 @@ if (table.code !== 'Ok') throw new Error(`OSRM: ${table.code}`);
 
 const trips = {};
 places.forEach(({ name }, index) => {
-	const seconds = table.durations[0][index + 1];
 	const metres = table.distances[0][index + 1];
-	if (seconds == null || metres == null) throw new Error(`No route to ${name}`);
-	trips[name] = { driveKm: Math.round(metres / 100) / 10, driveMinutes: Math.round(seconds / 60) };
+	if (metres == null) throw new Error(`No route to ${name}`);
+	trips[name] = { driveKm: Math.round(metres / 100) / 10 };
 });
 writeFileSync(OUTPUT, JSON.stringify(trips));
 console.log(`${Object.keys(trips).length} trips written`);

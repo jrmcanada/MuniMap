@@ -5,7 +5,7 @@ import { municipalities } from '#lib/data/municipalities.js';
 import { office } from '#lib/data/office.js';
 import officeTrips from '#lib/data/office-trips.json';
 import type { SiteWeather } from '#lib/weather/types.js';
-import { factSlots, nextSlot, type FactInputs } from './facts.js';
+import { factSlots, nextSlot, startSlot, type FactInputs } from './facts.js';
 
 const NOW = Date.parse('2026-10-23T03:00:00Z');
 
@@ -39,10 +39,8 @@ function inputs(readings: (number | null)[], extra: Partial<FactInputs> = {}): F
 	return {
 		municipalities: names.map(place),
 		office: { city: 'Sudbury', longitude: -80.99, latitude: 46.49 },
-		// Town 0 is 100 km away, Town 1 is 200 km, and so on.
-		trips: Object.fromEntries(
-			names.map((name, i) => [name, { driveKm: 100 * (i + 1), driveMinutes: 60 * (i + 1) }])
-		),
+		// Town 0 is 100 km away, Town 1 is 200 km, and so on; driving is worked out at 100 km/h.
+		trips: Object.fromEntries(names.map((name, i) => [name, { driveKm: 100 * (i + 1) }])),
 		landmarks: [
 			{ municipality: 'Town 1', text: 'Town 1 has a giant goose.' },
 			{ municipality: 'Town 2', text: 'Town 2 has a giant moose.' }
@@ -185,7 +183,7 @@ describe('factSlots, travel and place facts', () => {
 	const slots = () => factSlots(inputs(Array(10).fill(null)));
 
 	it('works out the drive, cycle and walk from the office to a random municipality', () => {
-		// random() of 0 picks Town 0: 100 km and 60 minutes by road.
+		// random() of 0 picks Town 0: 100 km by road, so 1 hour at 100 km/h.
 		expect(textOf(slots(), 'drive')).toBe(
 			"It's about a 1 hour drive from our Sudbury office to Town 0, 100 km by road."
 		);
@@ -309,5 +307,24 @@ describe('nextSlot', () => {
 
 	it('returns -1 when nothing has a fact', () => {
 		expect(nextSlot([null, null], 0)).toBe(-1);
+	});
+});
+
+describe('startSlot', () => {
+	const slot = (id: string) => ({ id, text: id });
+	const slots = [slot('a'), null, slot('c'), slot('d')];
+
+	it('starts on the slot the random number points at', () => {
+		expect(startSlot(slots, () => 0)).toBe(0);
+		expect(startSlot(slots, () => 0.5)).toBe(2);
+		expect(startSlot(slots, () => 0.99)).toBe(3);
+	});
+
+	it('moves on to the next fact when it lands on an empty slot', () => {
+		expect(startSlot(slots, () => 0.3)).toBe(2);
+	});
+
+	it('returns -1 when no slot has a fact', () => {
+		expect(startSlot([null, null], () => 0.4)).toBe(-1);
 	});
 });

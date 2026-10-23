@@ -11,10 +11,9 @@ export interface TickerFact {
 	text: string;
 }
 
-/** Driving distance and time from the office to one municipality, from scripts/build-office-trips.mjs. */
+/** Driving distance from the office to one municipality, from scripts/build-office-trips.mjs. */
 export interface OfficeTrip {
 	driveKm: number;
-	driveMinutes: number;
 }
 
 export interface FactInputs {
@@ -41,6 +40,10 @@ const MAX_LIVE_AGE_MS = 60 * 60 * 1000;
 const MIN_TEMPERATURE_SITES = 8;
 const WALKING_KMH = 5;
 const CYCLING_KMH = 20;
+/** Driving time is worked out at this steady speed, not taken from the routing service. */
+const DRIVING_KMH = 100;
+
+const travelMinutes = (km: number, kmh: number) => (km / kmh) * 60;
 /** Land area of the City of Toronto, 2021 census, for scale. */
 const TORONTO_KM2 = 631;
 const TIME_ZONE = 'America/Toronto';
@@ -203,14 +206,14 @@ function driveFact(inputs: FactInputs): TickerFact | null {
 	if (!pick) return null;
 	return {
 		id: 'drive',
-		text: `It's about a ${formatTravelTime(pick.trip.driveMinutes, true)} drive from our ${inputs.office.city} office to ${pick.name}, ${number.format(Math.round(pick.trip.driveKm))} km by road.`
+		text: `It's about a ${formatTravelTime(travelMinutes(pick.trip.driveKm, DRIVING_KMH), true)} drive from our ${inputs.office.city} office to ${pick.name}, ${number.format(Math.round(pick.trip.driveKm))} km by road.`
 	};
 }
 
 function cycleFact(inputs: FactInputs): TickerFact | null {
 	const pick = randomTrip(inputs);
 	if (!pick) return null;
-	const minutes = (pick.trip.driveKm / CYCLING_KMH) * 60;
+	const minutes = travelMinutes(pick.trip.driveKm, CYCLING_KMH);
 	return {
 		id: 'cycle',
 		text: `Cycling from our ${inputs.office.city} office to ${pick.name} would take about ${formatTravelTime(minutes)} at ${CYCLING_KMH} km/h, without stopping.`
@@ -220,7 +223,7 @@ function cycleFact(inputs: FactInputs): TickerFact | null {
 function walkFact(inputs: FactInputs): TickerFact | null {
 	const pick = randomTrip(inputs);
 	if (!pick) return null;
-	const minutes = (pick.trip.driveKm / WALKING_KMH) * 60;
+	const minutes = travelMinutes(pick.trip.driveKm, WALKING_KMH);
 	return {
 		id: 'walk',
 		text: `Walking from our ${inputs.office.city} office to ${pick.name} would take about ${formatTravelTime(minutes)} at ${WALKING_KMH} km/h, without a break.`
@@ -246,20 +249,20 @@ function byDistance(
 function farthestFact(inputs: FactInputs): TickerFact | null {
 	const farthest = byDistance(inputs, 'farthest');
 	if (!farthest) return null;
-	const { driveKm, driveMinutes } = farthest.trip;
+	const { driveKm } = farthest.trip;
 	return {
 		id: 'farthest',
-		text: `${farthest.name} is the farthest of our municipalities from ${inputs.office.city}: ${number.format(Math.round(driveKm))} km, about a ${formatTravelTime(driveMinutes, true)} drive.`
+		text: `${farthest.name} is the farthest of our municipalities from ${inputs.office.city}: ${number.format(Math.round(driveKm))} km, about a ${formatTravelTime(travelMinutes(driveKm, DRIVING_KMH), true)} drive.`
 	};
 }
 
 function closestFact(inputs: FactInputs): TickerFact | null {
 	const closest = byDistance(inputs, 'closest');
 	if (!closest) return null;
-	const { driveKm, driveMinutes } = closest.trip;
+	const { driveKm } = closest.trip;
 	return {
 		id: 'closest',
-		text: `${closest.name} is the closest to our ${inputs.office.city} office: ${number.format(Math.round(driveKm))} km, about a ${formatTravelTime(driveMinutes, true)} drive.`
+		text: `${closest.name} is the closest to our ${inputs.office.city} office: ${number.format(Math.round(driveKm))} km, about a ${formatTravelTime(travelMinutes(driveKm, DRIVING_KMH), true)} drive.`
 	};
 }
 
@@ -475,4 +478,9 @@ export function nextSlot(slots: (TickerFact | null)[], cursor: number): number {
 		if (slots[index]) return index;
 	}
 	return -1;
+}
+
+/** A random slot that has a fact to start the ticker on, so the display doesn't always open the same way. */
+export function startSlot(slots: (TickerFact | null)[], random: () => number): number {
+	return nextSlot(slots, Math.floor(random() * slots.length) - 1);
 }
