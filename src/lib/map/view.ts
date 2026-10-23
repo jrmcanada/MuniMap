@@ -32,6 +32,20 @@ export function zoomAt(
 	};
 }
 
+/** Drags the map by (dx, dy), keeping it covering the canvas. */
+export function panBy(
+	view: View,
+	dx: number,
+	dy: number,
+	size: { width: number; height: number }
+): View {
+	return {
+		k: view.k,
+		x: clamp(view.x + dx, size.width * (1 - view.k), 0),
+		y: clamp(view.y + dy, size.height * (1 - view.k), 0)
+	};
+}
+
 function clamp(value: number, min: number, max: number): number {
 	return Math.min(max, Math.max(min, value));
 }

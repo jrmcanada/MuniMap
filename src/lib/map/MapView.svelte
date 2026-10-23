@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { municipalities } from '#lib/data/municipalities.js';
+	import highwayData from '#lib/data/highways.json';
+	import { office } from '#lib/data/office.js';
 	import ontarioMap from '#lib/data/ontario-map.json';
 	import { beat } from '#lib/kiosk/heartbeat.js';
 	import { radarRequestSize } from '#lib/kiosk/radarSize.js';
@@ -11,6 +13,7 @@
 	import { canvasBbox } from '#lib/radar/wms.js';
 	import {
 		drawBase,
+		drawOffice,
 		drawHighlight,
 		drawPins,
 		drawRadar,
@@ -19,13 +22,15 @@
 	} from './draw.js';
 	import type { GeoProjection } from 'd3-geo';
 	import { createProjection, projectPlaces, zoomProjection } from './projection.js';
-	import type { MapColors, MapData, PinPoint } from './types.js';
-	import { FULL_VIEW, wheelFactor, zoomAt, type View } from './view.js';
+	import type { HighwayData, MapColors, MapData, PinPoint } from './types.js';
+	import { FULL_VIEW, panBy, wheelFactor, zoomAt, type View } from './view.js';
 
 	/** How close a click or tap has to land to a pin to count, in CSS pixels. */
 	const HIT_RADIUS = 16;
 	/** How long after the last wheel turn the map returns to the full view. */
 	const ZOOM_RESET_MS = 30_000;
+	/** How far the pointer must travel while pressed before a click becomes a drag, in CSS pixels. */
+	const DRAG_THRESHOLD = 4;
 
 	let {
 		highlight = null,
@@ -41,6 +46,8 @@
 	// cut to the Ontario region, coordinates rounded to 2 decimals, minified.
 	// The JSON import types geometry as plain strings; the file is built to the MapData shape.
 	const mapData = ontarioMap as unknown as MapData;
+	// highways.json: Natural Earth (public domain) major highways, built by scripts/build-highways.mjs.
+	const highways = highwayData as unknown as HighwayData;
 
 	let container: HTMLDivElement;
 	let canvas: HTMLCanvasElement;
@@ -50,6 +57,7 @@
 	let radarOpacity = 0;
 	let motionQuery: MediaQueryList;
 	let pins: PinPoint[] = [];
+	let officePin: PinPoint = { x: NaN, y: NaN };
 	let base: HTMLCanvasElement | null = null;
 	let width = 0;
 	let height = 0;
@@ -60,6 +68,8 @@
 	let ratio = 1;
 	let view: View = FULL_VIEW;
 	let baseStale = false;
+	let drag: { x: number; y: number } | null = null;
+	let dragMoved = false;
 
 	let radarTime = $state<string | null>(null);
 
@@ -107,11 +117,12 @@
 	function renderBase() {
 		const projection = zoomProjection(baseProjection, view);
 		pins = projectPlaces(projection, municipalities);
+		[officePin] = projectPlaces(projection, [office]);
 		const baseCtx = base!.getContext('2d')!;
 		baseCtx.setTransform(1, 0, 0, 1, 0, 0);
 		baseCtx.clearRect(0, 0, base!.width, base!.height);
 		baseCtx.setTransform(ratio, 0, 0, ratio, 0, 0);
-		drawBase(baseCtx, mapData, projection, colors);
+		drawBase(baseCtx, mapData, highways, projection, colors);
 		baseStale = false;
 	}
 
@@ -120,7 +131,11 @@
 		event.preventDefault();
 		const rect = canvas.getBoundingClientRect();
 		const point = { x: event.clientX - rect.left, y: event.clientY - rect.top };
-		view = zoomAt(view, point, wheelFactor(event.deltaY), { width, height });
+		changeView(zoomAt(view, point, wheelFactor(event.deltaY), { width, height }));
+	}
+
+	function changeView(next: View) {
+		view = next;
 		baseStale = true;
 		// A wall display has nobody to zoom back out, so the full view returns after a quiet spell.
 		clearTimeout(zoomResetTimer);
@@ -155,6 +170,7 @@
 		if (time !== radarTime) radarTime = time;
 
 		drawPins(ctx, pins, colors, seconds, animate);
+		drawOffice(ctx, officePin, colors);
 
 		const marked = municipalities.findIndex((municipality) => municipality.name === highlight);
 		if (marked >= 0) {
@@ -170,12 +186,36 @@
 	}
 
 	function select(event: MouseEvent) {
+		// A drag ends in a click too; only a real click picks a pin.
+		if (dragMoved) return;
 		const index = pinAt(event);
 		if (index >= 0) onSelect?.(municipalities[index].name);
 	}
 
-	function showPointer(event: MouseEvent) {
-		canvas.style.cursor = pinAt(event) >= 0 ? 'pointer' : '';
+	function startDrag(event: PointerEvent) {
+		drag = { x: event.clientX, y: event.clientY };
+		dragMoved = false;
+		canvas.setPointerCapture(event.pointerId);
+	}
+
+	function endDrag() {
+		drag = null;
+		canvas.style.cursor = '';
+	}
+
+	function movePointer(event: PointerEvent) {
+		if (!drag) {
+			canvas.style.cursor = pinAt(event) >= 0 ? 'pointer' : view.k > 1 ? 'grab' : '';
+			return;
+		}
+		const dx = event.clientX - drag.x;
+		const dy = event.clientY - drag.y;
+		// Small jitter during a click must not count as a drag.
+		if (!dragMoved && Math.hypot(dx, dy) < DRAG_THRESHOLD) return;
+		dragMoved = true;
+		canvas.style.cursor = 'grabbing';
+		drag = { x: event.clientX, y: event.clientY };
+		changeView(panBy(view, dx, dy, { width, height }));
 	}
 
 	let drawFailed = false;
@@ -245,7 +285,14 @@
 		aria-label="Map of client municipalities in Ontario"
 	>
 		<!-- Pointer only: the panel already steps through every municipality without any input. -->
-		<canvas bind:this={canvas} aria-hidden="true" onclick={select} onpointermove={showPointer}
+		<canvas
+			bind:this={canvas}
+			aria-hidden="true"
+			onclick={select}
+			onpointerdown={startDrag}
+			onpointermove={movePointer}
+			onpointerup={endDrag}
+			onpointercancel={endDrag}
 		></canvas>
 	</div>
 	{#if radarTime}<p class="caption">{radarTime}</p>{/if}
@@ -265,6 +312,7 @@
 	}
 
 	canvas {
+		touch-action: none;
 		display: block;
 		width: 100%;
 		height: 100%;

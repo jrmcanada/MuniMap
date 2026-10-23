@@ -108,3 +108,21 @@ test('zooms the map at the pointer with the mouse wheel', async ({ page }) => {
 	await page.waitForTimeout(300);
 	expect(errors).toEqual([]);
 });
+
+test('drags the zoomed map without selecting a pin', async ({ page }) => {
+	await page.goto('/');
+	const canvas = page.locator('canvas').first();
+	const box = (await canvas.boundingBox())!;
+	const centre = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+
+	await page.mouse.move(centre.x, centre.y);
+	await page.mouse.wheel(0, -800);
+	await page.waitForTimeout(300);
+	const zoomed = await canvas.screenshot();
+
+	await page.mouse.down();
+	await page.mouse.move(centre.x + 150, centre.y + 80, { steps: 5 });
+	await page.mouse.up();
+	await page.waitForTimeout(300);
+	expect((await canvas.screenshot()).equals(zoomed)).toBe(false);
+});

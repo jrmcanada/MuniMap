@@ -24,7 +24,8 @@ export function sunTimes(
 ): SunTimes | null {
 	const noonUtc = Date.UTC(year, month - 1, day, 12);
 	const julianDate = noonUtc / 86_400_000 + UNIX_EPOCH_JULIAN_DAY;
-	const cycle = Math.ceil(julianDate - J2000 + 0.0008);
+	// Whole days since J2000 at noon UTC of the requested date.
+	const cycle = Math.round(julianDate - J2000);
 	const solarNoon = cycle - longitude / 360;
 
 	const anomaly = (357.5291 + 0.98560028 * solarNoon) % 360;

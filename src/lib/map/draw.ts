@@ -1,8 +1,9 @@
 import { geoPath, type GeoProjection } from 'd3-geo';
 import { placeLabel } from './label.js';
-import type { MapColors, MapData, PinPoint } from './types.js';
+import type { HighwayData, MapColors, MapData, PinPoint } from './types.js';
 
 const PIN_RADIUS = 4;
+const OFFICE_RADIUS = 9;
 const HIGHLIGHT_RADIUS = 11;
 const HIGHLIGHT_BREATH = 2;
 const HIGHLIGHT_LINE_WIDTH = 2.5;
@@ -19,6 +20,8 @@ export function readColors(element: Element): MapColors {
 		land: read('--map-land'),
 		neighbour: read('--map-neighbour'),
 		border: read('--map-border'),
+		highway: read('--map-highway'),
+		office: read('--map-office'),
 		water: read('--map-water'),
 		pin: read('--map-pin'),
 		pinGlow: read('--map-pin-glow'),
@@ -49,6 +52,7 @@ export function drawRadar(
 export function drawBase(
 	ctx: CanvasRenderingContext2D,
 	data: MapData,
+	highways: HighwayData,
 	projection: GeoProjection,
 	colors: MapColors
 ): void {
@@ -72,6 +76,31 @@ export function drawBase(
 		path(feature);
 		ctx.fill();
 	}
+
+	ctx.lineWidth = 1.25;
+	ctx.strokeStyle = colors.highway;
+	ctx.beginPath();
+	for (const feature of highways.features) path(feature);
+	ctx.stroke();
+}
+
+/** Marks the company office with a diamond, drawn larger than a client pin so it stands apart. */
+export function drawOffice(
+	ctx: CanvasRenderingContext2D,
+	office: PinPoint,
+	colors: MapColors
+): void {
+	ctx.beginPath();
+	ctx.moveTo(office.x, office.y - OFFICE_RADIUS);
+	ctx.lineTo(office.x + OFFICE_RADIUS, office.y);
+	ctx.lineTo(office.x, office.y + OFFICE_RADIUS);
+	ctx.lineTo(office.x - OFFICE_RADIUS, office.y);
+	ctx.closePath();
+	ctx.fillStyle = colors.office;
+	ctx.fill();
+	ctx.lineWidth = 2;
+	ctx.strokeStyle = colors.labelHalo;
+	ctx.stroke();
 }
 
 /** Rings the pin the panel is showing and writes its name beside it. */
