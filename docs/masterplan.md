@@ -51,7 +51,7 @@ Questions 3 to 5 below are answered; see the decisions above.
 ## Build order (phases)
 
 1. **Phase 0, scaffold.** SvelteKit, TypeScript strict, Tailwind, shadcn-svelte, Vitest, Playwright. _(Done 2026-10-22.)_
-2. **Phase 1, map.** Ontario base map and client pins. _(Built 2026-10-22, review pending.)_
+2. **Phase 1, map.** Ontario base map and client pins. _(Built and reviewed 2026-10-22.)_
 3. **Phase 2, radar.** Animated overlay. _(Built 2026-10-22, review pending.)_
 4. **Phase 3, municipality panel.** Rotation, weather, population, facts.
 5. **Phase 4, status bar.** Clock, count, ticker.
