@@ -10,6 +10,7 @@ Fill the 5% strip along the bottom of the screen: the date and time, how many mu
 
 Left to right:
 
+0. **Logo** (added by the owner, 2026-10-23): the Managed Municipality logo in the lower left corner of the screen, from `src/lib/assets/tmm-logo.png`. It lives in the strip below the map, so it never overlaps the map, its borders or the radar. Its height is 80% of the strip.
 1. **Date and time**, in Toronto time, without seconds: "Thursday, October 22, 2026" and "10:48 pm".
 2. **Municipalities:** "54 municipalities". The count comes from the list, never typed in.
 3. **Ticker:** one fact at a time, 8 seconds each, with a short fade. A fact is a single line that fits the bar.

@@ -3,7 +3,7 @@
 ## Current state (2026-10-23)
 
 - Phases 0 to 4 (scaffold, map, radar, municipality panel, status bar) are merged to `main`.
-- Four municipalities were added and merged (54 in all). Branch `feat/faster-rotation-and-pin-select`: the panel rotates every 20 seconds, and clicking a pin shows that municipality for 60 seconds before the rotation resumes with the next one. Typecheck, lint, 70 unit tests, 3 e2e tests and build pass; checked live.
+- Four municipalities were added and merged (54 in all). Branch `feat/faster-rotation-and-pin-select`: the panel rotates every 20 seconds, and clicking a pin shows that municipality for 60 seconds before the rotation resumes with the next one. The Managed Municipality logo is also in the lower left corner of the status strip (`src/lib/assets/tmm-logo.png`). Typecheck, lint, 70 unit tests, 3 e2e tests and build pass; checked live.
 
 ## Next action
 
@@ -26,6 +26,7 @@
 
 ## Open questions
 
+- The logo is about 42px tall at 1080p, so its wordmark is small. A taller bottom strip (for example 7% instead of 5%) would let it grow; that also shrinks the map and panel.
 - To add a municipality: add it to `municipalities.md` and `src/lib/data/municipalities.ts`, then rerun `scripts/build-municipality-data.mjs` with the Statistics Canada CSV (the link is at the top of the script). The tests that count municipalities need the new total.
 - Dawson and Head, Clara, Maria coordinates are the least certain matches.
 - Radar colours are GeoMet defaults; tuning to the blue and gold palette is a later pass.
