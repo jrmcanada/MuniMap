@@ -2,12 +2,12 @@
 
 ## Current state (2026-10-23)
 
-- Phases 0 to 3 (scaffold, map, radar, municipality panel) are merged to `main`.
-- Phase 4 (status bar, spec `04-status-bar`) is built on branch `feat/status-bar`. Typecheck, lint, 62 unit tests, 3 e2e tests and build pass. Checked live at 720p, 1080p and 4K. Reviewed; fixes applied.
+- Phases 0 to 4 (scaffold, map, radar, municipality panel, status bar) are merged to `main`.
+- Four municipalities were added (Clearview, Georgian Bluffs, St. Joseph, Huron Shores), bringing the list to 54 on branch `feat/add-municipalities`. All checks pass. Clearview and Georgian Bluffs are in southern Ontario, so the map now crops wider to include them.
 
 ## Next action
 
-1. Open the PR for `feat/status-bar` and merge it.
+1. Open the PR for `feat/add-municipalities` and merge it.
 2. Write `docs/specs/05-kiosk/spec.md` (Phase 5: full screen, hidden cursor, long run recovery).
 3. Phase 6 is the Netlify deploy, which needs an explicit go from the owner.
 
@@ -26,6 +26,7 @@
 
 ## Open questions
 
+- To add a municipality: add it to `municipalities.md` and `src/lib/data/municipalities.ts`, then rerun `scripts/build-municipality-data.mjs` with the Statistics Canada CSV (the link is at the top of the script). The tests that count municipalities need the new total.
 - Dawson and Head, Clara, Maria coordinates are the least certain matches.
 - Radar colours are GeoMet defaults; tuning to the blue and gold palette is a later pass.
 - Panel text scales with width only. Check it at the real wall display resolution.

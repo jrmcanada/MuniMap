@@ -4,12 +4,12 @@ Phase 3 of `docs/masterplan.md`. Owner answers are in Resolved questions at the 
 
 ## Goal
 
-A panel in the right 20% of the screen that cycles through the 50 municipalities, 30 seconds each. Each one shows live weather and a few census facts. The matching pin is marked on the map, so the panel and the map read as one thing.
+A panel in the right 20% of the screen that cycles through the 54 municipalities, 30 seconds each. Each one shows live weather and a few census facts. The matching pin is marked on the map, so the panel and the map read as one thing.
 
 ## Sources
 
-- **Weather:** Environment Canada's open `citypageweather-realtime` API, `https://api.weather.gc.ca/collections/citypageweather-realtime/items`. No key, Open Government Licence, Canada. It covers 844 forecast sites, and none of the 50 municipalities is a site itself. Each uses its **nearest site**: the median distance is 22 km and the farthest are Dawson (Sioux Narrows, 78 km) and Matachewan (Kirkland Lake, 53 km). The panel names the site it used ("Weather from Sault Ste. Marie") so nothing claims more than it knows.
-- **Census facts:** Statistics Canada table 98-10-0002-01 (2021 Census, population and dwelling counts by census subdivision), a small CSV. Open Government Licence, Canada. Read once into a static file in the repo, never fetched at runtime. 45 of the 50 names match a census subdivision directly; 5 are mapped by hand: Hilton Township (Hilton), MacDonald, Meredith and Aberdeen (Macdonald, Meredith and Aberdeen Additional), Nairn (Nairn and Hyman), Plummer (Plummer Additional) and Tarbutt (Tarbutt and Tarbutt Additional). The district name comes from the census division in the same file.
+- **Weather:** Environment Canada's open `citypageweather-realtime` API, `https://api.weather.gc.ca/collections/citypageweather-realtime/items`. No key, Open Government Licence, Canada. It covers 844 forecast sites, and none of the 54 municipalities is a site itself. Each uses its **nearest site**: the median distance is 22 km and the farthest are Dawson (Sioux Narrows, 78 km) and Matachewan (Kirkland Lake, 53 km). The panel names the site it used ("Weather from Sault Ste. Marie") so nothing claims more than it knows.
+- **Census facts:** Statistics Canada table 98-10-0002-01 (2021 Census, population and dwelling counts by census subdivision), a small CSV. Open Government Licence, Canada. Read once into a static file in the repo, never fetched at runtime. Most names match a census subdivision directly; 7 are mapped by hand in the script, and the 5 the census renames are: Hilton Township (Hilton), MacDonald, Meredith and Aberdeen (Macdonald, Meredith and Aberdeen Additional), Nairn (Nairn and Hyman), Plummer (Plummer Additional) and Tarbutt (Tarbutt and Tarbutt Additional). The district name comes from the census division in the same file.
 - **Sunrise and sunset:** computed from the municipality's coordinates. No source.
 
 ## What the panel shows
@@ -42,7 +42,7 @@ Weather warnings from Environment Canada show as a banner at the top of the pane
 - The nearest site for each municipality is worked out once at build time and stored, so the app never downloads the full site list.
 - The route's layout becomes map (75%), panel (20%) and a reserved strip for the Phase 4 status bar (5%).
 - No new dependencies expected.
-- Tests: rotation covers every municipality once per lap, the nearest site table has 50 entries within 100 km, the parser handles a missing field, the cache expires correctly, and sunrise and sunset match a known date and place.
+- Tests: rotation covers every municipality once per lap, the nearest site table has an entry for every municipality within 100 km, the parser handles a missing field, the cache expires correctly, and sunrise and sunset match a known date and place.
 
 ## Out of scope
 

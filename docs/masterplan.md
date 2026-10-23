@@ -42,7 +42,7 @@ No database. The client list is a typed file in the repo (about 80 entries). Pin
 
 Questions 3 to 5 below are answered; see the decisions above.
 
-1. **Client list.** `municipalities.md` lists 50 municipalities, mostly small ones in Northern Ontario (Algoma, Timiskaming, Cochrane, Sudbury and Manitoulin districts, Kenora). It's names only, so each one needs a coordinate, and some are unclear (see below). Client company names stay off the screen unless you say otherwise.
+1. **Client list.** `municipalities.md` lists 54 municipalities, mostly small ones in Northern Ontario (Algoma, Timiskaming, Cochrane, Sudbury and Manitoulin districts, Kenora), plus two in southern Ontario (Clearview and Georgian Bluffs). It's names only, so each one needs a coordinate, and some are unclear (see below). Client company names stay off the screen unless you say otherwise.
 2. **Ambiguous names.** "Hilton Beach" and "Hilton Township", "James", "Prince", "Hudson", "Laird", "Johnson" and "Gordon-Barrie Island" appear in more than one place or are combined entries. "Head, Clara, Maria", "MacDonald, Meredith and Aberdeen" and "Burpee and Mills" are single municipalities with long names. I'd confirm the district for each when I build the data file.
 3. **Pin precision.** One pin per municipality is the proposal. Exact addresses would put client locations on a public screen.
 4. **Data sources.** Proposed: Environment Canada GeoMet for radar and current conditions (open licence), Statistics Canada census for population. Facts beyond that need a source each.

@@ -57,5 +57,9 @@ export const municipalities: Municipality[] = [
 	{ name: 'Thornloe', longitude: -79.762, latitude: 47.668 },
 	{ name: 'Val Rita-Harty', longitude: -82.63, latitude: 49.484 },
 	{ name: 'Wawa', longitude: -84.774, latitude: 47.994 },
-	{ name: 'White River', longitude: -85.259, latitude: 48.584 }
+	{ name: 'White River', longitude: -85.259, latitude: 48.584 },
+	{ name: 'Clearview', longitude: -80.074, latitude: 44.398 },
+	{ name: 'Georgian Bluffs', longitude: -81.027, latitude: 44.658 },
+	{ name: 'St. Joseph', longitude: -84.014, latitude: 46.26 },
+	{ name: 'Huron Shores', longitude: -83.369, latitude: 46.285 }
 ];
