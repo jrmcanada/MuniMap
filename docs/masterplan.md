@@ -35,6 +35,7 @@ No database. The client list is a typed file in the repo (about 80 entries). Pin
 - 2026-10-22: `@sveltejs/adapter-netlify` is installed per `CLAUDE.md`, but nothing deploys until every phase is done.
 - 2026-10-22: shadcn-svelte is installed (style `vega`, neutral base). The visuals are custom (scoped CSS); add components only when a real need shows up.
 
+- 2026-10-22: The base map is Web Mercator so Environment Canada radar frames line up with it (spec `02-radar`).
 - 2026-10-22: Pins mark the municipality only. Data sources are Environment Canada (radar, weather) and Statistics Canada (population). The base map is self drawn from open boundary data.
 
 ## Open questions (for the owner, before the specs)
@@ -51,7 +52,7 @@ Questions 3 to 5 below are answered; see the decisions above.
 
 1. **Phase 0, scaffold.** SvelteKit, TypeScript strict, Tailwind, shadcn-svelte, Vitest, Playwright. _(Done 2026-10-22.)_
 2. **Phase 1, map.** Ontario base map and client pins. _(Built 2026-10-22, review pending.)_
-3. **Phase 2, radar.** Animated overlay.
+3. **Phase 2, radar.** Animated overlay. _(Built 2026-10-22, review pending.)_
 4. **Phase 3, municipality panel.** Rotation, weather, population, facts.
 5. **Phase 4, status bar.** Clock, count, ticker.
 6. **Phase 5, kiosk polish.** Full screen, long run stability, error recovery.
