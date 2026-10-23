@@ -127,6 +127,7 @@
 	--map-caption: oklch(0.7 0.02 250);
 	--panel-background: oklch(0.18 0.02 250);
 	--panel-border: oklch(0.32 0.04 250);
+	--card-background: oklch(0.22 0.025 250);
 	--panel-text: oklch(0.96 0.01 250);
 	--panel-muted: oklch(0.72 0.02 250);
 	--warning-text: oklch(0.15 0.02 250);

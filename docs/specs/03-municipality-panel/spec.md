@@ -25,6 +25,20 @@ Top to bottom:
 
 Weather warnings from Environment Canada show as a banner at the top of the panel when one is active for the site.
 
+## Card layout (owner request, 2026-10-23)
+
+The panel is a stack of rounded cards on the panel background, in the existing colours. A card is a slightly lighter blue grey with the panel's border colour. Top to bottom:
+
+1. **Name card:** municipality and district.
+2. **Alert banners**, when there are any, as before.
+3. **Weather card:** icon, temperature, condition, feels like and humidity on the left, and a **wind compass** on the right. The arrow points where the wind is going (it comes from the named side) and is the map's pin colour. The speed and gusts sit under it. Calm wind shows "Calm" and no arrow. With no wind reading the compass is left out.
+4. **Forecast card:** the next 3 periods.
+5. **Sun card:** an arc from sunrise to sunset with the sun at its place now (pin colour for the stretch it has travelled, the highlight colour for the sun). When the sun is down the arc shows "Sun is down". Sunrise and sunset times sit under it.
+6. **Census card:** population and land area.
+7. Credit line at the foot, as before.
+
+Sizes use the same unit as before, now `--u: min(1cqw, 0.36cqh)`. The factor went from 0.38 to 0.36 so the tallest card (a three line name, two alerts, a full forecast, the compass and the arc) keeps at least 10% spare at the eight screen sizes. The card logic is in `WindCompass.svelte` and `SunArc.svelte`, with the direction to bearing rule in `#lib/weather/compass.ts` and the sun position in `#lib/weather/sunArc.ts`.
+
 ## Behaviour
 
 - **Order:** a fixed shuffled order, reshuffled each full lap, so neighbours on the map don't always follow each other and a long running screen doesn't feel on rails.

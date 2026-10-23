@@ -50,7 +50,7 @@ A web page can't switch itself to full screen. Browsers only allow it after a cl
   - `heartbeat.ts`: `beat()` and `lastBeat()`.
 - A small Svelte component, `Kiosk.svelte`, mounts the cursor, wake lock, refresh and watchdog, and renders nothing. `+page.svelte` includes it once and tells it whether a pin is held.
 - `RadarView` gets a request size that can differ from the canvas size. `MapView.svelte` sends the heartbeat from its loop.
-- Panel sizing: `container-type: size` on the panel (its width and height come from fixed grid tracks, so this is safe), and `--u: min(1cqw, 0.38cqh)` on the card's wrapper. Every size in the card is `calc(var(--u) * N)`. The `0.38cqh` factor comes from the tallest card measured (3 line name, 2 warnings, full forecast), which needed about 248 units of height.
+- Panel sizing: `container-type: size` on the panel (its width and height come from fixed grid tracks, so this is safe), and `--u: min(1cqw, 0.36cqh)` on the card's wrapper. Every size in the card is `calc(var(--u) * N)`. The `0.36cqh` factor comes from the tallest card measured (3 line name, 2 warnings, full forecast, compass and sun arc), which keeps at least 10% spare at all 8 screen sizes.
 - No new dependencies.
 - Tests: the refresh time across both daylight saving changes, the watchdog rule and its 10 minute guard, the radar size cap at 4K and below the cap, an e2e check that the cursor hides after 3 idle seconds and returns on movement, and an e2e check at 8 screen sizes (1024×768, 1280×720, 1366×768, 1920×1080, 1920×1200, 2560×1080, 2560×1440, 3840×2160) that the panel card and status bar don't clip.
 
@@ -82,7 +82,7 @@ Checked on 2026-10-23: `vite preview` serves the Netlify adapter's build on `127
 - **Frame loop safety:** the first failed draw is logged once, not 60 times a second. A map that keeps failing stops beating, so the watchdog reloads it.
 - **Cursor:** the hiding rule is `html.cursor-hidden, html.cursor-hidden * { cursor: none !important }`, which beats the hand's inline style. Only mouse movement on the whole document resets the 3 second timer. Taps and pen strokes don't show a cursor.
 - **Radar sizing:** the request size is also the size frames are decoded at, so it is what saves the memory. `MapView` passes `radarRequestSize(width, height)` as the radar width and height. The bounding box is unchanged.
-- **Panel sizing:** `--u` is set on the card's wrapper, a direct child of the panel, with a comment that no nested container may be added. The `0.38` factor and the 248 unit estimate are starting points: the tallest card is re-measured at all 8 screen sizes and the factor tuned until each has headroom.
+- **Panel sizing:** `--u` is set on the card's wrapper, a direct child of the panel, with a comment that no nested container may be added. The factor was `0.38` at first and is now `0.36` (see spec 03, Card layout). It and the 248 unit estimate were starting points: the tallest card is re-measured at all 8 screen sizes and the factor tuned until each has headroom.
 - **Credit text size:** the status bar credits are the same size as the panel footer, with no minimum (owner request, 2026-10-23). On a small screen such as 1024 by 768 that is about 8.6px.
 - **Windows steps:** auto sign in stores a password on the PC, so use a dedicated account with no other access, and the guide says so.
 

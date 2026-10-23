@@ -4,8 +4,11 @@
 	import { formatClockTime } from '#lib/radar/format.js';
 	import { formatDegrees } from '#lib/weather/format.js';
 	import { sunTimes } from '#lib/weather/sun.js';
+	import { sunPosition } from '#lib/weather/sunArc.js';
 	import { localDate, timeZoneAt } from '#lib/weather/timeZone.js';
 	import type { SiteWeather } from '#lib/weather/types.js';
+	import SunArc from './SunArc.svelte';
+	import WindCompass from './WindCompass.svelte';
 
 	let { municipality, weather }: { municipality: Municipality; weather: SiteWeather | null } =
 		$props();
@@ -14,23 +17,24 @@
 	const timeZone = $derived(timeZoneAt(municipality.longitude));
 	const current = $derived(weather?.current ?? null);
 
+	// Worked out once per card. A card is short lived, and the sun barely moves in that time.
 	const sun = $derived.by(() => {
-		const date = localDate(new Date(), timeZone);
-		return sunTimes(municipality.latitude, municipality.longitude, date.year, date.month, date.day);
+		const now = new Date();
+		const date = localDate(now, timeZone);
+		const times = sunTimes(
+			municipality.latitude,
+			municipality.longitude,
+			date.year,
+			date.month,
+			date.day
+		);
+		return times && { ...times, position: sunPosition(now, times) };
 	});
 
 	let iconFailed = $state(false);
 
 	const number = new Intl.NumberFormat('en-CA');
 	const decimal = new Intl.NumberFormat('en-CA', { maximumFractionDigits: 1 });
-
-	const wind = $derived.by(() => {
-		if (!current || current.windSpeedKmh === undefined) return null;
-		if (current.windSpeedKmh === 'calm') return 'Wind calm';
-		const direction = current.windDirection ? `${current.windDirection} ` : '';
-		const gust = current.windGustKmh ? `, gusts ${current.windGustKmh}` : '';
-		return `Wind ${direction}${current.windSpeedKmh} km/h${gust}`;
-	});
 
 	const populationChange = $derived(
 		facts.populationChangePercent === 0
@@ -40,7 +44,7 @@
 </script>
 
 <article class="card">
-	<header class="heading">
+	<header class="tile heading">
 		<h2 class="name">{municipality.name}</h2>
 		<p class="district">{facts.district}</p>
 	</header>
@@ -50,26 +54,34 @@
 	{/each}
 
 	{#if current}
-		<section class="current">
-			{#if current.iconUrl && !iconFailed}
-				<img class="icon" src={current.iconUrl} alt="" onerror={() => (iconFailed = true)} />
-			{/if}
-			<p class="temperature">{formatDegrees(current.temperatureC)}</p>
-			<div class="details">
+		<section class="tile current">
+			<div class="now">
+				<div class="headline">
+					{#if current.iconUrl && !iconFailed}
+						<img class="icon" src={current.iconUrl} alt="" onerror={() => (iconFailed = true)} />
+					{/if}
+					<p class="temperature">{formatDegrees(current.temperatureC)}</p>
+				</div>
 				{#if current.condition}<p class="condition">{current.condition}</p>{/if}
 				{#if current.feelsLikeC !== undefined}
-					<p>Feels like {formatDegrees(current.feelsLikeC)}</p>
+					<p class="detail">Feels like {formatDegrees(current.feelsLikeC)}</p>
 				{/if}
-				{#if wind}<p>{wind}</p>{/if}
 				{#if current.humidityPercent !== undefined}
-					<p>Humidity {current.humidityPercent}%</p>
+					<p class="detail">Humidity {current.humidityPercent}%</p>
 				{/if}
 			</div>
+			{#if current.windSpeedKmh !== undefined}
+				<WindCompass
+					direction={current.windDirection}
+					speed={current.windSpeedKmh}
+					gust={current.windGustKmh}
+				/>
+			{/if}
 		</section>
 	{/if}
 
 	{#if weather?.forecast.length}
-		<ul class="forecast">
+		<ul class="tile forecast">
 			{#each weather.forecast as period (period.name)}
 				<li class="period">
 					<span class="period-name">{period.name}</span>
@@ -86,13 +98,16 @@
 	{/if}
 
 	{#if sun}
-		<p class="sun">
-			<span>Sunrise {formatClockTime(sun.sunrise, timeZone)}</span>
-			<span>Sunset {formatClockTime(sun.sunset, timeZone)}</span>
-		</p>
+		<section class="tile">
+			<SunArc
+				position={sun.position}
+				sunrise={formatClockTime(sun.sunrise, timeZone)}
+				sunset={formatClockTime(sun.sunset, timeZone)}
+			/>
+		</section>
 	{/if}
 
-	<dl class="census">
+	<dl class="tile census">
 		<div>
 			<dt>Population, 2021</dt>
 			<dd>{number.format(facts.population)}</dd>
@@ -119,11 +134,20 @@
 	.card {
 		display: flex;
 		flex-direction: column;
-		gap: calc(var(--u) * 3.5);
+		gap: calc(var(--u) * 2.2);
 		height: 100%;
 		overflow: hidden;
-		font-size: calc(var(--u) * 5.2);
+		font-size: calc(var(--u) * 4.6);
 		color: var(--panel-text);
+	}
+
+	.tile {
+		margin: 0;
+		padding: calc(var(--u) * 2.6) calc(var(--u) * 3.5);
+		border-radius: calc(var(--u) * 3.5);
+		background: var(--card-background);
+		/* A hairline, so it stays 1px rather than scaling with --u. */
+		border: 1px solid var(--panel-border);
 	}
 
 	.heading {
@@ -134,7 +158,7 @@
 
 	.name {
 		margin: 0;
-		font-size: calc(var(--u) * 9.5);
+		font-size: calc(var(--u) * 8.6);
 		line-height: 1.1;
 		font-weight: 700;
 		overflow-wrap: anywhere;
@@ -149,15 +173,15 @@
 	}
 
 	.district {
-		font-size: calc(var(--u) * 5.4);
+		font-size: calc(var(--u) * 4.8);
 	}
 
 	.warning {
 		margin: 0;
 		padding: calc(var(--u) * 1.5) calc(var(--u) * 2.5);
-		border-radius: calc(var(--u) * 1.5);
+		border-radius: calc(var(--u) * 2);
 		font-weight: 600;
-		font-size: calc(var(--u) * 4.7);
+		font-size: calc(var(--u) * 4.4);
 		color: var(--warning-text);
 		background: var(--warning-other);
 	}
@@ -176,47 +200,54 @@
 
 	.current {
 		display: grid;
-		grid-template-columns: auto 1fr;
+		grid-template-columns: minmax(0, 1fr) auto;
 		align-items: center;
-		gap: 0 calc(var(--u) * 3);
+		gap: 0 calc(var(--u) * 2);
 	}
 
-	.icon {
-		grid-row: span 2;
-		width: calc(var(--u) * 16);
-		height: calc(var(--u) * 16);
-		object-fit: contain;
-	}
-
-	.temperature {
-		margin: 0;
-		font-size: calc(var(--u) * 20);
-		line-height: 1;
-		font-weight: 700;
-	}
-
-	.details {
-		grid-column: 1 / -1;
+	.now {
 		display: flex;
 		flex-direction: column;
 		gap: calc(var(--u) * 0.5);
 	}
 
-	.details p {
+	.headline {
+		display: flex;
+		align-items: center;
+		gap: calc(var(--u) * 2.5);
+	}
+
+	.icon {
+		width: calc(var(--u) * 12);
+		height: calc(var(--u) * 12);
+		object-fit: contain;
+	}
+
+	.temperature {
+		margin: 0;
+		font-size: calc(var(--u) * 16);
+		line-height: 1;
+		font-weight: 700;
+	}
+
+	.now p {
 		margin: 0;
 	}
 
-	.condition {
+	.now .condition {
+		margin-top: calc(var(--u) * 1);
 		font-weight: 600;
-		font-size: calc(var(--u) * 6.1);
+		font-size: calc(var(--u) * 5.4);
+	}
+
+	.detail {
+		font-size: calc(var(--u) * 4.4);
 	}
 
 	.forecast {
 		display: flex;
 		flex-direction: column;
-		gap: calc(var(--u) * 1.5);
-		margin: 0;
-		padding: 0;
+		gap: calc(var(--u) * 1.8);
 		list-style: none;
 	}
 
@@ -236,30 +267,24 @@
 
 	.period-summary {
 		grid-column: 1 / -1;
+		font-size: calc(var(--u) * 4.2);
 		color: var(--panel-muted);
-	}
-
-	.sun {
-		display: flex;
-		justify-content: space-between;
-		margin: 0;
 	}
 
 	.census {
 		display: grid;
 		grid-template-columns: 1fr 1fr;
 		gap: calc(var(--u) * 3);
-		margin: 0;
 	}
 
 	dd {
 		margin: 0;
-		font-size: calc(var(--u) * 7);
+		font-size: calc(var(--u) * 6.6);
 		font-weight: 600;
 	}
 
 	.note {
-		font-size: calc(var(--u) * 4.2);
+		font-size: calc(var(--u) * 3.8);
 		font-weight: 400;
 	}
 

@@ -49,7 +49,7 @@
 		/* One unit for everything in the card: the smaller of the width and height based sizes, so
 		   it fits tall, short, wide and ultrawide screens alike. This element must stay a direct child
 		   of the panel, and nothing inside may become a container, or these units would change. */
-		--u: min(1cqw, 0.38cqh);
+		--u: min(1cqw, 0.36cqh);
 		padding: calc(var(--u) * 3);
 	}
 </style>
