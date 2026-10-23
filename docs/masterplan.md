@@ -14,7 +14,7 @@ It runs on its own. Someone can click a pin to jump the panel to that municipali
 | ---------- | --------------- | --------------------------------------------------------------------------------------------------------- |
 | Main map   | 75%             | Map of Ontario, client pins, animated weather radar overlaid (subtle enough to keep the pins easy to see) |
 | Info panel | 20%             | One municipality at a time, 20 seconds each: weather, population and other facts                          |
-| Status bar | 5%              | Current date and time, number of municipalities represented, rotating ticker                              |
+| Status bar | 7%              | Current date and time, number of municipalities represented, rotating ticker                              |
 
 ## Features
 

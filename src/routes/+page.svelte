@@ -108,7 +108,7 @@
 	.screen {
 		display: grid;
 		grid-template-columns: minmax(0, 75fr) minmax(0, 20fr);
-		grid-template-rows: minmax(0, 95fr) minmax(0, 5fr);
+		grid-template-rows: minmax(0, 93fr) minmax(0, 7fr);
 		width: 100vw;
 		height: 100dvh;
 		background: var(--map-background);
