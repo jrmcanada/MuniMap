@@ -15,9 +15,7 @@
 
 	const { left, right, baseline, radiusX, radiusY } = SUN_ARC;
 	const fullArc = `M${left} ${baseline} A${radiusX} ${radiusY} 0 0 1 ${right} ${baseline}`;
-	const label = $derived(
-		`${position ? 'The sun is up.' : 'The sun is down.'} Sunrise ${sunrise}, sunset ${sunset}.`
-	);
+	const label = $derived(position ? 'The sun is up.' : 'The sun is down.');
 </script>
 
 <div class="sun">
@@ -72,6 +70,7 @@
 		fill: var(--map-highlight);
 	}
 
+	/* In the drawing's own 300 unit space, like the compass letters. */
 	.night {
 		font-size: 13px;
 		fill: var(--panel-muted);

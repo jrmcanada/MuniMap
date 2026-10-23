@@ -12,6 +12,7 @@
 		gust?: number;
 	} = $props();
 
+	// The feed says "calm" for no wind, so a speed of 0 with a direction still gets an arrow.
 	const calm = $derived(speed === 'calm');
 	const bearing = $derived(calm ? null : bearingOf(direction));
 	// The arrow shows where the wind is going, half a turn from the side it comes from.
@@ -20,7 +21,8 @@
 </script>
 
 <div class="compass">
-	<svg viewBox="0 0 84 84" role="img" aria-label={`Wind ${calm ? 'calm' : reading}`}>
+	<!-- The reading below says the same in words, so the drawing is hidden from screen readers. -->
+	<svg viewBox="0 0 84 84" aria-hidden="true">
 		<circle class="ring" cx="42" cy="42" r="38" />
 		<text class="point" x="42" y="13" text-anchor="middle">N</text>
 		<text class="point" x="42" y="79" text-anchor="middle">S</text>
@@ -57,6 +59,7 @@
 		stroke-width: 1.5;
 	}
 
+	/* Font sizes inside the drawing are in its own 84 unit space, so they scale with the compass. */
 	.point {
 		font-size: 11px;
 		fill: var(--panel-muted);

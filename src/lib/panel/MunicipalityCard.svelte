@@ -17,7 +17,7 @@
 	const timeZone = $derived(timeZoneAt(municipality.longitude));
 	const current = $derived(weather?.current ?? null);
 
-	// Worked out once per card, and a card only lasts 20 seconds, so this stays current.
+	// Worked out once per card. A card is short lived, and the sun barely moves in that time.
 	const sun = $derived.by(() => {
 		const now = new Date();
 		const date = localDate(now, timeZone);
@@ -146,6 +146,7 @@
 		padding: calc(var(--u) * 2.6) calc(var(--u) * 3.5);
 		border-radius: calc(var(--u) * 3.5);
 		background: var(--card-background);
+		/* A hairline, so it stays 1px rather than scaling with --u. */
 		border: 1px solid var(--panel-border);
 	}
 
@@ -233,8 +234,8 @@
 		margin: 0;
 	}
 
-	.condition {
-		margin-top: calc(var(--u) * 1) !important;
+	.now .condition {
+		margin-top: calc(var(--u) * 1);
 		font-weight: 600;
 		font-size: calc(var(--u) * 5.4);
 	}

@@ -22,6 +22,7 @@ describe('sunPosition', () => {
 	it('ends at the right end at sunset', () => {
 		const position = sunPosition(sun.sunset, sun)!;
 		expect(position.x).toBeCloseTo(SUN_ARC.right, 5);
+		expect(position.y).toBeCloseTo(SUN_ARC.baseline, 5);
 	});
 
 	it('has no position before sunrise or after sunset', () => {
