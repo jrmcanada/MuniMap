@@ -50,6 +50,27 @@ describe('WeatherCache', () => {
 		expect(cache.peek('on-138')).toBeNull();
 	});
 
+	it('drops a warning once it expires, even while the data is reused', async () => {
+		let now = Date.parse('2026-10-23T03:00:00Z');
+		const feature = {
+			properties: {
+				...observed('2026-10-23T03:00:00Z').properties,
+				warnings: [
+					{
+						description: en('YELLOW WARNING - SNOWFALL'),
+						alertColourLevel: en('yellow'),
+						expiryTime: en('2026-10-23T03:05:00Z')
+					}
+				]
+			}
+		};
+		const cache = new WeatherCache(vi.fn().mockResolvedValue(feature), () => now);
+		expect((await cache.load('on-138'))?.warnings).toHaveLength(1);
+
+		now += 6 * 60_000;
+		expect(cache.peek('on-138')?.warnings).toHaveLength(0);
+	});
+
 	it('resolves to null when nothing has ever loaded', async () => {
 		const cache = new WeatherCache(vi.fn().mockRejectedValue(new Error('down')));
 		expect(await cache.load('on-138')).toBeNull();

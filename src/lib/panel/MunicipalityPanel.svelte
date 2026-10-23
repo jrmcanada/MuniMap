@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
 	import type { Municipality } from '#lib/data/municipalities.js';
 	import type { SiteWeather } from '#lib/weather/types.js';
@@ -9,7 +10,15 @@
 	let { municipality, weather }: { municipality: Municipality; weather: SiteWeather | null } =
 		$props();
 
-	const duration = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : FADE_MS;
+	let duration = $state(FADE_MS);
+
+	onMount(() => {
+		const query = window.matchMedia('(prefers-reduced-motion: reduce)');
+		const update = () => (duration = query.matches ? 0 : FADE_MS);
+		update();
+		query.addEventListener('change', update);
+		return () => query.removeEventListener('change', update);
+	});
 </script>
 
 <aside class="panel" aria-live="off">

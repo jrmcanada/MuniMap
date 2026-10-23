@@ -5,6 +5,7 @@ import type { MapColors, MapData, PinPoint } from './types.js';
 const PIN_RADIUS = 4;
 const HIGHLIGHT_RADIUS = 11;
 const HIGHLIGHT_BREATH = 2;
+const HIGHLIGHT_LINE_WIDTH = 2.5;
 const LABEL_SIZE_RATIO = 0.013;
 const LABEL_MIN_SIZE = 14;
 const PULSE_SECONDS = 6;
@@ -84,7 +85,7 @@ export function drawHighlight(
 	animate: boolean
 ): void {
 	const breath = animate ? (Math.sin(seconds * 2) + 1) * HIGHLIGHT_BREATH : 0;
-	ctx.lineWidth = 2.5;
+	ctx.lineWidth = HIGHLIGHT_LINE_WIDTH;
 	ctx.strokeStyle = colors.highlight;
 	ctx.beginPath();
 	ctx.arc(pin.x, pin.y, HIGHLIGHT_RADIUS + breath, 0, Math.PI * 2);

@@ -75,11 +75,12 @@ function parseWarnings(properties: unknown, now: number): WeatherWarning[] {
 	const active = warnings.flatMap((warning): WeatherWarning[] => {
 		const description = readText(warning, 'description', 'en');
 		if (!description) return [];
-		const expires = Date.parse(readText(warning, 'expiryTime', 'en') ?? '');
-		if (Number.isFinite(expires) && expires <= now) return [];
+		const parsed = Date.parse(readText(warning, 'expiryTime', 'en') ?? '');
+		const expiresAt = Number.isFinite(parsed) ? parsed : undefined;
+		if (expiresAt !== undefined && expiresAt <= now) return [];
 		const colour = readText(warning, 'alertColourLevel', 'en');
 		const level = WARNING_ORDER.find((candidate) => candidate === colour) ?? 'other';
-		return [{ description, level }];
+		return [{ description, level, expiresAt }];
 	});
 	return active.sort((a, b) => WARNING_ORDER.indexOf(a.level) - WARNING_ORDER.indexOf(b.level));
 }

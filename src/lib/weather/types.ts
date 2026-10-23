@@ -23,6 +23,8 @@ export type WarningLevel = 'red' | 'orange' | 'yellow' | 'other';
 export interface WeatherWarning {
 	description: string;
 	level: WarningLevel;
+	/** Epoch milliseconds. Absent when the feed gives no expiry. */
+	expiresAt?: number;
 }
 
 export interface SiteWeather {

@@ -49,16 +49,10 @@ const normalise = (name) =>
 		.replace(/\s+/g, ' ')
 		.trim();
 
-function parseCsv(text) {
-	return text
-		.split(/\r?\n/)
-		.slice(1)
-		.filter(Boolean)
-		.map((line) =>
-			line
-				.match(/("([^"]*)"|[^,]*)(,|$)/g)
-				.map((cell) => cell.replace(/,$/, '').replace(/^"|"$/g, ''))
-		);
+function parseCsvLine(line) {
+	return line
+		.match(/("([^"]*)"|[^,]*)(,|$)/g)
+		.map((cell) => cell.replace(/,$/, '').replace(/^"|"$/g, ''));
 }
 
 function readMunicipalityNames() {
@@ -85,22 +79,46 @@ function readMunicipalityCoordinates() {
 
 // Column positions in the census CSV: each value is followed by a symbol column.
 const COLUMN = { population: 4, change: 8, landArea: 22, density: 24 };
+const EXPECTED_HEADERS = {
+	[COLUMN.population]: 'Population, 2021',
+	[COLUMN.change]: 'Population percentage change, 2016 to 2021',
+	[COLUMN.landArea]: 'Land area in square kilometres, 2021',
+	[COLUMN.density]: 'Population density per square kilometre, 2021'
+};
 
-const rows = parseCsv(readFileSync(CSV_PATH, 'utf8'));
+const lines = readFileSync(CSV_PATH, 'utf8').split(/\r?\n/).filter(Boolean);
+const header = parseCsvLine(lines[0]);
+for (const [index, title] of Object.entries(EXPECTED_HEADERS)) {
+	if (!header[index]?.includes(title)) {
+		throw new Error(`Column ${index} should be "${title}" but is "${header[index]}"`);
+	}
+}
+// Footnote lines are short, so skip anything that isn't a full data row.
+const rows = lines
+	.slice(1)
+	.map(parseCsvLine)
+	.filter((row) => row.length > COLUMN.density && row[2]);
 // DGUIDs encode the geography: 2021A0005 + 35 is a census subdivision in Ontario,
-// 2021A0003 + 35xx is an Ontario census division.
-const subdivisions = rows.filter((row) => row[2].startsWith('2021A00053'));
+// 2021A0003 + 35 is an Ontario census division. The digits after that are the division code.
+const subdivisions = rows.filter((row) => row[2].startsWith('2021A000535'));
 const divisions = new Map(
-	rows.filter((row) => row[2].startsWith('2021A00033')).map((row) => [row[2].slice(9), row[1]])
+	rows.filter((row) => row[2].startsWith('2021A000335')).map((row) => [row[2].slice(9), row[1]])
 );
 
-const sitesResponse = await fetch(SITES_URL);
+// The full site list is about 28 MB, so allow time.
+const sitesResponse = await fetch(SITES_URL, { signal: AbortSignal.timeout(120_000) });
 if (!sitesResponse.ok) throw new Error(`Site list failed: ${sitesResponse.status}`);
 const sites = (await sitesResponse.json()).features;
 
+const names = readMunicipalityNames();
 const coordinates = readMunicipalityCoordinates();
+if (names.length === 0 || names.length !== coordinates.size) {
+	throw new Error(
+		`Read ${names.length} names but ${coordinates.size} coordinates from municipalities.ts`
+	);
+}
 const facts = {};
-for (const name of readMunicipalityNames()) {
+for (const name of names) {
 	const key = normalise(CENSUS_NAME[name] ?? name);
 	const matches = subdivisions.filter((row) => normalise(row[1]) === key);
 	if (matches.length !== 1) throw new Error(`${name}: ${matches.length} census matches`);

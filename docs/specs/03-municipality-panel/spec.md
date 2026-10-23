@@ -62,6 +62,7 @@ Status bar and ticker (Phase 4). Forecast charts. Historical weather. French.
 - **Staleness:** weather older than 2 hours, measured from its observation time, is dropped. The cache is in memory only.
 - **Fetch rules:** each request has a 10 second timeout and is cancelled on failure. A failed prefetch is retried when the municipality comes up.
 - **Icon:** the feed's icon image is hot linked from weather.gc.ca and hidden if it fails to load.
+- **No server rendering for this page.** `src/routes/+page.ts` sets `ssr = false`: the page needs `window`, and the shuffled order differs on every load, so server HTML would never match the browser's.
 - **Out of scope, to keep it small:** pressure, dewpoint, hourly forecast, links on warnings.
 
 ## Resolved questions (owner, 2026-10-22)

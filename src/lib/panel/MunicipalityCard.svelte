@@ -33,7 +33,9 @@
 	});
 
 	const populationChange = $derived(
-		`${facts.populationChangePercent < 0 ? 'down' : 'up'} ${decimal.format(Math.abs(facts.populationChangePercent))}% since 2016`
+		facts.populationChangePercent === 0
+			? 'no change since 2016'
+			: `${facts.populationChangePercent < 0 ? 'down' : 'up'} ${decimal.format(Math.abs(facts.populationChangePercent))}% since 2016`
 	);
 </script>
 
@@ -43,7 +45,7 @@
 		<p class="district">{facts.district}</p>
 	</header>
 
-	{#each weather?.warnings ?? [] as warning (warning.description)}
+	{#each weather?.warnings ?? [] as warning, index (index)}
 		<p class="warning {warning.level}">{warning.description}</p>
 	{/each}
 
@@ -92,7 +94,7 @@
 
 	<dl class="census">
 		<div>
-			<dt>Population</dt>
+			<dt>Population, 2021</dt>
 			<dd>{number.format(facts.population)}</dd>
 			<dd class="note">{populationChange}</dd>
 		</div>

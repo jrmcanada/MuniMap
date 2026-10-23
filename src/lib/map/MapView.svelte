@@ -94,7 +94,8 @@
 
 		const marked = municipalities.findIndex((municipality) => municipality.name === highlight);
 		if (marked >= 0) {
-			drawHighlight(ctx, pins[marked], highlight!, colors, { width, height }, seconds, animate);
+			const { name } = municipalities[marked];
+			drawHighlight(ctx, pins[marked], name, colors, { width, height }, seconds, animate);
 		}
 	}
 

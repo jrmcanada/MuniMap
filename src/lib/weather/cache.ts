@@ -36,7 +36,11 @@ export class WeatherCache {
 	/** What is held for the site, or null when nothing is held or it is too old. */
 	peek(siteId: string): SiteWeather | null {
 		const weather = this.entries.get(siteId);
-		return weather && ageMs(weather, this.now()) <= MAX_AGE_MS ? weather : null;
+		const now = this.now();
+		if (!weather || ageMs(weather, now) > MAX_AGE_MS) return null;
+		// A warning can expire while the rest of the data is still being reused.
+		const warnings = weather.warnings.filter((w) => w.expiresAt === undefined || w.expiresAt > now);
+		return warnings.length === weather.warnings.length ? weather : { ...weather, warnings };
 	}
 
 	/** Fetches unless the held copy is under 10 minutes old. Never rejects. */
