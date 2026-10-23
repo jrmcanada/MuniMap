@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import { municipalities } from '#lib/data/municipalities.js';
 	import { municipalityFacts } from '#lib/data/facts.js';
+	import Kiosk from '#lib/kiosk/Kiosk.svelte';
 	import MapView from '#lib/map/MapView.svelte';
 	import MunicipalityPanel from '#lib/panel/MunicipalityPanel.svelte';
 	import { Rotation } from '#lib/panel/rotation.js';
@@ -101,6 +102,7 @@
 	</section>
 	<MunicipalityPanel municipality={current} {weather} />
 	<StatusBar peekWeather={(siteId) => cache.peek(siteId)} />
+	<Kiosk busy={pinned !== null} />
 </main>
 
 <style>
@@ -112,6 +114,10 @@
 		width: 100vw;
 		height: 100dvh;
 		background: var(--map-background);
+		/* The credit text size, shared by the panel's footer and the status bar so the two always match.
+		   It is 4 panel units: the panel is 20/95 of the width and 93% of the height, and its unit is the
+		   smaller of 1cqw and 0.38cqh (see MunicipalityPanel). Change the grid or the unit, change this. */
+		--credit-size: min(0.8421vw, 1.4136dvh);
 	}
 
 	.map-area {

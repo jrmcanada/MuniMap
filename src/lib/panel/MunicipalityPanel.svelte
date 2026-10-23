@@ -34,7 +34,7 @@
 	   so nothing in the panel can change the size of the map beside it. */
 	.panel {
 		display: grid;
-		container-type: inline-size;
+		container-type: size;
 		min-width: 0;
 		min-height: 0;
 		overflow: hidden;
@@ -46,6 +46,10 @@
 		grid-area: 1 / 1;
 		min-width: 0;
 		min-height: 0;
-		padding: 3cqw;
+		/* One unit for everything in the card: the smaller of the width and height based sizes, so
+		   it fits tall, short, wide and ultrawide screens alike. This element must stay a direct child
+		   of the panel, and nothing inside may become a container, or these units would change. */
+		--u: min(1cqw, 0.38cqh);
+		padding: calc(var(--u) * 3);
 	}
 </style>
