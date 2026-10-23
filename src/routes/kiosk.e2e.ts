@@ -87,3 +87,42 @@ for (const [width, height] of SCREENS) {
 		expect(clipped).toEqual({ card: false, barSideways: false, page: false });
 	});
 }
+
+test('zooms the map at the pointer with the mouse wheel', async ({ page }) => {
+	const errors: string[] = [];
+	page.on('pageerror', (error) => errors.push(error.message));
+	await page.goto('/');
+	const canvas = page.locator('canvas').first();
+	await expect(canvas).toBeVisible();
+
+	const before = await canvas.screenshot();
+	const box = (await canvas.boundingBox())!;
+	await page.mouse.move(box.x + box.width * 0.6, box.y + box.height * 0.6);
+	await page.mouse.wheel(0, -400);
+	await page.waitForTimeout(300);
+	const zoomed = await canvas.screenshot();
+	expect(zoomed.equals(before)).toBe(false);
+
+	// Scrolling back out returns the full view.
+	await page.mouse.wheel(0, 4000);
+	await page.waitForTimeout(300);
+	expect(errors).toEqual([]);
+});
+
+test('drags the zoomed map without selecting a pin', async ({ page }) => {
+	await page.goto('/');
+	const canvas = page.locator('canvas').first();
+	const box = (await canvas.boundingBox())!;
+	const centre = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+
+	await page.mouse.move(centre.x, centre.y);
+	await page.mouse.wheel(0, -800);
+	await page.waitForTimeout(300);
+	const zoomed = await canvas.screenshot();
+
+	await page.mouse.down();
+	await page.mouse.move(centre.x + 150, centre.y + 80, { steps: 5 });
+	await page.mouse.up();
+	await page.waitForTimeout(300);
+	expect((await canvas.screenshot()).equals(zoomed)).toBe(false);
+});

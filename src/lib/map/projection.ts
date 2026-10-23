@@ -1,6 +1,7 @@
 import { geoMercator, type GeoProjection } from 'd3-geo';
 import type { Municipality } from '#lib/data/municipalities.js';
 import type { PinPoint } from './types.js';
+import type { View } from './view.js';
 
 const PADDING_RATIO = 0.08;
 
@@ -24,6 +25,15 @@ export function createProjection(
 			coordinates: places.map((place) => [place.longitude, place.latitude])
 		}
 	);
+}
+
+/** The same projection zoomed to `view`; the base projection is left untouched. */
+export function zoomProjection(projection: GeoProjection, view: View): GeoProjection {
+	const [x, y] = projection.translate();
+	// A fresh plain Mercator, which is all `createProjection` ever makes.
+	return geoMercator()
+		.scale(projection.scale() * view.k)
+		.translate([x * view.k + view.x, y * view.k + view.y]);
 }
 
 /** Screen position of each place, in the same order as `places`. */
