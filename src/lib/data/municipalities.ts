@@ -1,0 +1,61 @@
+// Client municipalities. Coordinates are municipal centres from Natural Resources
+// Canada's Canadian Geographical Names Database (Open Government Licence - Canada).
+// Pins mark the municipality only, never a street address.
+export interface Municipality {
+	name: string;
+	longitude: number;
+	latitude: number;
+}
+
+export const municipalities: Municipality[] = [
+	{ name: 'Baldwin', longitude: -81.756, latitude: 46.326 },
+	{ name: 'Billings', longitude: -82.234, latitude: 45.909 },
+	{ name: 'Brethour', longitude: -79.565, latitude: 47.714 },
+	{ name: 'Burpee and Mills', longitude: -82.593, latitude: 45.792 },
+	{ name: 'Calvin', longitude: -78.919, latitude: 46.256 },
+	{ name: 'Carling', longitude: -80.239, latitude: 45.433 },
+	{ name: 'Casey', longitude: -79.567, latitude: 47.621 },
+	{ name: 'Chamberlain', longitude: -79.953, latitude: 47.888 },
+	{ name: 'Charlton and Dack', longitude: -79.953, latitude: 47.796 },
+	{ name: 'Cockburn Island', longitude: -83.374, latitude: 45.921 },
+	{ name: 'Dawson', longitude: -94.517, latitude: 48.767 },
+	{ name: 'Dubreuilville', longitude: -84.572, latitude: 48.336 },
+	{ name: 'East Ferris', longitude: -79.279, latitude: 46.247 },
+	{ name: 'Espanola', longitude: -81.757, latitude: 46.242 },
+	{ name: 'Evanturel', longitude: -79.813, latitude: 47.796 },
+	{ name: 'Fauquier-Strickland', longitude: -82.037, latitude: 49.276 },
+	{ name: 'Gauthier', longitude: -79.823, latitude: 48.146 },
+	{ name: 'Gordon-Barrie Island', longitude: -82.542, latitude: 45.893 },
+	{ name: 'Harley', longitude: -79.696, latitude: 47.625 },
+	{ name: 'Head, Clara, Maria', longitude: -77.836, latitude: 46.148 },
+	{ name: 'Hilliard', longitude: -79.697, latitude: 47.711 },
+	{ name: 'Hilton Beach', longitude: -83.893, latitude: 46.257 },
+	{ name: 'Hilton Township', longitude: -83.877, latitude: 46.208 },
+	{ name: 'Hornepayne', longitude: -84.782, latitude: 49.253 },
+	{ name: 'Hudson', longitude: -79.824, latitude: 47.537 },
+	{ name: 'Ignace', longitude: -91.677, latitude: 49.408 },
+	{ name: 'James', longitude: -80.34, latitude: 47.71 },
+	{ name: 'Jocelyn', longitude: -83.946, latitude: 46.164 },
+	{ name: 'Johnson', longitude: -83.893, latitude: 46.381 },
+	{ name: 'Joly', longitude: -79.249, latitude: 45.789 },
+	{ name: 'Kerns', longitude: -79.825, latitude: 47.625 },
+	{ name: 'Laird', longitude: -84.045, latitude: 46.403 },
+	{ name: 'Lake of the Woods', longitude: -94.493, latitude: 49.151 },
+	{ name: 'Latchford', longitude: -79.81, latitude: 47.329 },
+	{ name: 'MacDonald, Meredith and Aberdeen', longitude: -83.961, latitude: 46.479 },
+	{ name: 'Markstay-Warren', longitude: -80.487, latitude: 46.496 },
+	{ name: 'Matachewan', longitude: -80.667, latitude: 47.933 },
+	{ name: 'Mattawan', longitude: -78.847, latitude: 46.367 },
+	{ name: 'McKellar', longitude: -79.855, latitude: 45.496 },
+	{ name: 'Nairn', longitude: -81.638, latitude: 46.356 },
+	{ name: 'Opasatika', longitude: -82.938, latitude: 49.519 },
+	{ name: 'Plummer', longitude: -83.772, latitude: 46.368 },
+	{ name: 'Prince', longitude: -84.531, latitude: 46.563 },
+	{ name: 'St. Charles', longitude: -80.474, latitude: 46.351 },
+	{ name: 'Tarbutt', longitude: -83.998, latitude: 46.357 },
+	{ name: 'Tehkummah', longitude: -82.047, latitude: 45.632 },
+	{ name: 'Thornloe', longitude: -79.762, latitude: 47.668 },
+	{ name: 'Val Rita-Harty', longitude: -82.63, latitude: 49.484 },
+	{ name: 'Wawa', longitude: -84.774, latitude: 47.994 },
+	{ name: 'White River', longitude: -85.259, latitude: 48.584 }
+];
