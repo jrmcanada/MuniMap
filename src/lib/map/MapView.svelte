@@ -153,10 +153,7 @@
 	>
 		<canvas bind:this={canvas} aria-hidden="true"></canvas>
 	</div>
-	<p class="caption">
-		{#if radarTime}<span class="radar-time">{radarTime}</span>{/if}
-		Radar: Environment Canada. Open Government Licence, Canada.
-	</p>
+	{#if radarTime}<p class="caption">{radarTime}</p>{/if}
 </div>
 
 <style>
@@ -185,11 +182,7 @@
 		margin: 0;
 		pointer-events: none;
 		font-size: 0.75rem;
-		color: var(--map-caption);
-	}
-
-	.radar-time {
-		margin-right: 0.5rem;
 		font-weight: 600;
+		color: var(--map-caption);
 	}
 </style>

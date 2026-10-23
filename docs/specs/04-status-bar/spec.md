@@ -63,6 +63,20 @@ The numbers in each line are worked out when the line is about to show, so they 
 
 News, company announcements, a scrolling marquee, sound, anything needing a new data source. Phase 5 handles full screen, the hidden cursor and long run recovery.
 
+## Defaults from spec review (change if you disagree)
+
+- **Fit:** ticker facts and the credits may use two lines in the bar. Text is sized from the bar's height (`container-type: size`, `cqh` units) with a floor of 11px. A fact longer than two lines, including your own lines, is cut off with an ellipsis. The largest and smallest municipalities are two separate facts so each stays short.
+- **Temperatures name forecast sites, not municipalities.** 50 municipalities share 21 sites, so ties are certain and a municipality can't claim a reading it doesn't have. Example: "Warmest reading right now: Wawa, 6°. Coldest: Kirkland Lake, 1°." The site list is the 21 sites in `municipality-facts.json`. The fact needs readings from at least 8 sites, each observed within the last hour. It is skipped when the warmest and coldest round to the same number. Ties go to the first site alphabetically. A true minus sign is used for negatives ("−3°"), never a hyphen, and a reading that rounds to zero shows "0°".
+- **Alerts, not just warnings.** The count includes watches and warnings (red, orange or yellow), not statements. It reads "Weather alerts are in effect for 4 of our municipalities." and "No weather alerts for any of our municipalities." It counts municipalities, through each one's site. It is skipped unless all 21 sites were fetched within the last hour.
+- **Warm up:** the page fetches the 21 sites one at a time at start, and again every 5 minutes. The cache only refetches a site once its copy is 10 minutes old, so that is a refresh every 10 to 15 minutes, and a failed site is retried every 5 minutes. It runs beside the panel and never delays the first card. A site that keeps failing only costs the alerts fact and a place in the temperature reading.
+- **Rotation:** the ticker advances every 8 seconds on a timer and tracks its position by slot, so facts that appear or disappear as data arrives don't make it skip or repeat. A hidden tab simply resumes. Order: size (largest, smallest), growth, area, reach, temperatures, alerts, radar, then your own lines.
+- **Wording:** "across N districts and counties" (Renfrew is a county), "2021 census" and "between the 2016 and 2021 censuses" where it matters. Figures are rounded as follows: people as whole numbers with a thousands separator, land area to whole km², growth to 1 decimal.
+- **Own lines:** `tickerMessages.ts` exports `string[]`. Blank lines are ignored. Ids are positional. Lines should follow `docs/Writing.md`.
+- **If no live fact is available** the ticker shows the census facts, the radar line and your own lines.
+- **Clock:** always Toronto time, whatever the municipality on the panel, formatted like the radar label ("10:48 pm"). Checked once a second.
+- **Credits:** "Weather and radar: Environment Canada. Census: Statistics Canada. Map: Natural Earth. Open Government Licence, Canada." The map caption keeps only the radar time, and hides when there is none.
+- **Root element:** `StatusBar.svelte` is the page's footer element and sets its own grid placement across both columns.
+
 ## Resolved questions (owner, 2026-10-22)
 
 1. The ticker facts are right as listed, and a list of your own lines is wanted.

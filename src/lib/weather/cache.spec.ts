@@ -39,7 +39,7 @@ describe('WeatherCache', () => {
 		expect(weather?.current?.temperatureC).toBe(5);
 	});
 
-	it('drops weather observed more than 2 hours ago', async () => {
+	it('drops weather fetched more than 2 hours ago', async () => {
 		let now = Date.parse('2026-10-23T03:00:00Z');
 		const fetchSite = vi.fn().mockResolvedValue(observed('2026-10-23T03:00:00Z'));
 		const cache = new WeatherCache(fetchSite, () => now);
@@ -48,6 +48,20 @@ describe('WeatherCache', () => {
 
 		now += MAX_AGE_MS + 1;
 		expect(cache.peek('on-138')).toBeNull();
+	});
+
+	it('keeps the forecast when the station stopped reporting hours ago', async () => {
+		const now = Date.parse('2026-10-23T03:00:00Z');
+		const feature = {
+			properties: {
+				...observed('2026-10-22T22:00:00Z').properties,
+				forecastGroup: { forecasts: [{ period: { textForecastName: en('Tonight') } }] }
+			}
+		};
+		const cache = new WeatherCache(vi.fn().mockResolvedValue(feature), () => now);
+		const weather = await cache.load('on-83');
+		expect(weather?.current).toBeNull();
+		expect(weather?.forecast).toHaveLength(1);
 	});
 
 	it('drops a warning once it expires, even while the data is reused', async () => {

@@ -15,11 +15,6 @@ const fetchSiteFromApi: FetchSite = async (siteId, signal) => {
 	return response.json();
 };
 
-/** How old the data is: from the observation when there is one, otherwise from the fetch. */
-function ageMs(weather: SiteWeather, now: number): number {
-	return now - (weather.current ? Date.parse(weather.current.observedAt) : weather.fetchedAt);
-}
-
 /**
  * Weather per forecast site, in memory only. Several municipalities can share a site, so
  * one fetch serves them all. A failed fetch leaves the last good data in place.
@@ -33,14 +28,23 @@ export class WeatherCache {
 		private now: () => number = Date.now
 	) {}
 
-	/** What is held for the site, or null when nothing is held or it is too old. */
+	/**
+	 * What is held for the site, or null when nothing is held or the fetch is over 2 hours old.
+	 * A station that stopped reporting loses its current conditions, but the forecast and
+	 * warnings fetched with them are still good, so those stay.
+	 */
 	peek(siteId: string): SiteWeather | null {
 		const weather = this.entries.get(siteId);
 		const now = this.now();
-		if (!weather || ageMs(weather, now) > MAX_AGE_MS) return null;
+		if (!weather || now - weather.fetchedAt > MAX_AGE_MS) return null;
+
+		const observed = weather.current ? Date.parse(weather.current.observedAt) : NaN;
+		const current = weather.current && now - observed <= MAX_AGE_MS ? weather.current : null;
 		// A warning can expire while the rest of the data is still being reused.
 		const warnings = weather.warnings.filter((w) => w.expiresAt === undefined || w.expiresAt > now);
-		return warnings.length === weather.warnings.length ? weather : { ...weather, warnings };
+		return current === weather.current && warnings.length === weather.warnings.length
+			? weather
+			: { ...weather, current, warnings };
 	}
 
 	/** Fetches unless the held copy is under 10 minutes old. Never rejects. */

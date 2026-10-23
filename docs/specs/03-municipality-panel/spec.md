@@ -59,7 +59,7 @@ Status bar and ticker (Phase 4). Forecast charts. Historical weather. French.
 - **Warnings:** watches and warnings both show, all active ones, most severe colour first (red, orange, yellow). Text is the feed's `description`, as given. Expired ones are dropped. A site's warning shows on every municipality that uses that site.
 - **Forecast rows:** the next 3 periods, each with its name, high or low, and the short text (`abbreviatedForecast`).
 - **Missing data:** a missing field leaves out that row, never a dash. If a site has no temperature, the current conditions block is hidden.
-- **Staleness:** weather older than 2 hours, measured from its observation time, is dropped. The cache is in memory only.
+- **Staleness:** a site's weather is dropped when it was fetched more than 2 hours ago. A reading observed more than 2 hours ago loses only the current conditions block, because the forecast and warnings fetched with it are still good (Deep River's station can go quiet for hours). The cache is in memory only.
 - **Fetch rules:** each request has a 10 second timeout and is cancelled on failure. A failed prefetch is retried when the municipality comes up.
 - **Icon:** the feed's icon image is hot linked from weather.gc.ca and hidden if it fails to load.
 - **No server rendering for this page.** `src/routes/+page.ts` sets `ssr = false`: the page needs `window`, and the shuffled order differs on every load, so server HTML would never match the browser's.
