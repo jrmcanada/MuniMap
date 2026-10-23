@@ -12,7 +12,7 @@
 	.screen {
 		display: flex;
 		width: 100vw;
-		height: 100vh;
+		height: 100dvh;
 		background: var(--map-background);
 	}
 

@@ -6,6 +6,8 @@
 	import { createProjection, projectPlaces } from './projection.js';
 	import type { MapColors, MapData, PinPoint } from './types.js';
 
+	// ontario-map.json: Natural Earth (public domain) 50m provinces and states plus 10m lakes,
+	// cut to the Ontario region, coordinates rounded to 2 decimals, minified.
 	// The JSON import types geometry as plain strings; the file is built to the MapData shape.
 	const mapData = ontarioMap as unknown as MapData;
 
@@ -14,6 +16,7 @@
 
 	let ctx: CanvasRenderingContext2D;
 	let colors: MapColors;
+	let motionQuery: MediaQueryList;
 	let pins: PinPoint[] = [];
 	let base: HTMLCanvasElement | null = null;
 	let frame = 0;
@@ -36,25 +39,36 @@
 		const baseCtx = base.getContext('2d')!;
 		baseCtx.setTransform(ratio, 0, 0, ratio, 0, 0);
 		drawBase(baseCtx, mapData, projection, colors);
+		start();
 	}
 
-	function render(time: number) {
-		if (base) {
-			ctx.save();
-			ctx.setTransform(1, 0, 0, 1, 0, 0);
-			ctx.drawImage(base, 0, 0);
-			ctx.restore();
-			const pulse = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-			drawPins(ctx, pins, colors, time / 1000, pulse);
-		}
-		frame = requestAnimationFrame(render);
+	function draw(seconds: number, pulse: boolean) {
+		if (!base) return;
+		ctx.save();
+		ctx.setTransform(1, 0, 0, 1, 0, 0);
+		ctx.drawImage(base, 0, 0);
+		ctx.restore();
+		drawPins(ctx, pins, colors, seconds, pulse);
+	}
+
+	function loop(time: number) {
+		draw(time / 1000, true);
+		frame = requestAnimationFrame(loop);
+	}
+
+	/** Animates, or draws one still frame when the visitor prefers reduced motion. */
+	function start() {
+		cancelAnimationFrame(frame);
+		if (motionQuery.matches) draw(0, false);
+		else frame = requestAnimationFrame(loop);
 	}
 
 	onMount(() => {
 		ctx = canvas.getContext('2d')!;
 		colors = readColors(container);
+		motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+		motionQuery.addEventListener('change', start);
 		layout();
-		frame = requestAnimationFrame(render);
 
 		const observer = new ResizeObserver(() => {
 			clearTimeout(resizeTimer);
@@ -65,6 +79,7 @@
 		return () => {
 			cancelAnimationFrame(frame);
 			clearTimeout(resizeTimer);
+			motionQuery.removeEventListener('change', start);
 			observer.disconnect();
 		};
 	});

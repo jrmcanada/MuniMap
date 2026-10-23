@@ -25,6 +25,7 @@ describe('projection', () => {
 	it('places every pin inside the canvas', () => {
 		const projection = createProjection(1440, 1080, municipalities);
 		for (const pin of projectPlaces(projection, municipalities)) {
+			expect(Number.isFinite(pin.x) && Number.isFinite(pin.y)).toBe(true);
 			expect(pin.x).toBeGreaterThan(0);
 			expect(pin.x).toBeLessThan(1440);
 			expect(pin.y).toBeGreaterThan(0);
