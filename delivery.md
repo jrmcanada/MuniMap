@@ -3,12 +3,12 @@
 ## Current state (2026-10-23)
 
 - Phases 0 to 4 (scaffold, map, radar, municipality panel, status bar) are merged to `main`, plus 54 municipalities, the 20 second rotation, click a pin to jump to it, the logo, and the 7% bottom strip. The Phase 5 spec is merged too.
-- Phase 5 (kiosk, spec `05-kiosk`) is built on branch `feat/kiosk`. Typecheck, lint, 81 unit tests, 12 e2e tests and build pass. Not yet through code-reviewer. Not pushed. Also on this branch: the status bar credits are now the same size as the panel's credit line (owner request).
-- Not yet tried on the real display PC. `scripts/start-kiosk.ps1` was tested for the server and its restart (without opening Edge). The Edge launch flags, wake lock in kiosk mode and the logon shortcut need one run on the PC, following `docs/kiosk-setup.md`.
+- Phase 5 (kiosk, spec `05-kiosk`) is built on branch `feat/kiosk`. Typecheck, lint, 81 unit tests, 12 e2e tests and build pass. Reviewed; fixes applied; pushed. Also on this branch: the status bar credits are now the same size as the panel's credit line (owner request).
+- Not yet tried on the real display PC. `scripts/start-kiosk.ps1` was tested for the server, its restart, the one-copy guard and the stop script (without opening Edge). The kiosk server uses port 4183. The Edge launch flags, wake lock in kiosk mode and the logon shortcut need one run on the PC, following `docs/kiosk-setup.md`.
 
 ## Next action
 
-1. Run code-reviewer on `feat/kiosk`, fix what it finds, push, open the PR.
+1. Open the PR for `feat/kiosk` and merge it.
 2. Owner tries `docs/kiosk-setup.md` on the display PC and reports anything Edge does differently.
 3. Phase 6 is the Netlify deploy, which needs an explicit go from the owner. The start script already takes `-Url` for it.
 
@@ -29,6 +29,8 @@
 
 ## Open questions
 
+- Layout options: five mockups (today, floating card, top billboard, daylight, wide two column panel) are on a private canvas at https://claude.ai/artifact/TrLWv5HPcXMdbmFvKuPxQL. The owner has not picked one yet.
+- Credit text has no minimum size, as requested, so it is about 8.6px at 1024 by 768.
 - To add a municipality: add it to `municipalities.md` and `src/lib/data/municipalities.ts`, then rerun `scripts/build-municipality-data.mjs` with the Statistics Canada CSV (the link is at the top of the script). The tests that count municipalities need the new total.
 - Dawson and Head, Clara, Maria coordinates are the least certain matches.
 - Radar colours are GeoMet defaults; tuning to the blue and gold palette is a later pass.

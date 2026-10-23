@@ -11,8 +11,8 @@ This is how to turn a Windows PC with Edge into the wall display. It takes about
 ## Steps
 
 1. **Build the app.** In the project folder, run `npm install`, then `npm run build`.
-2. **Try it once by hand.** Run `powershell -ExecutionPolicy Bypass -File scripts\start-kiosk.ps1`. Edge should open full screen on the map within a minute. This is also where you find out if your version of Edge ignores one of the launch flags. If a bubble or a prompt shows up on screen, tell me which one.
-3. **Sign in on its own at boot.** Windows has to log in without anyone typing. That stores the account's password on the PC, so use the dedicated account from above and nothing else. Search for `netplwiz` in the Start menu, untick "Users must enter a user name and password", and enter the password when asked.
+2. **Try it once by hand.** Run `powershell -ExecutionPolicy Bypass -File scripts\start-kiosk.ps1`. Edge should open full screen on the map within a minute. This is also where you find out if your version of Edge ignores one of the launch flags. If a bubble or a prompt shows up on screen, write down which one. The script keeps running, so to end this test run `powershell -ExecutionPolicy Bypass -File scripts\stop-kiosk.ps1`.
+3. **Sign in on its own at boot.** Windows has to log in without anyone typing. That stores the account's password on the PC, so use the dedicated account from above and nothing else. Search for `netplwiz` in the Start menu, untick "Users must enter a user name and password", and enter the password when asked. On Windows 11 that checkbox can be missing. If so, go to Settings, Accounts, Sign-in options, turn off "For improved security, only allow Windows Hello sign-in for Microsoft accounts", and try again.
 4. **Start the display at logon.** Press Win+R, type `shell:startup`, and make a shortcut in that folder with this target (use your real project path):
 
    ```
@@ -33,7 +33,7 @@ The script writes no log files, so nothing grows on the disk. Edge itself can st
 
 ## Updating the app
 
-1. Run `scripts\stop-kiosk.ps1`. It stops the script, the server and the kiosk window.
+1. Run `powershell -ExecutionPolicy Bypass -File scripts\stop-kiosk.ps1`. It stops the script, the server and the kiosk window.
 2. Pull the new version, then run `npm install` if `package.json` changed, then `npm run build`.
 3. Start the display again with the shortcut, or restart the PC.
 
@@ -54,4 +54,6 @@ The script then skips the local server and only keeps Edge open. Nothing else in
 - **A cursor in the middle of the screen.** It hides after 3 seconds of no movement. Move the mouse and wait.
 - **Edge comes up in a window, not full screen.** Press F11.
 - **Black screen after boot.** Run the script by hand (step 2) and read what it says.
-- **To leave the display and use the PC.** Run `scripts\stop-kiosk.ps1`.
+- **To leave the display and use the PC.** Run `powershell -ExecutionPolicy Bypass -File scripts\stop-kiosk.ps1`.
+- **The script is already running.** Starting it twice does nothing: only one copy runs at a time.
+- **Port.** The app is served on port 4183, which dev tools and the e2e tests don't use.

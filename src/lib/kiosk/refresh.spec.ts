@@ -18,8 +18,9 @@ describe('msUntilNextRefresh', () => {
 		expect(msUntilNextRefresh(at('2026-10-23T08:00:00Z'))).toBe(24 * HOUR);
 	});
 
-	it('is right across the fall back, when the night has an extra hour', () => {
-		// 05:00 EDT on 31 October to 04:00 EST on 1 November.
+	it('is right across the fall back, when 1 November has an extra hour', () => {
+		// 05:00 EDT on 31 October to 04:00 EST on 1 November. The clocks go back at 2:00 am, so the
+		// wall clock covers 23 hours but 24 hours really pass.
 		expect(msUntilNextRefresh(at('2026-10-31T09:00:00Z'))).toBe(24 * HOUR);
 		// 01:30 EDT on 1 November is the first 1:30 of the night; 4:00 am EST is 09:00 UTC.
 		expect(msUntilNextRefresh(at('2026-11-01T05:30:00Z'))).toBe(3.5 * HOUR);

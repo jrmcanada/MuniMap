@@ -115,9 +115,9 @@
 		height: 100dvh;
 		background: var(--map-background);
 		/* The credit text size, shared by the panel's footer and the status bar so the two always match.
-		   It is 4 panel units: the panel is 20/95 of the width and 93% of the height, and its unit is the
+		   It is 4 panel units. The panel is 20/95 of the width and 93% of the height, and its unit is the
 		   smaller of 1cqw and 0.38cqh (see MunicipalityPanel). Change the grid or the unit, change this. */
-		--credit-size: min(0.8421vw, 1.4136dvh);
+		--credit-size: min(calc(1vw * 20 / 95 * 4), calc(1dvh * 93 / 100 * 0.38 * 4));
 	}
 
 	.map-area {

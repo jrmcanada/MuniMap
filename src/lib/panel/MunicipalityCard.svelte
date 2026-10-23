@@ -114,6 +114,8 @@
 </article>
 
 <style>
+	/* Every size here is a multiple of --u, which MunicipalityPanel sets. Used on its own, the card
+	   has no sizes. */
 	.card {
 		display: flex;
 		flex-direction: column;

@@ -50,10 +50,14 @@
 
 		// Screen wake lock: a bonus on top of the PC's own power settings.
 		let lock: WakeLockSentinel | null = null;
+		let destroyed = false;
 		async function keepAwake() {
 			if (lock || !('wakeLock' in navigator) || document.visibilityState !== 'visible') return;
 			try {
-				lock = await navigator.wakeLock.request('screen');
+				const granted = await navigator.wakeLock.request('screen');
+				// The page may have gone while the request was pending.
+				if (destroyed) return void granted.release();
+				lock = granted;
 				lock.addEventListener('release', () => (lock = null));
 			} catch {
 				// The browser said no; the power settings still apply.
@@ -88,6 +92,7 @@
 		}, CHECK_MS);
 
 		return () => {
+			destroyed = true;
 			clearInterval(timer);
 			clearTimeout(idle);
 			document.removeEventListener('pointermove', onPointerMove);

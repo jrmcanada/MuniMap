@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 
 test('hides the cursor after 3 idle seconds and shows it again on movement', async ({ page }) => {
 	await page.goto('/');
@@ -15,6 +15,42 @@ test('hides the cursor after 3 idle seconds and shows it again on movement', asy
 	await expect(root).not.toHaveClass(/cursor-hidden/);
 });
 
+const en = (value: unknown) => ({ en: value, fr: value });
+
+/** A tall card: every field the panel can show, three forecast periods and two alerts. */
+const TALL_WEATHER = {
+	properties: {
+		currentConditions: {
+			timestamp: en(new Date().toISOString()),
+			temperature: { value: en(2.1) },
+			windChill: { value: en(-4) },
+			condition: en('Mainly Clear'),
+			wind: { speed: { value: en(11) }, direction: { value: en('WNW') }, gust: { value: en(30) } },
+			relativeHumidity: { value: en(55) }
+		},
+		forecastGroup: {
+			forecasts: ['Tonight', 'Friday', 'Friday night'].map((name) => ({
+				period: { textForecastName: en(name) },
+				temperatures: { temperature: [{ class: en('low'), value: en(3) }] },
+				abbreviatedForecast: { textSummary: en('A few clouds') }
+			}))
+		},
+		warnings: [
+			{ description: en('RED WARNING - BLIZZARD'), alertColourLevel: en('red') },
+			{ description: en('YELLOW WATCH - FREEZING RAIN'), alertColourLevel: en('yellow') }
+		]
+	}
+};
+
+async function serveTallWeather(page: Page) {
+	await page.route('https://api.weather.gc.ca/**', (route) =>
+		route.fulfill({
+			json: TALL_WEATHER,
+			headers: { 'access-control-allow-origin': '*' }
+		})
+	);
+}
+
 // The panel and status bar must fit whatever screen the display PC has.
 const SCREENS = [
 	[1024, 768],
@@ -29,9 +65,12 @@ const SCREENS = [
 
 for (const [width, height] of SCREENS) {
 	test(`nothing clips at ${width} by ${height}`, async ({ page }) => {
+		await serveTallWeather(page);
 		await page.setViewportSize({ width, height });
 		await page.goto('/');
 		await expect(page.getByRole('heading', { level: 2 })).toBeVisible();
+		// Wait for the stubbed weather to land, so the tall card is what gets measured.
+		await expect(page.getByText('RED WARNING - BLIZZARD')).toBeVisible();
 
 		const clipped = await page.evaluate(() => {
 			const fits = (selector: string) => {

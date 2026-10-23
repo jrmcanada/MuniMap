@@ -20,7 +20,7 @@ A web page can't switch itself to full screen. Browsers only allow it after a cl
 
 ## Starting at boot
 
-- `scripts/start-kiosk.ps1` starts the app's local server (`npm run preview` on port 4173, bound to `127.0.0.1`), waits up to 60 seconds for it to answer, then opens Edge full screen on `http://localhost:4173` with `--kiosk --edge-kiosk-type=fullscreen --no-first-run`. A `-NoBrowser` switch starts only the server, for testing.
+- `scripts/start-kiosk.ps1` starts the app's local server (`vite preview` on port 4183, bound to `127.0.0.1`), waits up to 60 seconds for it to answer, then opens Edge full screen on `http://localhost:4173` with `--kiosk --edge-kiosk-type=fullscreen --no-first-run`. A `-NoBrowser` switch starts only the server, for testing.
 - `docs/kiosk-setup.md` is a short, numbered guide for the display PC:
   1. Install Node and get the project onto the PC, then `npm install` and `npm run build`.
   2. Put a shortcut to the start script in the Windows Startup folder (`shell:startup`), and set the PC to sign in on its own.
@@ -65,7 +65,7 @@ Checked on 2026-10-23: `vite preview` serves the Netlify adapter's build on `127
 **Serving and keeping it running**
 
 - `vite preview` is a developer tool, so nothing restarts it. `scripts/start-kiosk.ps1` therefore stays running as a small supervisor in a hidden window. Every 30 seconds it checks that the server answers and that Edge is running, and restarts whichever is down. It never writes a log, so nothing grows on disk.
-- The server starts with `--host 127.0.0.1 --port 4173 --strictPort`, and Edge opens `http://127.0.0.1:4173`, so the host, port and address always agree. It runs `node` on Vite directly from the project folder, so it doesn't depend on `npm.cmd` or on where a Startup shortcut runs from.
+- The server starts with `--host 127.0.0.1 --port 4183 --strictPort`, and Edge opens `http://127.0.0.1:4183`, so the host, port and address always agree. Port 4183 is not Vite's usual 4173, so dev tools and the e2e tests can't collide with it. It runs `node` on Vite directly from the project folder, so it doesn't depend on `npm.cmd` or on where a Startup shortcut runs from.
 - If there is no build, the script builds one first. If the server isn't answering after 60 seconds, the supervisor loop tries again rather than opening a dead page.
 - `-Url <address>` skips the local server and opens that address instead (the Netlify move). `-NoBrowser` starts only the server, for testing.
 - To update the app: stop the script, pull, `npm run build`, start the script again (or restart the PC). Never build while the server is running.
@@ -83,6 +83,7 @@ Checked on 2026-10-23: `vite preview` serves the Netlify adapter's build on `127
 - **Cursor:** the hiding rule is `html.cursor-hidden, html.cursor-hidden * { cursor: none !important }`, which beats the hand's inline style. Only mouse movement on the whole document resets the 3 second timer. Taps and pen strokes don't show a cursor.
 - **Radar sizing:** the request size is also the size frames are decoded at, so it is what saves the memory. `MapView` passes `radarRequestSize(width, height)` as the radar width and height. The bounding box is unchanged.
 - **Panel sizing:** `--u` is set on the card's wrapper, a direct child of the panel, with a comment that no nested container may be added. The `0.38` factor and the 248 unit estimate are starting points: the tallest card is re-measured at all 8 screen sizes and the factor tuned until each has headroom.
+- **Credit text size:** the status bar credits are the same size as the panel footer, with no minimum (owner request, 2026-10-23). On a small screen such as 1024 by 768 that is about 8.6px.
 - **Windows steps:** auto sign in stores a password on the PC, so use a dedicated account with no other access, and the guide says so.
 
 ## Resolved questions (owner, 2026-10-23)
