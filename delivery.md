@@ -6,6 +6,8 @@
 - Phase 5 (kiosk, spec `05-kiosk`) is built on branch `feat/kiosk`. Typecheck, lint, 81 unit tests, 12 e2e tests and build pass. Reviewed; fixes applied; pushed. Also on this branch: the status bar credits are now the same size as the panel's credit line (owner request).
 - Not yet tried on the real display PC. `scripts/start-kiosk.ps1` was tested for the server, its restart, the one-copy guard and the stop script (without opening Edge). The kiosk server uses port 4183. The Edge launch flags, wake lock in kiosk mode and the logon shortcut need one run on the PC, following `docs/kiosk-setup.md`.
 
+- The side panel is now a stack of cards (name, weather with a wind compass, forecast, sun arc, census) in the existing colours, on branch `feat/panel-cards`, built on top of `feat/kiosk`. The kiosk PR has to be merged first. The panel unit factor is now 0.36.
+
 ## Next action
 
 1. Open the PR for `feat/kiosk` and merge it.
