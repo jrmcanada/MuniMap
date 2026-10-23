@@ -123,6 +123,8 @@
 	--map-border: oklch(0.45 0.05 250);
 	/* Water matches the background, so open sea and lakes read as one. */
 	--map-water: oklch(0.15 0.02 250);
+	--map-radar-opacity: 0.45;
+	--map-caption: oklch(0.7 0.02 250);
 	--map-pin: oklch(0.82 0.17 80);
 	/* The pulse ring starts the same colour as the pin; kept separate so it can be tuned. */
 	--map-pin-glow: oklch(0.82 0.17 80);

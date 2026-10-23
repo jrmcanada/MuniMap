@@ -19,6 +19,23 @@ export function readColors(element: Element): MapColors {
 	};
 }
 
+export function readRadarOpacity(element: Element): number {
+	return Number(getComputedStyle(element).getPropertyValue('--map-radar-opacity'));
+}
+
+/** Draws one radar frame stretched over the canvas, which it was fetched to fit. */
+export function drawRadar(
+	ctx: CanvasRenderingContext2D,
+	image: ImageBitmap,
+	width: number,
+	height: number,
+	opacity: number
+): void {
+	ctx.globalAlpha = opacity;
+	ctx.drawImage(image, 0, 0, width, height);
+	ctx.globalAlpha = 1;
+}
+
 export function drawBase(
 	ctx: CanvasRenderingContext2D,
 	data: MapData,
