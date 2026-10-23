@@ -99,6 +99,11 @@ describe('factSlots, live facts', () => {
 		);
 	});
 
+	it('breaks a tie for warmest by site name', () => {
+		const slots = factSlots(inputs([5, 9, 9, 1, 2, 2, 2, 2, 2, 2]));
+		expect(textOf(slots, 'temperatures')).toContain('Warmest reading right now: Site 1, 9°.');
+	});
+
 	it('shows a reading that rounds to zero as 0°', () => {
 		const slots = factSlots(inputs([2, -0.4, 1, 1, 1, 1, 1, 1, 1, 1]));
 		expect(textOf(slots, 'temperatures')).toContain('Coldest: Site 1, 0°.');

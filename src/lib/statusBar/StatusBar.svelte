@@ -39,8 +39,9 @@
 
 	let now = $state(new Date());
 	// The first fact that has something to say; the ticker then moves on every few seconds.
-	let cursor = nextSlot(currentSlots(), -1);
-	let fact = $state(currentSlots()[cursor] ?? null);
+	const first = currentSlots();
+	let cursor = nextSlot(first, -1);
+	let fact = $state(first[cursor] ?? null);
 
 	onMount(() => {
 		const clock = setInterval(() => (now = new Date()), CLOCK_MS);

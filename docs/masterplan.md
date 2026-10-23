@@ -54,7 +54,7 @@ Questions 3 to 5 below are answered; see the decisions above.
 2. **Phase 1, map.** Ontario base map and client pins. _(Built and reviewed 2026-10-22.)_
 3. **Phase 2, radar.** Animated overlay. _(Built and reviewed 2026-10-22.)_
 4. **Phase 3, municipality panel.** Rotation, weather, population, facts. _(Built and reviewed 2026-10-22.)_
-5. **Phase 4, status bar.** Clock, count, ticker. _(Built 2026-10-23, review pending.)_
+5. **Phase 4, status bar.** Clock, count, ticker. _(Built and reviewed 2026-10-23.)_
 6. **Phase 5, kiosk polish.** Full screen, long run stability, error recovery.
 7. **Phase 6, deploy.** Netlify, once everything above is done.
 

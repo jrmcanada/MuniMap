@@ -85,6 +85,30 @@ describe('WeatherCache', () => {
 		expect(cache.peek('on-138')?.warnings).toHaveLength(0);
 	});
 
+	it('keeps warnings when a stale reading is dropped', async () => {
+		const now = Date.parse('2026-10-23T03:00:00Z');
+		const feature = {
+			properties: {
+				...observed('2026-10-22T22:00:00Z').properties,
+				warnings: [{ description: en('YELLOW WARNING - SNOWFALL'), alertColourLevel: en('yellow') }]
+			}
+		};
+		const cache = new WeatherCache(vi.fn().mockResolvedValue(feature), () => now);
+		const weather = await cache.load('on-83');
+		expect(weather?.current).toBeNull();
+		expect(weather?.warnings).toHaveLength(1);
+	});
+
+	it('returns the same object while nothing needs filtering', async () => {
+		const now = Date.parse('2026-10-23T03:00:00Z');
+		const cache = new WeatherCache(
+			vi.fn().mockResolvedValue(observed('2026-10-23T02:55:00Z')),
+			() => now
+		);
+		await cache.load('on-138');
+		expect(cache.peek('on-138')).toBe(cache.peek('on-138'));
+	});
+
 	it('resolves to null when nothing has ever loaded', async () => {
 		const cache = new WeatherCache(vi.fn().mockRejectedValue(new Error('down')));
 		expect(await cache.load('on-138')).toBeNull();

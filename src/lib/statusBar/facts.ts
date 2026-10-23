@@ -41,7 +41,10 @@ function extreme(
 	return first;
 }
 
-/** Forecast sites in use, each with the weather held for it, fresh enough for "right now". */
+/**
+ * Forecast sites in use, each with the weather held for it. The cache already drops anything
+ * fetched over 2 hours ago; "right now" facts are stricter and want a fetch within the hour.
+ */
 function liveSites(
 	inputs: FactInputs
 ): { siteId: string; siteName: string; weather: SiteWeather | null }[] {
@@ -69,7 +72,11 @@ function warmestAndColdest(inputs: FactInputs): TickerFact | null {
 
 	readings.sort((a, b) => a.celsius - b.celsius || a.siteName.localeCompare(b.siteName));
 	const coldest = readings[0];
-	const warmest = readings[readings.length - 1];
+	// Sorted by temperature then name, so the first reading at the top temperature is the
+	// alphabetical tie winner.
+	const warmest = readings.find(
+		(reading) => reading.celsius === readings[readings.length - 1].celsius
+	)!;
 	if (formatDegrees(warmest.celsius) === formatDegrees(coldest.celsius)) return null;
 	return {
 		id: 'temperatures',

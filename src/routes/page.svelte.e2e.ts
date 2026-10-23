@@ -16,5 +16,5 @@ test('shows the status bar with the clock, the count and a ticker fact', async (
 	const bar = page.locator('footer[aria-label="Status bar"]');
 	await expect(bar.getByText('50 municipalities', { exact: true })).toBeVisible();
 	await expect(bar.getByText(/\d{1,2}:\d{2} [ap]m/)).toBeVisible();
-	await expect(bar.locator('.fact')).not.toBeEmpty();
+	await expect(bar.locator('.fact').first()).not.toBeEmpty();
 });

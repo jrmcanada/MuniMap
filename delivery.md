@@ -3,11 +3,11 @@
 ## Current state (2026-10-23)
 
 - Phases 0 to 3 (scaffold, map, radar, municipality panel) are merged to `main`.
-- Phase 4 (status bar, spec `04-status-bar`) is built on branch `feat/status-bar`. Typecheck, lint, 59 unit tests, 3 e2e tests and build pass. Checked live at 720p, 1080p and 4K. Not yet through code-reviewer. Not pushed.
+- Phase 4 (status bar, spec `04-status-bar`) is built on branch `feat/status-bar`. Typecheck, lint, 62 unit tests, 3 e2e tests and build pass. Checked live at 720p, 1080p and 4K. Reviewed; fixes applied.
 
 ## Next action
 
-1. Run code-reviewer on `feat/status-bar`, fix what it finds, push, open the PR.
+1. Open the PR for `feat/status-bar` and merge it.
 2. Write `docs/specs/05-kiosk/spec.md` (Phase 5: full screen, hidden cursor, long run recovery).
 3. Phase 6 is the Netlify deploy, which needs an explicit go from the owner.
 

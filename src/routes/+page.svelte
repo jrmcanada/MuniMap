@@ -42,11 +42,16 @@
 			...new Set(municipalities.map((municipality) => municipalityFacts[municipality.name].siteId))
 		];
 		let stopped = false;
+		let running = false;
 		async function warmUp() {
+			// A slow pass must not be joined by the next one.
+			if (running) return;
+			running = true;
 			for (const siteId of siteIds) {
-				if (stopped) return;
+				if (stopped) break;
 				await cache.load(siteId);
 			}
+			running = false;
 		}
 		void warmUp();
 		const timer = setInterval(() => void warmUp(), WARM_UP_MS);
