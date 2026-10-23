@@ -126,3 +126,15 @@ test('drags the zoomed map without selecting a pin', async ({ page }) => {
 	await page.waitForTimeout(300);
 	expect((await canvas.screenshot()).equals(zoomed)).toBe(false);
 });
+
+test('clicking the office marker shows the company card', async ({ page }) => {
+	await page.setViewportSize({ width: 1920, height: 1080 });
+	await page.goto('/');
+	await expect(page.getByRole('heading', { level: 2 })).toBeVisible();
+	// Sudbury sits at about 61% across and 52% down the map at this size.
+	await page.mouse.click(1179, 565);
+	await expect(
+		page.getByRole('heading', { level: 2, name: 'The Managed Municipality' })
+	).toBeVisible();
+	await expect(page.getByText('Sudbury office')).toBeVisible();
+});
