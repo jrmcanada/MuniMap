@@ -28,6 +28,15 @@ describe('FrameStore', () => {
 		expect(old.close).toHaveBeenCalledOnce();
 	});
 
+	it('retires a frame that is replaced at the same time', () => {
+		const store = new FrameStore();
+		const first = fakeImage();
+		store.add('2026-10-23T00:00:00Z', first);
+		store.add('2026-10-23T00:00:00Z', fakeImage());
+		store.releaseRetired();
+		expect(first.close).toHaveBeenCalledOnce();
+	});
+
 	it('closes everything on dispose', () => {
 		const store = new FrameStore();
 		const image = fakeImage();

@@ -122,13 +122,15 @@
 	});
 </script>
 
-<div
-	class="map"
-	bind:this={container}
-	role="img"
-	aria-label="Map of client municipalities in Ontario"
->
-	<canvas bind:this={canvas} aria-hidden="true"></canvas>
+<div class="map">
+	<div
+		class="surface"
+		bind:this={container}
+		role="img"
+		aria-label="Map of client municipalities in Ontario"
+	>
+		<canvas bind:this={canvas} aria-hidden="true"></canvas>
+	</div>
 	<p class="caption">
 		{#if radarTime}<span class="radar-time">{radarTime}</span>{/if}
 		Radar: Environment Canada. Open Government Licence, Canada.
@@ -143,6 +145,11 @@
 		background: var(--map-background);
 	}
 
+	.surface {
+		width: 100%;
+		height: 100%;
+	}
+
 	canvas {
 		display: block;
 		width: 100%;
@@ -154,6 +161,7 @@
 		right: 0.75rem;
 		bottom: 0.5rem;
 		margin: 0;
+		pointer-events: none;
 		font-size: 0.75rem;
 		color: var(--map-caption);
 	}

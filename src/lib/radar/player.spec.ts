@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import type { RadarFrame } from './frameStore.js';
 import { RadarPlayer, STALE_MS } from './player.js';
 
@@ -36,11 +36,17 @@ describe('RadarPlayer', () => {
 		expect(player.frameAt(3.5, NOW)).toBe(current[0]);
 	});
 
-	it('releases retired frames each time it adopts a set', () => {
-		const release = vi.fn();
-		const player = new RadarPlayer(() => frames, release);
+	it('releases retired frames only after the new set is read', () => {
+		const calls: string[] = [];
+		const player = new RadarPlayer(
+			() => {
+				calls.push('source');
+				return frames;
+			},
+			() => calls.push('release')
+		);
 		player.frameAt(0, NOW);
-		expect(release).toHaveBeenCalled();
+		expect(calls).toEqual(['source', 'release']);
 	});
 
 	it('shows nothing before any frame arrives', () => {

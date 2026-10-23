@@ -34,30 +34,31 @@ async function loadFrame(
 	view: RadarView,
 	signal: AbortSignal
 ): Promise<ImageBitmap | null> {
-	const layers = await Promise.allSettled(
-		[RAIN_LAYER, SNOW_LAYER].map((layer) => fetchLayer(layer, time, view, signal))
-	);
-	const images = layers.flatMap((layer) => (layer.status === 'fulfilled' ? [layer.value] : []));
-	if (images.length === 0) return null;
-
 	const canvas = new OffscreenCanvas(view.width, view.height);
 	const ctx = canvas.getContext('2d')!;
-	for (const image of images) {
-		ctx.drawImage(image, 0, 0);
-		image.close();
-	}
-	return canvas.transferToImageBitmap();
+	let drawn = 0;
+	// Each layer is drawn and closed as it arrives, so full size bitmaps never pile up.
+	await Promise.allSettled(
+		[RAIN_LAYER, SNOW_LAYER].map(async (layer) => {
+			const image = await fetchLayer(layer, time, view, signal);
+			ctx.drawImage(image, 0, 0);
+			image.close();
+			drawn++;
+		})
+	);
+	return drawn > 0 ? canvas.transferToImageBitmap() : null;
 }
 
-async function runLimited<T>(
+/** Runs `work` over the items, `limit` at a time. A failing item counts as false. */
+async function runLimited(
 	items: string[],
 	limit: number,
-	work: (item: string) => Promise<T>
-): Promise<T[]> {
-	const results: T[] = [];
+	work: (item: string) => Promise<boolean>
+): Promise<boolean[]> {
+	const results: boolean[] = [];
 	let next = 0;
 	const worker = async () => {
-		while (next < items.length) results.push(await work(items[next++]));
+		while (next < items.length) results.push(await work(items[next++]).catch(() => false));
 	};
 	await Promise.all(Array.from({ length: Math.min(limit, items.length) }, worker));
 	return results;
@@ -73,7 +74,7 @@ export class RadarFeed {
 	private timer: ReturnType<typeof setTimeout> | undefined;
 	private failures = 0;
 
-	/** @param onChange called whenever a frame is added */
+	/** @param onChange called when a frame is added and when a refresh ends */
 	constructor(private onChange: () => void) {}
 
 	frames(): RadarFrame[] {
@@ -110,6 +111,7 @@ export class RadarFeed {
 		let succeeded = false;
 		try {
 			const times = await fetchFrameTimes(signal);
+			if (signal.aborted) return;
 			this.store.keepOnly(times);
 			const missing = times.filter((time) => !this.store.has(time)).reverse();
 			const loaded = await runLimited(missing, CONCURRENT_REQUESTS, async (time) => {
@@ -128,6 +130,8 @@ export class RadarFeed {
 			// Network or parse failure: keep the frames we have and retry below.
 		}
 		if (signal.aborted) return;
+		// Lets a still frame notice radar that has gone stale, since no frame will arrive to do it.
+		this.onChange();
 
 		this.failures = succeeded ? 0 : this.failures + 1;
 		const delay = succeeded ? REFRESH_MS : (RETRY_MS[this.failures - 1] ?? REFRESH_MS);

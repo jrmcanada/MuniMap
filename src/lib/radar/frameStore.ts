@@ -17,6 +17,8 @@ export class FrameStore {
 	}
 
 	add(time: string, image: ImageBitmap): void {
+		const replaced = this.frames.get(time);
+		if (replaced) this.retired.push(replaced);
 		this.frames.set(time, image);
 	}
 
