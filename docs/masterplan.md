@@ -4,23 +4,23 @@ A live map of our clients across Ontario for the big screen at the office. Sourc
 
 ## Purpose and audience
 
-We're a software development and IT company with about 80 clients in Ontario. The screen sits in our office, so clients, visitors and staff all see it. It has to change often enough that someone watching for 30 seconds notices it's alive. Every data source has to be public domain or openly licensed, since outsiders will see the screen.
+We're a software development and IT company with about 80 clients in Ontario. The screen sits in our office, so clients, visitors and staff all see it. It has to change often enough that someone watching for 20 seconds notices it's alive. Every data source has to be public domain or openly licensed, since outsiders will see the screen.
 
-Nobody interacts with it. Single owner, no accounts.
+It runs on its own. Someone can click a pin to jump the panel to that municipality (see spec `03`), and that is the only input. Single owner, no accounts.
 
 ## Screen layout
 
 | Area       | Share of screen | Contents                                                                                                  |
 | ---------- | --------------- | --------------------------------------------------------------------------------------------------------- |
 | Main map   | 75%             | Map of Ontario, client pins, animated weather radar overlaid (subtle enough to keep the pins easy to see) |
-| Info panel | 20%             | One municipality at a time, 30 seconds each: weather, population and other facts                          |
+| Info panel | 20%             | One municipality at a time, 20 seconds each: weather, population and other facts                          |
 | Status bar | 5%              | Current date and time, number of municipalities represented, rotating ticker                              |
 
 ## Features
 
 1. **Map.** Ontario base map with a pin for each client municipality.
 2. **Radar overlay.** Animated weather radar over the map at low opacity.
-3. **Municipality panel.** Cycles through the municipalities, 30 seconds each. Current weather, population, and other facts worth showing.
+3. **Municipality panel.** Cycles through the municipalities, 20 seconds each. Clicking a pin jumps to that municipality. Current weather, population, and other facts worth showing.
 4. **Status bar.** Clock, municipality count, rotating ticker.
 5. **Kiosk behaviour.** Full screen, hidden cursor, runs unattended for days, recovers from a dropped connection.
 

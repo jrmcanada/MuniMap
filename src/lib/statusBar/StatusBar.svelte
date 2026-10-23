@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import { MediaQuery } from 'svelte/reactivity';
 	import { fade } from 'svelte/transition';
+	import logo from '#lib/assets/tmm-logo.png';
 	import { municipalityFacts } from '#lib/data/facts.js';
 	import { municipalities } from '#lib/data/municipalities.js';
 	import { tickerMessages } from '#lib/data/tickerMessages.js';
@@ -58,6 +59,8 @@
 </script>
 
 <footer class="bar" aria-label="Status bar">
+	<img class="logo" src={logo} alt="The Managed Municipality" />
+
 	<div class="clock">
 		<span class="date">{dateFormat.format(now)}</span>
 		<span class="time">{formatClockTime(now, TIME_ZONE)}</span>
@@ -72,8 +75,8 @@
 	</div>
 
 	<p class="credits">
-		Weather and radar: Environment Canada. Census: Statistics Canada. Map: Natural Earth. Open
-		Government Licence, Canada.
+		<span>Weather and radar: Environment Canada. Census: Statistics Canada.</span>
+		<span>Map: Natural Earth. Open Government Licence, Canada.</span>
 	</p>
 </footer>
 
@@ -84,7 +87,7 @@
 		grid-column: 1 / -1;
 		container-type: size;
 		display: grid;
-		grid-template-columns: auto auto minmax(0, 1fr) minmax(0, 30%);
+		grid-template-columns: auto auto auto minmax(0, 1fr) auto;
 		align-items: center;
 		gap: 0 2.5vw;
 		padding: 0 1.5vw;
@@ -98,6 +101,13 @@
 
 	p {
 		margin: 0;
+	}
+
+	/* The lower left corner of the screen. It is part of the strip below the map, so it never
+	   sits on the map, its borders or the radar. */
+	.logo {
+		height: 80cqh;
+		width: auto;
 	}
 
 	.clock {
@@ -144,10 +154,11 @@
 		font-size: max(11px, 22cqh);
 		line-height: 1.15;
 		color: var(--panel-muted);
-		display: -webkit-box;
-		-webkit-box-orient: vertical;
-		-webkit-line-clamp: 2;
-		line-clamp: 2;
-		overflow: hidden;
+		white-space: nowrap;
+	}
+
+	/* The line break goes before "Map". */
+	.credits span {
+		display: block;
 	}
 </style>
