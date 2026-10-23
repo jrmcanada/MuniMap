@@ -4,7 +4,10 @@
 	import { fade } from 'svelte/transition';
 	import logo from '#lib/assets/tmm-logo.png';
 	import { municipalityFacts } from '#lib/data/facts.js';
+	import { landmarks } from '#lib/data/landmarks.js';
 	import { municipalities } from '#lib/data/municipalities.js';
+	import { office } from '#lib/data/office.js';
+	import officeTrips from '#lib/data/office-trips.json';
 	import { tickerMessages } from '#lib/data/tickerMessages.js';
 	import { formatClockTime } from '#lib/radar/format.js';
 	import type { SiteWeather } from '#lib/weather/types.js';
@@ -31,6 +34,10 @@
 	function currentSlots() {
 		return factSlots({
 			municipalities,
+			office,
+			landmarks,
+			trips: officeTrips,
+			random: Math.random,
 			facts: municipalityFacts,
 			peekWeather,
 			customMessages: tickerMessages,

@@ -1,6 +1,9 @@
 import { describe, it, expect } from 'vitest';
 import { municipalityFacts, type MunicipalityFacts } from '#lib/data/facts.js';
+import { landmarks } from '#lib/data/landmarks.js';
 import { municipalities } from '#lib/data/municipalities.js';
+import { office } from '#lib/data/office.js';
+import officeTrips from '#lib/data/office-trips.json';
 import type { SiteWeather } from '#lib/weather/types.js';
 import { factSlots, nextSlot, type FactInputs } from './facts.js';
 
@@ -35,6 +38,16 @@ function inputs(readings: (number | null)[], extra: Partial<FactInputs> = {}): F
 	const names = readings.map((_, i) => `Town ${i}`);
 	return {
 		municipalities: names.map(place),
+		office: { city: 'Sudbury', longitude: -80.99, latitude: 46.49 },
+		// Town 0 is 100 km away, Town 1 is 200 km, and so on.
+		trips: Object.fromEntries(
+			names.map((name, i) => [name, { driveKm: 100 * (i + 1), driveMinutes: 60 * (i + 1) }])
+		),
+		landmarks: [
+			{ municipality: 'Town 1', text: 'Town 1 has a giant goose.' },
+			{ municipality: 'Town 2', text: 'Town 2 has a giant moose.' }
+		],
+		random: () => 0,
 		facts: Object.fromEntries(
 			names.map((name, i) => [
 				name,
@@ -81,6 +94,10 @@ describe('factSlots, census facts', () => {
 	it('matches the real data', () => {
 		const slots = factSlots({
 			municipalities,
+			office,
+			landmarks,
+			trips: officeTrips,
+			random: Math.random,
 			facts: municipalityFacts,
 			peekWeather: () => null,
 			customMessages: [],
@@ -151,17 +168,121 @@ describe('factSlots, live facts', () => {
 		expect(textOf(factSlots(inputs([5, 5, 5, 5, 5, 5, 5, 5, 5, null])), 'alerts')).toBeUndefined();
 	});
 
-	it('still has census facts and the radar line when nothing live is available', () => {
-		const offline = inputs(Array(10).fill(null));
-		const shown = factSlots(offline).filter(Boolean);
-		expect(shown.map((slot) => slot!.id)).toEqual([
-			'largest',
-			'smallest',
-			'growth',
-			'area',
-			'reach',
-			'radar'
-		]);
+	it('keeps the census facts and the radar line when nothing live is available', () => {
+		const ids = factSlots(inputs(Array(10).fill(null)))
+			.filter(Boolean)
+			.map((slot) => slot!.id);
+		expect(ids).toEqual(
+			expect.arrayContaining(['largest', 'smallest', 'growth', 'area', 'reach', 'radar'])
+		);
+		expect(ids).toEqual(expect.arrayContaining(['drive', 'cycle', 'walk', 'daylight', 'toronto']));
+		expect(ids).not.toContain('temperatures');
+		expect(ids).not.toContain('wind');
+	});
+});
+
+describe('factSlots, travel and place facts', () => {
+	const slots = () => factSlots(inputs(Array(10).fill(null)));
+
+	it('works out the drive, cycle and walk from the office to a random municipality', () => {
+		// random() of 0 picks Town 0: 100 km and 60 minutes by road.
+		expect(textOf(slots(), 'drive')).toBe(
+			"It's about a 1 hour drive from our Sudbury office to Town 0, 100 km by road."
+		);
+		expect(textOf(slots(), 'cycle')).toBe(
+			'Cycling from our Sudbury office to Town 0 would take about 5 hours at 20 km/h, without stopping.'
+		);
+		expect(textOf(slots(), 'walk')).toBe(
+			'Walking from our Sudbury office to Town 0 would take about 20 hours at 5 km/h, without a break.'
+		);
+	});
+
+	it('picks a different municipality for a different random number', () => {
+		const picked = factSlots(inputs(Array(10).fill(null), { random: () => 0.95 }));
+		expect(textOf(picked, 'drive')).toContain('to Town 9, 1,000 km by road');
+		expect(textOf(picked, 'drive')).toContain('10 hour drive');
+	});
+
+	it('tells very long trips in days', () => {
+		const far = inputs(Array(10).fill(null), { random: () => 0.95 });
+		expect(textOf(factSlots(far), 'walk')).toContain('about 8.3 days');
+	});
+
+	it('names the farthest and closest municipality by road', () => {
+		expect(textOf(slots(), 'farthest')).toBe(
+			'Town 9 is the farthest of our municipalities from Sudbury: 1,000 km, about a 10 hour drive.'
+		);
+		expect(textOf(slots(), 'closest')).toContain('Town 0 is the closest to our Sudbury office');
+	});
+
+	it('skips the travel facts when no trips are known', () => {
+		const ids = factSlots(inputs(Array(10).fill(null), { trips: {} }))
+			.filter(Boolean)
+			.map((slot) => slot!.id);
+		expect(ids).not.toContain('drive');
+		expect(ids).not.toContain('farthest');
+	});
+
+	it('gives the daylight in Sudbury and how it changed since yesterday', () => {
+		// 23 October: days are getting shorter by a few minutes.
+		expect(textOf(slots(), 'daylight')).toMatch(
+			/^Sudbury gets 10 hours \d+ minutes of daylight today, \d+ minutes? less than yesterday\.$/
+		);
+	});
+
+	it('finds the windiest site, only from fresh readings', () => {
+		const windy = inputs(Array(10).fill(5), {
+			peekWeather: (siteId) =>
+				weather(5, {
+					current: {
+						observedAt: '2026-10-23T02:50:00Z',
+						temperatureC: 5,
+						windSpeedKmh: siteId === 's3' ? 42 : 10
+					}
+				})
+		});
+		expect(textOf(factSlots(windy), 'wind')).toBe(
+			'Windiest spot right now: Site 3, with winds at 42 km/h.'
+		);
+	});
+
+	it('shows a landmark picked at random, and skips them when there are none', () => {
+		expect(textOf(slots(), 'landmark-Town 1')).toBe('Town 1 has a giant goose.');
+		const second = factSlots(inputs(Array(10).fill(null), { random: () => 0.9 }));
+		expect(textOf(second, 'landmark-Town 2')).toBe('Town 2 has a giant moose.');
+		const none = factSlots(inputs(Array(10).fill(null), { landmarks: [] }));
+		expect(none.some((slot) => slot?.id.startsWith('landmark'))).toBe(false);
+	});
+
+	it('adds up the district, growth and name superlatives', () => {
+		const text = (id: string) => textOf(slots(), id);
+		expect(text('busiest-district')).toBe(
+			'Algoma District is home to more of our municipalities than any other: 10 of 10.'
+		);
+		expect(text('growing')).toBe(
+			'10 of our 10 municipalities grew between the 2016 and 2021 censuses.'
+		);
+		expect(text('size-gap')).toBe('Town 9 has about 10 times the people of Town 0, our smallest.');
+		// Every name is the same length, so the first alphabetically wins.
+		expect(text('longest-name')).toContain('Town 0 has the longest name');
+	});
+
+	it('names the density and shape extremes from the real data', () => {
+		const real = factSlots({
+			municipalities,
+			office,
+			landmarks,
+			trips: officeTrips,
+			random: () => 0,
+			facts: municipalityFacts,
+			peekWeather: () => null,
+			customMessages: [],
+			now: NOW
+		});
+		expect(textOf(real, 'toronto')).toMatch(/times the size of the City of Toronto/);
+		expect(textOf(real, 'north')).toMatch(/is our northernmost municipality, at \d+\.\d° N\./);
+		expect(textOf(real, 'west')).toMatch(/is our westernmost municipality, at \d+\.\d° W\./);
+		expect(textOf(real, 'densest')).toMatch(/people per km²\.$/);
 	});
 });
 
