@@ -4,7 +4,7 @@ Phase 1 of `docs/masterplan.md`.
 
 ## Goal
 
-A full-screen map of Ontario with one pin for each of the 50 client municipalities in `municipalities.md`. No radar, panel or status bar yet; the map area is laid out at 75% of the screen so later phases slot in.
+A full-screen map of Ontario with one pin for each of the 54 client municipalities in `municipalities.md`. No radar, panel or status bar yet; the map area is laid out at 75% of the screen so later phases slot in.
 
 ## Decisions (owner, 2026-10-22)
 
@@ -37,7 +37,7 @@ A full-screen map of Ontario with one pin for each of the 50 client municipaliti
 - Drawing logic lives in plain TypeScript under `#lib/map/` (projection, draw functions), separate from the Svelte component so it can be unit tested.
 - Map is drawn on an HTML canvas with `d3-geo`. One shared `requestAnimationFrame` loop; land is cached on an offscreen canvas and only pins redraw per frame.
 - New dependencies, need approval: `d3-geo`, `@types/d3-geo` (plus `topojson-client` and its types if the boundary is TopoJSON).
-- Unit tests: the list has 50 entries, names are unique, coordinates fall inside Ontario's bounding box, and the projection returns finite points for every entry.
+- Unit tests: the list has 54 entries, names are unique, coordinates fall inside Ontario's bounding box, and the projection returns finite points for every entry.
 
 ## Out of scope
 

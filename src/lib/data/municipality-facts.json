@@ -448,5 +448,41 @@
 		"densityPerKm2": 5.8,
 		"siteId": "on-67",
 		"siteName": "White River"
+	},
+	"Clearview": {
+		"district": "Simcoe County",
+		"population": 14814,
+		"populationChangePercent": 4.7,
+		"landAreaKm2": 556.37,
+		"densityPerKm2": 26.6,
+		"siteId": "on-150",
+		"siteName": "Collingwood"
+	},
+	"Georgian Bluffs": {
+		"district": "Grey County",
+		"population": 11100,
+		"populationChangePercent": 5.9,
+		"landAreaKm2": 599.96,
+		"densityPerKm2": 18.5,
+		"siteId": "on-7",
+		"siteName": "Owen Sound"
+	},
+	"St. Joseph": {
+		"district": "Algoma District",
+		"population": 1426,
+		"populationChangePercent": 15,
+		"landAreaKm2": 127.65,
+		"densityPerKm2": 11.2,
+		"siteId": "on-162",
+		"siteName": "Sault Ste. Marie"
+	},
+	"Huron Shores": {
+		"district": "Algoma District",
+		"population": 1860,
+		"populationChangePercent": 11.8,
+		"landAreaKm2": 451.87,
+		"densityPerKm2": 4.1,
+		"siteId": "on-21",
+		"siteName": "Blind River"
 	}
 }

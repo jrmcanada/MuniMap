@@ -86,7 +86,7 @@ describe('factSlots, census facts', () => {
 			customMessages: [],
 			now: NOW
 		});
-		expect(textOf(slots, 'reach')).toContain('We serve 50 municipalities');
+		expect(textOf(slots, 'reach')).toContain(`We serve ${municipalities.length} municipalities`);
 		expect(textOf(slots, 'area')).toContain('1,010 km²');
 	});
 });
