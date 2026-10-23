@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { municipalities } from '#lib/data/municipalities.js';
-	import { municipalityFacts } from '#lib/data/facts.js';
+	import { factsFor, municipalityFacts } from '#lib/data/facts.js';
+	import { office } from '#lib/data/office.js';
 	import Kiosk from '#lib/kiosk/Kiosk.svelte';
 	import MapView from '#lib/map/MapView.svelte';
 	import MunicipalityPanel from '#lib/panel/MunicipalityPanel.svelte';
@@ -28,8 +29,11 @@
 	let pinned = $state<string | null>(null);
 	let weather = $state<SiteWeather | null>(null);
 
+	// The office is never in the rotation; it appears only when its marker is clicked.
 	const current = $derived(
-		municipalities.find((municipality) => municipality.name === (pinned ?? rotation.at(slot)))!
+		pinned === office.name
+			? office
+			: municipalities.find((municipality) => municipality.name === (pinned ?? rotation.at(slot)))!
 	);
 
 	function syncSchedule() {
@@ -37,7 +41,7 @@
 		pinned = schedule.pinnedName;
 	}
 
-	/** A click on a pin: show that municipality now, then carry on with the rotation. */
+	/** A click on a pin or the office marker: show it now, then carry on with the rotation. */
 	function showMunicipality(name: string) {
 		schedule.pin(name, performance.now());
 		syncSchedule();
@@ -79,7 +83,7 @@
 	});
 
 	$effect(() => {
-		const siteId = municipalityFacts[current.name].siteId;
+		const siteId = factsFor(current.name).siteId;
 		const nextSiteId = municipalityFacts[rotation.at(slot + 1)].siteId;
 
 		weather = cache.peek(siteId);

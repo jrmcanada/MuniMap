@@ -38,7 +38,7 @@
 	}: {
 		/** Name of the municipality to ring and label, or null for none. */
 		highlight?: string | null;
-		/** Called with the name of the municipality whose pin was clicked. */
+		/** Called with the name of the municipality whose pin was clicked, or of the office. */
 		onSelect?: (name: string) => void;
 	} = $props();
 
@@ -176,20 +176,25 @@
 		if (marked >= 0) {
 			const { name } = municipalities[marked];
 			drawHighlight(ctx, pins[marked], name, colors, { width, height }, seconds, animate);
+		} else if (highlight === office.name) {
+			drawHighlight(ctx, officePin, office.name, colors, { width, height }, seconds, animate);
 		}
 	}
 
-	function pinAt(event: MouseEvent): number {
+	/** The name of the office or municipality under the pointer, or null for open map. */
+	function targetAt(event: MouseEvent): string | null {
 		const rect = canvas.getBoundingClientRect();
 		const point = { x: event.clientX - rect.left, y: event.clientY - rect.top };
-		return nearestPin(pins, point, HIT_RADIUS);
+		if (nearestPin([officePin], point, HIT_RADIUS) >= 0) return office.name;
+		const index = nearestPin(pins, point, HIT_RADIUS);
+		return index >= 0 ? municipalities[index].name : null;
 	}
 
 	function select(event: MouseEvent) {
 		// A drag ends in a click too; only a real click picks a pin.
 		if (dragMoved) return;
-		const index = pinAt(event);
-		if (index >= 0) onSelect?.(municipalities[index].name);
+		const name = targetAt(event);
+		if (name) onSelect?.(name);
 	}
 
 	function startDrag(event: PointerEvent) {
@@ -205,7 +210,7 @@
 
 	function movePointer(event: PointerEvent) {
 		if (!drag) {
-			canvas.style.cursor = pinAt(event) >= 0 ? 'pointer' : view.k > 1 ? 'grab' : '';
+			canvas.style.cursor = targetAt(event) ? 'pointer' : view.k > 1 ? 'grab' : '';
 			return;
 		}
 		const dx = event.clientX - drag.x;

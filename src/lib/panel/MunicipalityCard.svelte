@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Municipality } from '#lib/data/municipalities.js';
-	import { municipalityFacts } from '#lib/data/facts.js';
+	import { factsFor } from '#lib/data/facts.js';
 	import { formatClockTime } from '#lib/radar/format.js';
 	import { formatDegrees } from '#lib/weather/format.js';
 	import { sunTimes } from '#lib/weather/sun.js';
@@ -13,7 +13,7 @@
 	let { municipality, weather }: { municipality: Municipality; weather: SiteWeather | null } =
 		$props();
 
-	const facts = $derived(municipalityFacts[municipality.name]);
+	const facts = $derived(factsFor(municipality.name));
 	const timeZone = $derived(timeZoneAt(municipality.longitude));
 	const current = $derived(weather?.current ?? null);
 
