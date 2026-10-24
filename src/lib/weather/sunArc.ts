@@ -17,8 +17,13 @@ export interface SunPosition {
 
 /** Where the sun sits on the arc at `now`, or null when it is below the horizon. */
 export function sunPosition(now: Date, sun: SunTimes): SunPosition | null {
-	const start = sun.sunrise.getTime();
-	const progress = (now.getTime() - start) / (sun.sunset.getTime() - start);
+	return arcPosition(now, sun.sunrise, sun.sunset);
+}
+
+/** Where a body that rises at `rise` and sets at `set` sits on the arc at `now`, or null if not up. */
+export function arcPosition(now: Date, rise: Date, set: Date): SunPosition | null {
+	const start = rise.getTime();
+	const progress = (now.getTime() - start) / (set.getTime() - start);
 	if (!(progress >= 0 && progress <= 1)) return null;
 
 	const angle = Math.PI * progress;
