@@ -5,8 +5,11 @@
 - Phases 0 to 5 are merged to `main`: scaffold, map, radar, municipality panel, status bar and kiosk behaviour. Also merged: 54 municipalities, the 20 second rotation, click a pin to jump to it, the logo, the 7% bottom strip, the card style side panel (wind compass, sun arc), and credits sized to match.
 - Map interaction: mouse wheel zooms at the pointer (up to 8x), dragging pans, and the map returns to the full view after 30 quiet seconds. Radar is enlarged when zoomed, not refetched. A green diamond (the logo green) marks the Sudbury office, and major highways are drawn from Natural Earth (`scripts/build-highways.mjs`).
 - Fixed: sunrise and sunset were computed for the next day, so the sun showed as down all day.
+- Clicking the office diamond shows a card titled The Managed Municipality with Sudbury weather (site `on-40`) and the census totals for all municipalities.
+- When the sun is down and the moon is up, the sun panel shows a white moon on the arc, drawn at its current phase, with moonrise and moonset times. The moon and its times are worked out in the app (`src/lib/weather/moon.ts`), so they can be a few minutes off.
+- The status bar has many more facts, mixed in with the originals: drive, cycle and walk times from the Sudbury office to random municipalities (driving worked out at 90 km/h), farthest and closest, north/south/east/west extremes, densest and sparsest, population change, area, daylight and windiest, and ten researched landmarks (`src/lib/data/landmarks.ts`). Travel facts are weighted to come up less often, and the ticker starts on a random fact.
 - Not yet tried on the real display PC. `scripts/start-kiosk.ps1` was tested for the server, its restart, the one-copy guard and the stop script (without opening Edge). The kiosk server uses port 4183. The Edge launch flags, wake lock in kiosk mode and the logon shortcut need one run on the PC, following `docs/kiosk-setup.md`.
-- 103 unit and component tests and 14 e2e tests pass.
+- 131 unit and component tests and 15 e2e tests pass.
 
 ## Next action
 
@@ -34,6 +37,8 @@
 - Layout options: five mockups (today, floating card, top billboard, daylight, wide two column panel) are on a private canvas at https://claude.ai/artifact/TrLWv5HPcXMdbmFvKuPxQL. The owner has not picked one yet.
 - Credit text has no minimum size, as requested, so it is about 8.6px at 1024 by 768.
 - To add a municipality: add it to `municipalities.md` and `src/lib/data/municipalities.ts`, then rerun `scripts/build-municipality-data.mjs` with the Statistics Canada CSV (the link is at the top of the script). The tests that count municipalities need the new total.
+- Landmark facts were checked against web sources but should be read by someone who knows the towns. Only ten municipalities have one; more can be added to `src/lib/data/landmarks.ts`. Drive distances come from the OSRM demo server (`scripts/build-office-trips.mjs`, rerun when municipalities change).
+- A stale `npm run dev` left running on a lower port can serve old styles; use the port the newest server prints.
 - Dawson and Head, Clara, Maria coordinates are the least certain matches.
 - Radar colours are GeoMet defaults; tuning to the blue and gold palette is a later pass.
 - The highlight label can cover neighbouring pins in the dense Timiskaming cluster. Accepted for now.
