@@ -4,11 +4,14 @@
 	import { fade } from 'svelte/transition';
 	import logo from '#lib/assets/tmm-logo.png';
 	import { municipalityFacts } from '#lib/data/facts.js';
+	import { landmarks } from '#lib/data/landmarks.js';
 	import { municipalities } from '#lib/data/municipalities.js';
+	import { office } from '#lib/data/office.js';
+	import officeTrips from '#lib/data/office-trips.json';
 	import { tickerMessages } from '#lib/data/tickerMessages.js';
 	import { formatClockTime } from '#lib/radar/format.js';
 	import type { SiteWeather } from '#lib/weather/types.js';
-	import { factSlots, nextSlot } from './facts.js';
+	import { factSlots, nextSlot, startSlot } from './facts.js';
 
 	const TIME_ZONE = 'America/Toronto';
 	const CLOCK_MS = 1000;
@@ -31,6 +34,10 @@
 	function currentSlots() {
 		return factSlots({
 			municipalities,
+			office,
+			landmarks,
+			trips: officeTrips,
+			random: Math.random,
 			facts: municipalityFacts,
 			peekWeather,
 			customMessages: tickerMessages,
@@ -39,9 +46,9 @@
 	}
 
 	let now = $state(new Date());
-	// The first fact that has something to say; the ticker then moves on every few seconds.
+	// A random fact to start on; the ticker then moves on in order every few seconds.
 	const first = currentSlots();
-	let cursor = nextSlot(first, -1);
+	let cursor = startSlot(first, Math.random);
 	let fact = $state(first[cursor] ?? null);
 
 	onMount(() => {
