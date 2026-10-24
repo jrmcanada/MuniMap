@@ -3,8 +3,9 @@
 	import { factsFor } from '#lib/data/facts.js';
 	import { formatClockTime } from '#lib/radar/format.js';
 	import { formatDegrees } from '#lib/weather/format.js';
+	import { moonPass, moonPhase } from '#lib/weather/moon.js';
 	import { sunTimes } from '#lib/weather/sun.js';
-	import { sunPosition } from '#lib/weather/sunArc.js';
+	import { arcPosition, sunPosition } from '#lib/weather/sunArc.js';
 	import { localDate, timeZoneAt } from '#lib/weather/timeZone.js';
 	import type { SiteWeather } from '#lib/weather/types.js';
 	import SunArc from './SunArc.svelte';
@@ -28,7 +29,19 @@
 			date.month,
 			date.day
 		);
-		return times && { ...times, position: sunPosition(now, times) };
+		if (!times) return null;
+
+		const position = sunPosition(now, times);
+		const pass = position ? null : moonPass(now, municipality.latitude, municipality.longitude);
+		const moonPosition = pass && arcPosition(now, pass.rise, pass.set);
+		const moon = pass &&
+			moonPosition && {
+				position: moonPosition,
+				phase: moonPhase(now),
+				rise: formatClockTime(pass.rise, timeZone),
+				set: formatClockTime(pass.set, timeZone)
+			};
+		return { ...times, position, moon };
 	});
 
 	let iconFailed = $state(false);
@@ -101,6 +114,7 @@
 		<section class="tile">
 			<SunArc
 				position={sun.position}
+				moon={sun.moon}
 				sunrise={formatClockTime(sun.sunrise, timeZone)}
 				sunset={formatClockTime(sun.sunset, timeZone)}
 			/>
