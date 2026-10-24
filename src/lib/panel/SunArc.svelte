@@ -101,7 +101,7 @@
 	}
 
 	.moon-lit {
-		fill: var(--map-highlight);
+		fill: var(--panel-text);
 	}
 
 	/* In the drawing's own 300 unit space, like the compass letters. */
