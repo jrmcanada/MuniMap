@@ -47,6 +47,16 @@
 		syncSchedule();
 	}
 
+	/** Right arrow shows the next municipality in the rotation, left arrow the one before. */
+	function step(event: KeyboardEvent) {
+		if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
+		const by = event.key === 'ArrowRight' ? 1 : event.key === 'ArrowLeft' ? -1 : 0;
+		if (!by) return;
+		event.preventDefault();
+		schedule.step(by, performance.now());
+		syncSchedule();
+	}
+
 	onMount(() => {
 		const timer = setInterval(() => {
 			schedule.tick(performance.now());
@@ -99,6 +109,8 @@
 		};
 	});
 </script>
+
+<svelte:window onkeydown={step} />
 
 <main class="screen">
 	<section class="map-area">

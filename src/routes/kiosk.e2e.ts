@@ -138,3 +138,20 @@ test('clicking the office marker shows the company card', async ({ page }) => {
 	).toBeVisible();
 	await expect(page.getByText('Sudbury office')).toBeVisible();
 });
+
+test('the arrow keys step through the municipalities', async ({ page }) => {
+	await page.goto('/');
+	const headings = page.getByRole('heading', { level: 2 });
+	await expect(headings).toHaveCount(1);
+	const first = await headings.innerText();
+	const showing = (name: string) => page.getByRole('heading', { level: 2, name, exact: true });
+
+	// Two cards share the screen while one fades into the next, so wait for the old one to go.
+	await page.keyboard.press('ArrowRight');
+	await expect(showing(first)).toHaveCount(0);
+	await expect(headings).toHaveCount(1);
+
+	await page.keyboard.press('ArrowLeft');
+	await expect(showing(first)).toHaveCount(1);
+	await expect(headings).toHaveCount(1);
+});
