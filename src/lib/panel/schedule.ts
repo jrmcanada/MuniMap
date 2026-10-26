@@ -26,6 +26,16 @@ export class PanelSchedule {
 	}
 
 	/**
+	 * Moves the rotation `by` slots (negative goes back, stopping at the first) and gives the new
+	 * municipality a full slot. Any pin is dropped; the rotation counts from the slot it was on.
+	 */
+	step(by: number, now: number): void {
+		this.pinnedName = null;
+		this.slot = Math.max(0, this.slot + by);
+		this.startedAt = now - this.slot * this.slotMs;
+	}
+
+	/**
 	 * Moves to `now`. When a hold ends, the rotation resumes with the next municipality in its
 	 * order and gives it a full slot.
 	 */

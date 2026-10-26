@@ -36,6 +36,37 @@ describe('PanelSchedule', () => {
 		expect(schedule.pinnedName).toBe('Espanola');
 	});
 
+	it('steps forward and back, giving the new municipality a full slot', () => {
+		const schedule = new PanelSchedule(SLOT, HOLD, 0);
+		schedule.tick(45_000);
+		schedule.step(1, 45_000);
+		expect(schedule.slot).toBe(3);
+
+		schedule.tick(45_000 + 19_999);
+		expect(schedule.slot).toBe(3);
+		schedule.step(-1, 50_000);
+		expect(schedule.slot).toBe(2);
+		schedule.tick(50_000 + 19_999);
+		expect(schedule.slot).toBe(2);
+		schedule.tick(50_000 + 20_000);
+		expect(schedule.slot).toBe(3);
+	});
+
+	it('stops stepping back at the first municipality', () => {
+		const schedule = new PanelSchedule(SLOT, HOLD, 0);
+		schedule.step(-1, 1000);
+		expect(schedule.slot).toBe(0);
+	});
+
+	it('drops a pin when stepping and counts from the slot the rotation was on', () => {
+		const schedule = new PanelSchedule(SLOT, HOLD, 0);
+		schedule.tick(30_000);
+		schedule.pin('Wawa', 30_000);
+		schedule.step(1, 35_000);
+		expect(schedule.pinnedName).toBeNull();
+		expect(schedule.slot).toBe(2);
+	});
+
 	it('resumes with the next municipality and gives it a full slot', () => {
 		const schedule = new PanelSchedule(SLOT, HOLD, 0);
 		schedule.tick(30_000);
