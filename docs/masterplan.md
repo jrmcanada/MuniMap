@@ -1,6 +1,6 @@
-# TMM Map: master plan
+# MuniMap: master plan
 
-A live map of our clients across Ontario for the big screen at the office. Source notes: `TMMMap.md` (repo root).
+A live map of our clients across Ontario for the big screen at the office. Source notes: `MuniMap.md` (repo root).
 
 ## Purpose and audience
 

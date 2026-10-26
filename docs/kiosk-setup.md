@@ -16,7 +16,7 @@ This is how to turn a Windows PC with Edge into the wall display. It takes about
 4. **Start the display at logon.** Press Win+R, type `shell:startup`, and make a shortcut in that folder with this target (use your real project path):
 
    ```
-   powershell.exe -WindowStyle Hidden -ExecutionPolicy Bypass -File "C:\path\to\TMMMap\scripts\start-kiosk.ps1"
+   powershell.exe -WindowStyle Hidden -ExecutionPolicy Bypass -File "C:\path\to\MuniMap\scripts\start-kiosk.ps1"
    ```
 
    The script has to be started with `-File`, because the stop script finds it that way.
@@ -44,7 +44,7 @@ Don't build while the server is running. The old server would send the new pages
 Once the app is on Netlify, start the script with the address instead:
 
 ```
-powershell.exe -WindowStyle Hidden -ExecutionPolicy Bypass -File "C:\path\to\TMMMap\scripts\start-kiosk.ps1" -Url https://your-site.netlify.app
+powershell.exe -WindowStyle Hidden -ExecutionPolicy Bypass -File "C:\path\to\MuniMap\scripts\start-kiosk.ps1" -Url https://your-site.netlify.app
 ```
 
 The script then skips the local server and only keeps Edge open. Nothing else in the app changes.
