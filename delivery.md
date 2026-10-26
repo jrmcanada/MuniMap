@@ -2,22 +2,27 @@
 
 ## Current state (2026-10-23)
 
-- Phases 0 to 5 are merged to `main`: scaffold, map, radar, municipality panel, status bar and kiosk behaviour. Also merged: 54 municipalities, the 20 second rotation, click a pin to jump to it, the logo, the 7% bottom strip, the card style side panel (wind compass, sun arc), and credits sized to match.
+- Phases 0 to 6 are done. Phases 0 to 5 are merged to `main`: scaffold, map, radar, municipality panel, status bar and kiosk behaviour. Also merged: 54 municipalities, the 20 second rotation, click a pin to jump to it, the logo, the 7% bottom strip, the card style side panel (wind compass, sun arc), and credits sized to match.
 - Map interaction: mouse wheel zooms at the pointer (up to 8x), dragging pans, and the map returns to the full view after 30 quiet seconds. Radar is enlarged when zoomed, not refetched. A green diamond (the logo green) marks the Sudbury office, and major highways are drawn from Natural Earth (`scripts/build-highways.mjs`).
 - Fixed: sunrise and sunset were computed for the next day, so the sun showed as down all day.
+- Clicking the office diamond shows a card titled The Managed Municipality with Sudbury weather (site `on-40`) and the census totals for all municipalities.
+- When the sun is down and the moon is up, the sun panel shows a white moon on the arc, drawn at its current phase, with moonrise and moonset times. The moon and its times are worked out in the app (`src/lib/weather/moon.ts`), so they can be a few minutes off.
+- The status bar has many more facts, mixed in with the originals: drive, cycle and walk times from the Sudbury office to random municipalities (driving worked out at 90 km/h), farthest and closest, north/south/east/west extremes, densest and sparsest, population change, area, daylight and windiest, and ten researched landmarks (`src/lib/data/landmarks.ts`). Travel facts are weighted to come up less often, and the ticker starts on a random fact.
+- Phase 6: deployed to Netlify at https://munimap.netlify.app (project `munimap`, deploys on merge to `main`). The site is private (Netlify team login). On the laptop, a desktop shortcut opens that address, so nothing runs locally.
+- The project was renamed from TMM Map to MuniMap (repo, folder, package, scripts). The logo file `tmm-logo.png` keeps its name because TMM is the company.
 - Not yet tried on the real display PC. `scripts/start-kiosk.ps1` was tested for the server, its restart, the one-copy guard and the stop script (without opening Edge). The kiosk server uses port 4183. The Edge launch flags, wake lock in kiosk mode and the logon shortcut need one run on the PC, following `docs/kiosk-setup.md`.
-- 103 unit and component tests and 14 e2e tests pass.
+- 131 unit and component tests and 15 e2e tests pass.
 
 ## Next action
 
 1. Owner tries `docs/kiosk-setup.md` on the display PC and reports anything Edge does differently.
-2. Owner decides whether any other mockup layout should be built.
-3. Phase 6 is the Netlify deploy, which needs an explicit go from the owner. The start script already takes `-Url` for it.
+2. Owner signs in to Netlify once in the kiosk's Edge profile (`start-kiosk.ps1 -Url https://munimap.netlify.app`), then stops and restarts the script to see whether the sign in lasts. If it does not, decide between a public site and serving the display from its local copy.
+3. In Netlify, turn off Deploy Previews and Branch deploys (`CLAUDE.md` says no PR previews), and confirm the production branch is `main`.
 
 ## Decisions
 
 - Docs replaced: old screensaver plan and specs deleted.
-- No Supabase, no auth. Netlify adapter installed, no deploy until all phases are done. The display is served from the PC itself for now (`vite preview`, which works with the Netlify adapter's build because the page has no server routes).
+- No Supabase, no auth. Netlify adapter installed; deployed in Phase 6. The display can be served from the PC itself (`vite preview`, which works with the Netlify adapter's build because the page has no server routes).
 - Pins mark municipalities only. Boundary from Natural Earth, coordinates from CGNDB.
 - Base map is Web Mercator for radar alignment. GeoMet takes one layer per request, so rain and snow are fetched separately and composited.
 - Radar older than 1 hour (by newest frame) is hidden. Label is Toronto time. Radar frames are requested at most 1600 CSS pixels wide.
@@ -31,9 +36,11 @@
 
 ## Open questions
 
-- Layout options: five mockups (today, floating card, top billboard, daylight, wide two column panel) are on a private canvas at https://claude.ai/artifact/TrLWv5HPcXMdbmFvKuPxQL. The owner has not picked one yet.
+- Layout: the owner chose to keep the current layout (2026-10-26). The other mockups are still on the private canvas at https://claude.ai/artifact/TrLWv5HPcXMdbmFvKuPxQL.
 - Credit text has no minimum size, as requested, so it is about 8.6px at 1024 by 768.
 - To add a municipality: add it to `municipalities.md` and `src/lib/data/municipalities.ts`, then rerun `scripts/build-municipality-data.mjs` with the Statistics Canada CSV (the link is at the top of the script). The tests that count municipalities need the new total.
+- Landmark facts were checked against web sources but should be read by someone who knows the towns. Only ten municipalities have one; more can be added to `src/lib/data/landmarks.ts`. Drive distances come from the OSRM demo server (`scripts/build-office-trips.mjs`, rerun when municipalities change).
+- A stale `npm run dev` left running on a lower port can serve old styles; use the port the newest server prints.
 - Dawson and Head, Clara, Maria coordinates are the least certain matches.
 - Radar colours are GeoMet defaults; tuning to the blue and gold palette is a later pass.
 - The highlight label can cover neighbouring pins in the dense Timiskaming cluster. Accepted for now.
