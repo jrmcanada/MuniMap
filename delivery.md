@@ -11,7 +11,8 @@
 - Phase 6: deployed to Netlify at https://munimap.netlify.app (project `munimap`, deploys on merge to `main`; checked 2026-10-26: production branch `main`, branch deploys only the production branch, deploy previews off). The site is private (Netlify team login). On the laptop, a desktop shortcut opens that address, so nothing runs locally.
 - The project was renamed from TMM Map to MuniMap (repo, folder, package, scripts). The logo file `tmm-logo.png` keeps its name because TMM is the company.
 - Not yet tried on the real display PC. `scripts/start-kiosk.ps1` was tested for the server, its restart, the one-copy guard and the stop script (without opening Edge). The kiosk server uses port 4183. The Edge launch flags, wake lock in kiosk mode and the logon shortcut need one run on the PC, following `docs/kiosk-setup.md`.
-- 131 unit and component tests and 15 e2e tests pass.
+- Keyboard: the left and right arrow keys step to the previous or next municipality in the rotation (`PanelSchedule.step`). The new one gets a full 20 second slot and any pin is dropped; stepping back stops at the first slot. Clicking a pin still holds for 60 seconds. There are no other key controls.
+- 134 unit and component tests and 16 e2e tests pass.
 
 ## Next action
 
