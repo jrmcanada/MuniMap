@@ -56,6 +56,6 @@ Questions 3 to 5 below are answered; see the decisions above.
 4. **Phase 3, municipality panel.** Rotation, weather, population, facts. _(Built and reviewed 2026-10-22.)_
 5. **Phase 4, status bar.** Clock, count, ticker. _(Built and reviewed 2026-10-23.)_
 6. **Phase 5, kiosk polish.** Full screen, long run stability, error recovery. _(Built 2026-10-23, review pending.)_
-7. **Phase 6, deploy.** Netlify, once everything above is done.
+7. **Phase 6, deploy.** Netlify. _(Done 2026-10-26: https://munimap.netlify.app, private.)_
 
 Each phase becomes one or more `spec.md` files under `docs/specs/` as it is picked up. This plan sets order and boundaries, not implementation detail.
