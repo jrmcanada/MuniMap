@@ -1,5 +1,5 @@
 <#
-Stops the TMM Map display: the supervisor, the local server and the kiosk Edge window.
+Stops the MuniMap display: the supervisor, the local server and the kiosk Edge window.
 Run this before updating the app, then build, then start the display again.
 #>
 $ErrorActionPreference = 'SilentlyContinue'
@@ -7,7 +7,7 @@ $ErrorActionPreference = 'SilentlyContinue'
 $root = Split-Path -Parent $PSScriptRoot
 $port = 4183
 $vite = Join-Path $root 'node_modules\vite\bin\vite.js'
-$edgeProfile = Join-Path $env:LOCALAPPDATA 'TMMMapKiosk'
+$edgeProfile = Join-Path $env:LOCALAPPDATA 'MuniMapKiosk'
 
 # The supervisor first, so it doesn't restart what we are about to stop. It is started with -File,
 # which keeps this from matching anything else that merely mentions the script.

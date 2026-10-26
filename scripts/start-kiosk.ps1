@@ -1,5 +1,5 @@
 <#
-Starts the TMM Map display on this PC, then keeps it running.
+Starts the MuniMap display on this PC, then keeps it running.
 
 It serves the built app on 127.0.0.1, opens it full screen in Edge, and every 30 seconds
 restarts the server or Edge if either has stopped. It writes no log files.
@@ -22,14 +22,14 @@ $root = Split-Path -Parent $PSScriptRoot
 $port = 4183
 $localUrl = "http://127.0.0.1:$port"
 $address = if ($Url) { $Url } else { $localUrl }
-$edgeProfile = Join-Path $env:LOCALAPPDATA 'TMMMapKiosk'
+$edgeProfile = Join-Path $env:LOCALAPPDATA 'MuniMapKiosk'
 $vite = Join-Path $root 'node_modules\vite\bin\vite.js'
 $checkSeconds = 30
 $startupSeconds = 60
 
 # One supervisor at a time: a second copy (a shortcut run twice, or step 2 of the guide left
 # running) would fight the first.
-$mutex = New-Object System.Threading.Mutex($false, 'Global\TMMMapKiosk')
+$mutex = New-Object System.Threading.Mutex($false, 'Global\MuniMapKiosk')
 if (-not $mutex.WaitOne(0)) { exit }
 
 function Test-App {
