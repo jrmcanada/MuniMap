@@ -57,3 +57,15 @@ The script then skips the local server and only keeps Edge open. Nothing else in
 - **To leave the display and use the PC.** Run `powershell -ExecutionPolicy Bypass -File scripts\stop-kiosk.ps1`.
 - **The script is already running.** Starting it twice does nothing: only one copy runs at a time.
 - **Port.** The app is served on port 4183, which dev tools and the e2e tests don't use.
+
+## Running it on a laptop or desk
+
+To use the app on an ordinary PC without a dev server window, run `npm run build` once, then use `scripts\open-munimap.ps1`. It starts the server in the background and opens the app in your default browser at `http://127.0.0.1:4183`.
+
+For a one-click desktop shortcut, right-click the desktop, choose New, Shortcut, and use this as the target (with your real project path):
+
+```
+powershell.exe -WindowStyle Hidden -ExecutionPolicy Bypass -File "C:\path\to\MuniMap\scripts\open-munimap.ps1"
+```
+
+Stop it with `scripts\stop-kiosk.ps1`. After changing the code, stop it, run `npm run build`, and open the shortcut again.
