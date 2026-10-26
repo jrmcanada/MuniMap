@@ -8,7 +8,7 @@
 - Clicking the office diamond shows a card titled The Managed Municipality with Sudbury weather (site `on-40`) and the census totals for all municipalities.
 - When the sun is down and the moon is up, the sun panel shows a white moon on the arc, drawn at its current phase, with moonrise and moonset times. The moon and its times are worked out in the app (`src/lib/weather/moon.ts`), so they can be a few minutes off.
 - The status bar has many more facts, mixed in with the originals: drive, cycle and walk times from the Sudbury office to random municipalities (driving worked out at 90 km/h), farthest and closest, north/south/east/west extremes, densest and sparsest, population change, area, daylight and windiest, and ten researched landmarks (`src/lib/data/landmarks.ts`). Travel facts are weighted to come up less often, and the ticker starts on a random fact.
-- Phase 6: deployed to Netlify at https://munimap.netlify.app (project `munimap`, deploys on merge to `main`). The site is private (Netlify team login). On the laptop, a desktop shortcut opens that address, so nothing runs locally.
+- Phase 6: deployed to Netlify at https://munimap.netlify.app (project `munimap`, deploys on merge to `main`; checked 2026-10-26: production branch `main`, branch deploys only the production branch, deploy previews off). The site is private (Netlify team login). On the laptop, a desktop shortcut opens that address, so nothing runs locally.
 - The project was renamed from TMM Map to MuniMap (repo, folder, package, scripts). The logo file `tmm-logo.png` keeps its name because TMM is the company.
 - Not yet tried on the real display PC. `scripts/start-kiosk.ps1` was tested for the server, its restart, the one-copy guard and the stop script (without opening Edge). The kiosk server uses port 4183. The Edge launch flags, wake lock in kiosk mode and the logon shortcut need one run on the PC, following `docs/kiosk-setup.md`.
 - 131 unit and component tests and 15 e2e tests pass.
@@ -17,7 +17,6 @@
 
 1. Owner tries `docs/kiosk-setup.md` on the display PC and reports anything Edge does differently.
 2. Owner signs in to Netlify once in the kiosk's Edge profile (`start-kiosk.ps1 -Url https://munimap.netlify.app`), then stops and restarts the script to see whether the sign in lasts. If it does not, decide between a public site and serving the display from its local copy.
-3. In Netlify, turn off Deploy Previews and Branch deploys (`CLAUDE.md` says no PR previews), and confirm the production branch is `main`.
 
 ## Decisions
 
