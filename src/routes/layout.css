@@ -129,6 +129,10 @@
 	--road-wet: oklch(0.68 0.14 240);
 	--road-snow: oklch(0.95 0.03 250);
 	--road-ice: oklch(0.7 0.22 330);
+	/* Road event symbols: a red circle, an orange triangle and a yellow square. */
+	--road-closed: oklch(0.65 0.22 25);
+	--road-collision: oklch(0.75 0.17 55);
+	--road-roadwork: oklch(0.88 0.15 95);
 	/* The green of the company logo. */
 	--map-office: #2de690;
 	--map-radar-opacity: 0.45;

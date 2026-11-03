@@ -11,11 +11,13 @@
 	import { formatRadarTime } from '#lib/radar/format.js';
 	import { RadarPlayer } from '#lib/radar/player.js';
 	import { canvasBbox } from '#lib/radar/wms.js';
+	import { toEvents, type RoadEvent } from '#lib/roads/events.js';
 	import { startRoadFeed } from '#lib/roads/feed.js';
-	import type { RoadSegment } from '#lib/roads/roadConditions.js';
-	import { fetchRoadConditions, ROAD_SOURCE_LABEL } from '#lib/roads/source.js';
+	import { toSegments, type RoadSegment } from '#lib/roads/roadConditions.js';
+	import { fetchRoadConditions, fetchRoadEvents, ROAD_SOURCE_LABEL } from '#lib/roads/source.js';
 	import {
 		drawBase,
+		drawEvents,
 		drawOffice,
 		drawHighlight,
 		drawPins,
@@ -24,6 +26,7 @@
 		readRadarOpacity
 	} from './draw.js';
 	import type { GeoProjection } from 'd3-geo';
+	import RoadEventCard from './RoadEventCard.svelte';
 	import RoadLegend from './RoadLegend.svelte';
 	import { createProjection, projectPlaces, zoomProjection } from './projection.js';
 	import type { HighwayData, MapColors, MapData, PinPoint } from './types.js';
@@ -77,7 +80,19 @@
 
 	let radarTime = $state<string | null>(null);
 	let roads: RoadSegment[] = [];
-	let hasRoads = $state(false);
+	let events: RoadEvent[] = [];
+	let eventPins: PinPoint[] = [];
+	let eventTimer: ReturnType<typeof setTimeout>;
+	/** The road event whose card is open, with where its symbol sits on the map. */
+	let openEvent = $state<{
+		event: RoadEvent;
+		x: number;
+		y: number;
+		/** Which side of the symbol has room for the card. */
+		left: boolean;
+		up: boolean;
+	} | null>(null);
+	let hasRoadData = $state(false);
 
 	const feed = new RadarFeed(() => {
 		// A still frame has no loop to pick up new radar, so it redraws itself.
@@ -98,6 +113,7 @@
 		canvas.height = Math.round(height * ratio);
 		ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
 
+		closeEvent();
 		baseProjection = createProjection(width, height, municipalities);
 		clearTimeout(zoomResetTimer);
 		view = FULL_VIEW;
@@ -124,6 +140,7 @@
 		const projection = zoomProjection(baseProjection, view);
 		pins = projectPlaces(projection, municipalities);
 		[officePin] = projectPlaces(projection, [office]);
+		eventPins = projectPlaces(projection, events);
 		const baseCtx = base!.getContext('2d')!;
 		baseCtx.setTransform(1, 0, 0, 1, 0, 0);
 		baseCtx.clearRect(0, 0, base!.width, base!.height);
@@ -141,6 +158,7 @@
 	}
 
 	function changeView(next: View) {
+		closeEvent();
 		view = next;
 		baseStale = true;
 		// A wall display has nobody to zoom back out, so the full view returns after a quiet spell.
@@ -150,6 +168,7 @@
 	}
 
 	function resetZoom() {
+		closeEvent();
 		view = FULL_VIEW;
 		baseStale = true;
 		if (motionQuery.matches) draw(0, false);
@@ -175,6 +194,7 @@
 		const time = radar ? formatRadarTime(radar.time) : null;
 		if (time !== radarTime) radarTime = time;
 
+		drawEvents(ctx, events, eventPins, colors);
 		drawPins(ctx, pins, colors, seconds, animate);
 		drawOffice(ctx, officePin, colors);
 
@@ -187,20 +207,45 @@
 		}
 	}
 
+	function pointOf(event: MouseEvent): PinPoint {
+		const rect = canvas.getBoundingClientRect();
+		return { x: event.clientX - rect.left, y: event.clientY - rect.top };
+	}
+
 	/** The name of the office or municipality under the pointer, or null for open map. */
 	function targetAt(event: MouseEvent): string | null {
-		const rect = canvas.getBoundingClientRect();
-		const point = { x: event.clientX - rect.left, y: event.clientY - rect.top };
+		const point = pointOf(event);
 		if (nearestPin([officePin], point, HIT_RADIUS) >= 0) return office.name;
 		const index = nearestPin(pins, point, HIT_RADIUS);
 		return index >= 0 ? municipalities[index].name : null;
+	}
+
+	/** How long a road event card stays up when nobody closes it. */
+	const EVENT_CARD_MS = 30_000;
+
+	function closeEvent() {
+		clearTimeout(eventTimer);
+		openEvent = null;
 	}
 
 	function select(event: MouseEvent) {
 		// A drag ends in a click too; only a real click picks a pin.
 		if (dragMoved) return;
 		const name = targetAt(event);
-		if (name) onSelect?.(name);
+		if (name) {
+			closeEvent();
+			onSelect?.(name);
+			return;
+		}
+		const index = nearestPin(eventPins, pointOf(event), HIT_RADIUS);
+		if (index < 0) {
+			closeEvent();
+			return;
+		}
+		const { x, y } = eventPins[index];
+		openEvent = { event: events[index], x, y, left: x > width / 2, up: y > height * 0.6 };
+		clearTimeout(eventTimer);
+		eventTimer = setTimeout(closeEvent, EVENT_CARD_MS);
 	}
 
 	function startDrag(event: PointerEvent) {
@@ -216,7 +261,8 @@
 
 	function movePointer(event: PointerEvent) {
 		if (!drag) {
-			canvas.style.cursor = targetAt(event) ? 'pointer' : view.k > 1 ? 'grab' : '';
+			const overSymbol = targetAt(event) || nearestPin(eventPins, pointOf(event), HIT_RADIUS) >= 0;
+			canvas.style.cursor = overSymbol ? 'pointer' : view.k > 1 ? 'grab' : '';
 			return;
 		}
 		const dx = event.clientX - drag.x;
@@ -265,11 +311,18 @@
 		motionQuery.addEventListener('change', start);
 		layout();
 		// The land is only redrawn on a change, so new road conditions mark it stale.
-		const stopRoads = startRoadFeed(fetchRoadConditions, (segments) => {
-			roads = segments;
-			hasRoads = segments.length > 0;
+		const roadsChanged = () => {
+			hasRoadData = roads.length > 0 || events.length > 0;
 			baseStale = true;
 			if (motionQuery.matches) draw(0, false);
+		};
+		const stopRoads = startRoadFeed(fetchRoadConditions, toSegments, (segments) => {
+			roads = segments;
+			roadsChanged();
+		});
+		const stopEvents = startRoadFeed(fetchRoadEvents, toEvents, (found) => {
+			events = found;
+			roadsChanged();
 		});
 		// Not passive, so zoom() can stop the page zooming too.
 		canvas.addEventListener('wheel', zoom, { passive: false });
@@ -285,6 +338,8 @@
 
 		return () => {
 			stopRoads();
+			stopEvents();
+			clearTimeout(eventTimer);
 			cancelAnimationFrame(frame);
 			clearTimeout(resizeTimer);
 			clearTimeout(zoomResetTimer);
@@ -314,7 +369,18 @@
 			onpointercancel={endDrag}
 		></canvas>
 	</div>
-	{#if hasRoads}<RoadLegend source={ROAD_SOURCE_LABEL} />{/if}
+	{#if openEvent}
+		<div
+			class="event-card"
+			class:left={openEvent.left}
+			class:up={openEvent.up}
+			style:left="{openEvent.x}px"
+			style:top="{openEvent.y}px"
+		>
+			<RoadEventCard event={openEvent.event} onClose={closeEvent} />
+		</div>
+	{/if}
+	{#if hasRoadData}<RoadLegend source={ROAD_SOURCE_LABEL} />{/if}
 	{#if radarTime}<p class="caption">{radarTime}</p>{/if}
 </div>
 
@@ -336,6 +402,24 @@
 		display: block;
 		width: 100%;
 		height: 100%;
+	}
+
+	/* Anchored beside the symbol, on whichever side has room. */
+	.event-card {
+		position: absolute;
+		transform: translate(1rem, -1rem);
+	}
+
+	.event-card.left {
+		transform: translate(calc(-100% - 1rem), -1rem);
+	}
+
+	.event-card.up {
+		transform: translate(1rem, calc(-100% + 1rem));
+	}
+
+	.event-card.left.up {
+		transform: translate(calc(-100% - 1rem), calc(-100% + 1rem));
 	}
 
 	.caption {

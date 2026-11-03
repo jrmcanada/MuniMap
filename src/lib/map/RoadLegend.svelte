@@ -16,6 +16,9 @@
 		{#each ROAD_STATUSES as status (status)}
 			<li><span class="swatch {status}"></span>{LABELS[status]}</li>
 		{/each}
+		<li><span class="closed"></span>Closed</li>
+		<li><span class="collision"></span>Collision</li>
+		<li><span class="roadwork"></span>Roadwork</li>
 	</ul>
 	<p class="source">{source}</p>
 </div>
@@ -68,6 +71,26 @@
 
 	.ice {
 		background: var(--road-ice);
+	}
+
+	.closed {
+		width: 0.7rem;
+		height: 0.7rem;
+		border-radius: 50%;
+		background: var(--road-closed);
+	}
+
+	.collision {
+		width: 0.8rem;
+		height: 0.7rem;
+		clip-path: polygon(50% 0, 100% 100%, 0 100%);
+		background: var(--road-collision);
+	}
+
+	.roadwork {
+		width: 0.6rem;
+		height: 0.6rem;
+		background: var(--road-roadwork);
 	}
 
 	.source {

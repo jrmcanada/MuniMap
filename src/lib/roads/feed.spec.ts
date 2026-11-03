@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, it, expect, vi } from 'vitest';
 import { ROAD_REFRESH_MS, startRoadFeed } from './feed.js';
-import type { RoadConditionRecord } from './roadConditions.js';
+import { toSegments, type RoadConditionRecord } from './roadConditions.js';
 
 const record: RoadConditionRecord = {
 	RoadwayName: '17',
@@ -17,7 +17,7 @@ describe('startRoadFeed', () => {
 	it('loads at once and then every refresh', async () => {
 		const load = vi.fn(async () => [record]);
 		const onUpdate = vi.fn();
-		const stop = startRoadFeed(load, onUpdate);
+		const stop = startRoadFeed(load, toSegments, onUpdate);
 
 		await vi.advanceTimersByTimeAsync(0);
 		expect(onUpdate).toHaveBeenCalledTimes(1);
@@ -34,7 +34,7 @@ describe('startRoadFeed', () => {
 			.mockRejectedValueOnce(new Error('down'))
 			.mockResolvedValueOnce(null);
 		const onUpdate = vi.fn();
-		const stop = startRoadFeed(load, onUpdate);
+		const stop = startRoadFeed(load, toSegments, onUpdate);
 
 		await vi.advanceTimersByTimeAsync(2 * ROAD_REFRESH_MS);
 		expect(load).toHaveBeenCalledTimes(3);
@@ -44,7 +44,7 @@ describe('startRoadFeed', () => {
 
 	it('stops loading once stopped', async () => {
 		const load = vi.fn(async () => [record]);
-		const stop = startRoadFeed(load, vi.fn());
+		const stop = startRoadFeed(load, toSegments, vi.fn());
 		await vi.advanceTimersByTimeAsync(0);
 		stop();
 		await vi.advanceTimersByTimeAsync(3 * ROAD_REFRESH_MS);

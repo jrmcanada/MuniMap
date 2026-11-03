@@ -1,0 +1,75 @@
+[
+	{
+		"ID": 9001,
+		"RoadwayName": "HWY 17",
+		"Description": "Sample closure west of Wawa. Highway closed in both directions.",
+		"EventType": "closures",
+		"IsFullClosure": true,
+		"Latitude": 47.99,
+		"Longitude": -85.2,
+		"DirectionOfTravel": "All Directions",
+		"LanesAffected": "All lanes",
+		"LastUpdated": 1793700000,
+		"PlannedEndDate": 1793800000
+	},
+	{
+		"ID": 9002,
+		"RoadwayName": "HWY 11",
+		"Description": "Sample collision north of Cochrane. Highway closed while the scene is cleared.",
+		"EventType": "accidentsAndIncidents",
+		"IsFullClosure": true,
+		"Latitude": 49.4,
+		"Longitude": -81.0,
+		"DirectionOfTravel": "Southbound",
+		"LanesAffected": "All lanes",
+		"LastUpdated": 1793720000
+	},
+	{
+		"ID": 9003,
+		"RoadwayName": "HWY 69",
+		"Description": "Sample roadwork south of Sudbury. Lanes stay open.",
+		"EventType": "roadwork",
+		"IsFullClosure": false,
+		"Latitude": 46.2,
+		"Longitude": -80.9,
+		"DirectionOfTravel": "Northbound",
+		"LanesAffected": "Right lane",
+		"LastUpdated": 1793650000,
+		"PlannedEndDate": 1795000000
+	},
+	{
+		"ID": 9004,
+		"RoadwayName": "HWY 6",
+		"Description": "Sample closure near Espanola.",
+		"EventType": "closures",
+		"IsFullClosure": true,
+		"Latitude": 46.3,
+		"Longitude": -81.8,
+		"DirectionOfTravel": "Unknown",
+		"LastUpdated": 1793710000
+	},
+	{
+		"ID": 9005,
+		"RoadwayName": "HWY 17",
+		"Description": "Sample collision east of Thunder Bay. One lane blocked.",
+		"EventType": "accidentsAndIncidents",
+		"IsFullClosure": false,
+		"Latitude": 48.6,
+		"Longitude": -88.0,
+		"DirectionOfTravel": "Eastbound",
+		"LanesAffected": "Right lane",
+		"LastUpdated": 1793730000
+	},
+	{
+		"ID": 9006,
+		"RoadwayName": "HWY 11",
+		"Description": "Sample bridge work near Temagami.",
+		"EventType": "roadwork",
+		"IsFullClosure": false,
+		"Latitude": 47.1,
+		"Longitude": -79.8,
+		"DirectionOfTravel": "Both Directions",
+		"LanesAffected": "Shoulder",
+		"LastUpdated": 1793600000
+	}
+]

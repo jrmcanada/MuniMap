@@ -1,3 +1,4 @@
+import type { RoadEventRecord } from './events.js';
 import type { RoadConditionRecord } from './roadConditions.js';
 
 /**
@@ -9,6 +10,12 @@ import type { RoadConditionRecord } from './roadConditions.js';
 export async function fetchRoadConditions(): Promise<RoadConditionRecord[] | null> {
 	if (!import.meta.env.DEV) return null;
 	return (await import('./sample-road-conditions.json')).default as RoadConditionRecord[];
+}
+
+/** Road events, from which the closures are picked. Same rules as the conditions above. */
+export async function fetchRoadEvents(): Promise<RoadEventRecord[] | null> {
+	if (!import.meta.env.DEV) return null;
+	return (await import('./sample-road-events.json')).default as RoadEventRecord[];
 }
 
 /** Credit under the legend. Sample data says so, so nobody mistakes it for the real thing. */
