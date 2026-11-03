@@ -1,0 +1,218 @@
+[
+	{
+		"LocationDescription": "Sample section 1.1",
+		"Condition": ["Bare and dry road"],
+		"Visibility": "Good",
+		"Drifting": null,
+		"Region": "Northern",
+		"RoadwayName": "Sample 1",
+		"EncodedPolyline": [
+			"ohi|HnrzvM~{B~{BnwH~uJ~{B~{B~{Bn}@~uJn}@~{B_|Bn}@??n}@~{Bo}@nzD_vJ~rN~xF~rNnzDnwHnzD~{B?~uJ_|BnwHn}@~{B?n}@_|B~{BowHn}@o}@n}@?nkX~rN~{BnzD~{B~xF~{B~{B~rN~{B~xFnwH~{B~{BnwHn}@~rN?nzD?~{B_|B~xFn}@nzDnwHn}@~{B"
+		],
+		"LastUpdated": 1793000000
+	},
+	{
+		"LocationDescription": "Sample section 1.2",
+		"Condition": ["Bare and wet road"],
+		"Visibility": "Good",
+		"Drifting": null,
+		"Region": "Northern",
+		"RoadwayName": "Sample 1",
+		"EncodedPolyline": [
+			"_dutHnydyM~{B?n}@?~xFozD~{BowH~{B_|B~oR_vJ~{B_|Bn}@owH?_mV~{B_sN~xF_pR~{BozD~{BozD~{Bo}@nzD?~oR?~rN?~xFn}@~uJnzDnzDn}@nzDo}@~uJ_|BnzD?nzDn}@n}@n}@?~{BozDnwH?~{B?n}@~{B~{BnwH~{Bn}@~{Bn}@~oR~xFnh\\n}@~uJ~{BnqP"
+		],
+		"LastUpdated": 1793000000
+	},
+	{
+		"LocationDescription": "Sample section 1.3",
+		"Condition": ["Snow covered"],
+		"Visibility": "Good",
+		"Drifting": null,
+		"Region": "Northern",
+		"RoadwayName": "Sample 1",
+		"EncodedPolyline": [
+			"oxsnHnydyMn}@~uJ~iZ?n}@n}@n}@~{Bn}@ntLo}@nh\\n}@~uJn}@nzDnwHn}@~uJ?nwHn}@~{B?n}@o}@nzD_yF~{Bo}@~xFn}@~{Bo}@~xF_|B~uJowHnzD_|BnzD?ntLn}@n}@?nzD_|B~xF?~rN_|BnwH?~{B?n}@nqP?n}@~{Bn}@n}@~uJn}@~{Bn}@n}@~xF?nkX?"
+		],
+		"LastUpdated": 1793000000
+	},
+	{
+		"LocationDescription": "Sample section 2.1",
+		"Condition": ["Bare and wet road"],
+		"Visibility": "Good",
+		"Drifting": null,
+		"Region": "Northern",
+		"RoadwayName": "Sample 2",
+		"EncodedPolyline": [
+			"obumGnww_N??owH~{B_|Bo}@_yF_|B_|B?_yFn}@o}@~{Bo}@?_yF?o}@?otL??n}@_|Bn}@ozDo}@o}@~{Bo}@n}@_|B?_|B_|BozD?"
+		],
+		"LastUpdated": 1793000000
+	},
+	{
+		"LocationDescription": "Sample section 2.2",
+		"Condition": ["Snow covered"],
+		"Visibility": "Good",
+		"Drifting": null,
+		"Region": "Northern",
+		"RoadwayName": "Sample 2",
+		"EncodedPolyline": [
+			"__mpGnq_`N?_|Bo}@o}@o}@_|Bo}@?_|Bo}@_|B?_|B_|BozD_|B_|Bo}@o}@~{BozDn}@o}@o}@_|BozD_|Bo}@o}@?o}@~{Bo}@?ozDnzD?nzDo}@n}@"
+		],
+		"LastUpdated": 1793000000
+	},
+	{
+		"LocationDescription": "Sample section 2.3",
+		"Condition": ["Snow packed", "Icy sections"],
+		"Visibility": "Good",
+		"Drifting": null,
+		"Region": "Northern",
+		"RoadwayName": "Sample 2",
+		"EncodedPolyline": [
+			"_rgrGnww_N_|Bo}@o}@~{Bn}@nzDo}@nzDozDn}@_|B~{BozD~xF_|B_|B?o}@_|B_|Bo}@~{Bo}@~{Bo}@o}@?nzDo}@??n}@?nzDo}@?o}@nzD_|Bn}@"
+		],
+		"LastUpdated": 1793000000
+	},
+	{
+		"LocationDescription": "Sample section 3.1",
+		"Condition": ["Snow covered"],
+		"Visibility": "Good",
+		"Drifting": null,
+		"Region": "Northern",
+		"RoadwayName": "Sample 3",
+		"EncodedPolyline": [
+			"oo_oH~`jeMn}@~{B?nzDn}@~lVo}@~oR~{BnkXozDn_h@?nkX_|B~yxAn}@nh\\n}@nzDn}@nzDntLnqP~xFnzDnqP~uJ~{B~{Bn}@nzD~xF~oR~uJnqP"
+		],
+		"LastUpdated": 1793000000
+	},
+	{
+		"LocationDescription": "Sample section 3.2",
+		"Condition": ["Snow packed", "Icy sections"],
+		"Visibility": "Good",
+		"Drifting": null,
+		"Region": "Northern",
+		"RoadwayName": "Sample 3",
+		"EncodedPolyline": [
+			"ob}lHnnopMn}@nzD~{B~oR~xFnkXnzD~rNn}@~lV~{BnqP~xF~xFnwHnwHnzDo}@~xFn}@n}@n}@nwHnnT~{Bn}@n}@?~xFozD~{B?n}@n}@n}@nzDn}@~{B"
+		],
+		"LastUpdated": 1793000000
+	},
+	{
+		"LocationDescription": "Sample section 3.3",
+		"Condition": ["Bare and dry road"],
+		"Visibility": "Good",
+		"Drifting": null,
+		"Region": "Northern",
+		"RoadwayName": "Sample 3",
+		"EncodedPolyline": [
+			"_iajHnvkuM~rN~uJn}@n}@~{B?~xF_|B~uJ?~rN_|BnwH?nzD?n}@n}@~{B~{BnqPnzD~rNnwHnwHnzDnqP~rN~uJnzDntLnzDntL~{B"
+		],
+		"LastUpdated": 1793000000
+	},
+	{
+		"LocationDescription": "Sample section 4.1",
+		"Condition": ["Snow packed", "Icy sections"],
+		"Visibility": "Good",
+		"Drifting": null,
+		"Region": "Northern",
+		"RoadwayName": "Sample 4",
+		"EncodedPolyline": [
+			"_fejHnisyO~{B_g^_|B_|B?_|B?_|B?o}@n}@?~{B?n}@?n}@_|B~{BowHn}@_sNn}@owH?_yF~{B_vJ?owHn}@_|Bn}@_|B"
+		],
+		"LastUpdated": 1793000000
+	},
+	{
+		"LocationDescription": "Sample section 4.2",
+		"Condition": ["Bare and dry road"],
+		"Visibility": "Good",
+		"Drifting": null,
+		"Region": "Northern",
+		"RoadwayName": "Sample 4",
+		"EncodedPolyline": [
+			"oykiHnfzuOn}@oqPn}@ozD~{B_|Bo}@_yF~xFonT~xF_db@o}@owHo}@o}@ozD_|Bo}@_|B_|BoqPn}@_|B~uJozDn}@o}@?_|B?ozD_|BotLo}@owH"
+		],
+		"LastUpdated": 1793000000
+	},
+	{
+		"LocationDescription": "Sample section 4.3",
+		"Condition": ["Construction zone"],
+		"Visibility": "Good",
+		"Drifting": null,
+		"Region": "Northern",
+		"RoadwayName": "Sample 4",
+		"EncodedPolyline": [
+			"oe|hH~klpOo}@ozD?_|B?_|BnzDowH~{B_pR_|Bo}@o}@_|B~uJoh\\~{BowHnzDonTn}@_vJ?onTo}@_yF?owH?owHo}@_|B"
+		],
+		"LastUpdated": 1793000000
+	},
+	{
+		"LocationDescription": "Sample section 5.1",
+		"Condition": ["Bare and dry road"],
+		"Visibility": "Good",
+		"Drifting": null,
+		"Region": "Northern",
+		"RoadwayName": "Sample 5",
+		"EncodedPolyline": [
+			"oaqbHn|e|NnzD_|BnzD_sNn}@_|BntLotLnzD_|BnzDo}@nkXn}@nzD?nzD_|B~{B?~rNn}@~xFo}@~rN_yF~xFo}@~rNn}@~xFnzD"
+		],
+		"LastUpdated": 1793000000
+	},
+	{
+		"LocationDescription": "Sample section 5.2",
+		"Condition": ["Construction zone"],
+		"Visibility": "Good",
+		"Drifting": null,
+		"Region": "Northern",
+		"RoadwayName": "Sample 5",
+		"EncodedPolyline": [
+			"_uz}Gn`wzN~{B?nzD?~{B?~{BnzD~{BntL~{B~{B~{Bn}@nwHn}@nzDn}@~{B~xF~{Bn}@~{B?nzD_|B~{B?nwH~xF~{Bn}@nzDn}@"
+		],
+		"LastUpdated": 1793000000
+	},
+	{
+		"LocationDescription": "Sample section 5.3",
+		"Condition": ["Bare and dry road"],
+		"Visibility": "Good",
+		"Drifting": null,
+		"Region": "Northern",
+		"RoadwayName": "Sample 5",
+		"EncodedPolyline": [
+			"_wd{Gn|e|N~{B?~xF_|B~xF_yFn}@o}@n}@?~{BnzD?~{Bn}@n}@n}@?nzD?~{B~uJn}@n}@nzD??~{Bn}@n}@n}@n}@n}@?"
+		],
+		"LastUpdated": 1793000000
+	},
+	{
+		"LocationDescription": "Sample section 6.1",
+		"Condition": ["Construction zone"],
+		"Visibility": "Good",
+		"Drifting": null,
+		"Region": "Northern",
+		"RoadwayName": "Sample 6",
+		"EncodedPolyline": [
+			"osgyH~jheP~uJ~{BnqP~xFntL~{B~xF?~xFo}@~uJ_yF~{B?~{B~{BnwH~lVnzDnwH~{Bn}@~{Bn}@nwH~uJnzDnzD~{B?~xFn}@"
+		],
+		"LastUpdated": 1793000000
+	},
+	{
+		"LocationDescription": "Sample section 6.2",
+		"Condition": ["Bare and dry road"],
+		"Visibility": "Good",
+		"Drifting": null,
+		"Region": "Northern",
+		"RoadwayName": "Sample 6",
+		"EncodedPolyline": [
+			"ovfuH~wjgP~xFo}@n}@n}@ntLntL~uJ~{BntL~{B~rNo}@~uJn}@~oR~rNnwH~{B~xF?nzDn}@nzDnwHnqPnwH~{B~{B~{BnzD?~rNnzD~uJ"
+		],
+		"LastUpdated": 1793000000
+	},
+	{
+		"LocationDescription": "Sample section 6.3",
+		"Condition": ["Bare and wet road"],
+		"Visibility": "Good",
+		"Drifting": null,
+		"Region": "Northern",
+		"RoadwayName": "Sample 6",
+		"EncodedPolyline": [
+			"onjpHnknjP~{BnzDntLnwHnwHntL~{B~{B~{Bn}@~rN?~{B?~{Bn}@nzDnzDnzDnzDnzDntL~uJ~uJnwH~uJ~rNnh\\nzD~xF"
+		],
+		"LastUpdated": 1793000000
+	}
+]

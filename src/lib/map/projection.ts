@@ -37,7 +37,10 @@ export function zoomProjection(projection: GeoProjection, view: View): GeoProjec
 }
 
 /** Screen position of each place, in the same order as `places`. */
-export function projectPlaces(projection: GeoProjection, places: Municipality[]): PinPoint[] {
+export function projectPlaces(
+	projection: GeoProjection,
+	places: { longitude: number; latitude: number }[]
+): PinPoint[] {
 	return places.map((place) => {
 		const [x, y] = projection([place.longitude, place.latitude]) ?? [NaN, NaN];
 		return { x, y };

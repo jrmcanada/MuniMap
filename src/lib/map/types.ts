@@ -1,3 +1,5 @@
+import type { RoadEventKind } from '#lib/roads/events.js';
+import type { RoadStatus } from '#lib/roads/status.js';
 import type { Feature, FeatureCollection, LineString, MultiPolygon, Polygon } from 'geojson';
 
 export interface MapFeatureProperties {
@@ -16,6 +18,10 @@ export interface MapColors {
 	neighbour: string;
 	border: string;
 	highway: string;
+	/** Road condition line colours, by status. */
+	roads: Record<RoadStatus, string>;
+	/** Road event marker colours, by kind. */
+	roadEvents: Record<RoadEventKind, string>;
 	office: string;
 	water: string;
 	pin: string;

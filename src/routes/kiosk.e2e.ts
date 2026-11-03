@@ -155,3 +155,42 @@ test('the arrow keys step through the municipalities', async ({ page }) => {
 	await expect(showing(first)).toHaveCount(1);
 	await expect(headings).toHaveCount(1);
 });
+
+const ROAD_ROUTES = '**/api/road-*';
+
+test('shows no road layer when the Ontario 511 feed is unavailable', async ({ page }) => {
+	// Without the feed the production build must show nothing, and never made up sample roads.
+	await page.route(ROAD_ROUTES, (route) => route.fulfill({ status: 503 }));
+	await page.goto('/');
+	await expect(page.getByRole('heading', { level: 2 })).toBeVisible();
+	await page.waitForTimeout(1500);
+	await expect(page.getByText('Sample data, not real conditions')).toHaveCount(0);
+	await expect(page.getByText('Snow covered', { exact: true })).toHaveCount(0);
+});
+
+test('shows the road legend, credited to Ontario 511, when the feed answers', async ({ page }) => {
+	await page.route('**/api/road-conditions', (route) =>
+		route.fulfill({
+			json: [{ Condition: ['Bare and wet road'], EncodedPolyline: ['_p~iF~ps|U_ulLnnqC_mqNvxq`@'] }]
+		})
+	);
+	await page.route('**/api/road-events', (route) =>
+		route.fulfill({
+			json: [
+				{
+					ID: 1,
+					RoadwayName: 'HWY 17',
+					Description: 'Closed.',
+					EventType: 'closures',
+					IsFullClosure: true,
+					Latitude: 47,
+					Longitude: -80
+				}
+			]
+		})
+	);
+	await page.goto('/');
+	await expect(page.getByText('Road conditions: Ontario 511')).toBeVisible();
+	await expect(page.getByText('Snow covered', { exact: true })).toBeVisible();
+	await expect(page.getByText('Sample data, not real conditions')).toHaveCount(0);
+});
