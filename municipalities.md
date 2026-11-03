@@ -6,6 +6,7 @@ Calvin
 Carling
 Casey
 Chamberlain
+Chapleau
 Charlton and Dack
 Clearview
 Cockburn Island

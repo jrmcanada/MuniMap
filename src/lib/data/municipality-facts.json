@@ -71,6 +71,15 @@
 		"siteId": "on-136",
 		"siteName": "Earlton"
 	},
+	"Chapleau": {
+		"district": "Sudbury District",
+		"population": 1942,
+		"populationChangePercent": -1.1,
+		"landAreaKm2": 13.2,
+		"densityPerKm2": 147.1,
+		"siteId": "on-91",
+		"siteName": "Chapleau"
+	},
 	"Charlton and Dack": {
 		"district": "Timiskaming District",
 		"population": 686,
