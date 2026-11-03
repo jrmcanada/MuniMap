@@ -14,7 +14,7 @@
 	import { toEvents, type RoadEvent } from '#lib/roads/events.js';
 	import { startRoadFeed } from '#lib/roads/feed.js';
 	import { toSegments, type RoadSegment } from '#lib/roads/roadConditions.js';
-	import { fetchRoadConditions, fetchRoadEvents, ROAD_SOURCE_LABEL } from '#lib/roads/source.js';
+	import { fetchRoadConditions, fetchRoadEvents, roadSourceLabel } from '#lib/roads/source.js';
 	import {
 		drawBase,
 		drawEvents,
@@ -380,7 +380,7 @@
 			<RoadEventCard event={openEvent.event} onClose={closeEvent} />
 		</div>
 	{/if}
-	{#if hasRoadData}<RoadLegend source={ROAD_SOURCE_LABEL} />{/if}
+	{#if hasRoadData}<RoadLegend source={roadSourceLabel()} />{/if}
 	{#if radarTime}<p class="caption">{radarTime}</p>{/if}
 </div>
 

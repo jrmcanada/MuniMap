@@ -45,11 +45,15 @@ const isCoordinate = (value: unknown, limit: number): value is number =>
 const toMilliseconds = (seconds: number | null | undefined): number | null =>
 	typeof seconds === 'number' && seconds > 0 ? seconds * 1000 : null;
 
-/** A shut road is a closure whatever 511 filed it under, so a collision that shuts a highway counts. */
+/**
+ * Closures and collisions are always shown. Roadwork is shown only where it shuts the road, since
+ * the feed lists several hundred minor jobs that would bury the map. A collision that shuts a
+ * highway counts as a closure; roadwork that shuts a ramp stays roadwork, not a red "closed".
+ */
 function kindOf(record: RoadEventRecord): RoadEventKind | null {
+	if (record.EventType === 'roadwork') return record.IsFullClosure === true ? 'roadwork' : null;
 	if (record.EventType === 'closures' || record.IsFullClosure === true) return 'closure';
 	if (record.EventType === 'accidentsAndIncidents') return 'collision';
-	if (record.EventType === 'roadwork') return 'roadwork';
 	return null;
 }
 

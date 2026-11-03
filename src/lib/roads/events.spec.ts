@@ -41,7 +41,7 @@ describe('toEvents', () => {
 		const kinds = toEvents([
 			record({ ID: 1 }),
 			record({ ID: 2, EventType: 'accidentsAndIncidents', IsFullClosure: false }),
-			record({ ID: 3, EventType: 'roadwork', IsFullClosure: false })
+			record({ ID: 3, EventType: 'roadwork' })
 		]).map(({ kind }) => kind);
 		expect(kinds).toEqual(['closure', 'collision', 'roadwork']);
 	});
@@ -49,6 +49,14 @@ describe('toEvents', () => {
 	it('calls any event that shuts the road a closure, such as a collision', () => {
 		const collision = record({ EventType: 'accidentsAndIncidents', IsFullClosure: true });
 		expect(toEvents([collision])[0].kind).toBe('closure');
+	});
+
+	it('shows roadwork only where it shuts the road, and never as a closure', () => {
+		const events = toEvents([
+			record({ ID: 1, EventType: 'roadwork', IsFullClosure: false }),
+			record({ ID: 2, EventType: 'roadwork', IsFullClosure: true })
+		]);
+		expect(events.map(({ id, kind }) => [id, kind])).toEqual([[2, 'roadwork']]);
 	});
 
 	it('leaves out unknown event types, missing positions and repeats', () => {

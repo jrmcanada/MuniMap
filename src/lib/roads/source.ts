@@ -1,24 +1,34 @@
 import type { RoadEventRecord } from './events.js';
 import type { RoadConditionRecord } from './roadConditions.js';
 
+/** True while the roads on the map are made up, which only `npm run dev` without a key can do. */
+let usingSample = false;
+
 /**
- * Where road conditions come from. This is the one place to change when the Ontario 511 feed is
- * connected: return its records here (through a server route, because the 511 key must not reach
- * the browser). Until then, `npm run dev` shows made up sample roads so the layer can be built and
- * seen, and a production build returns null so nothing invented is ever shown on the wall display.
+ * Loads one feed from our own server routes, which hold the Ontario 511 key. If the route fails,
+ * `npm run dev` falls back to made up sample roads so the layer can be built and seen; a
+ * production build returns null so nothing invented is ever shown on the wall display.
  */
-export async function fetchRoadConditions(): Promise<RoadConditionRecord[] | null> {
+async function load<Record>(
+	path: string,
+	sample: () => Promise<{ default: unknown }>
+): Promise<Record[] | null> {
+	const response = await fetch(path).catch(() => null);
+	if (response?.ok) {
+		usingSample = false;
+		return (await response.json()) as Record[];
+	}
 	if (!import.meta.env.DEV) return null;
-	return (await import('./sample-road-conditions.json')).default as RoadConditionRecord[];
+	usingSample = true;
+	return (await sample()).default as Record[];
 }
 
-/** Road events, from which the closures are picked. Same rules as the conditions above. */
-export async function fetchRoadEvents(): Promise<RoadEventRecord[] | null> {
-	if (!import.meta.env.DEV) return null;
-	return (await import('./sample-road-events.json')).default as RoadEventRecord[];
-}
+export const fetchRoadConditions = () =>
+	load<RoadConditionRecord>('/api/road-conditions', () => import('./sample-road-conditions.json'));
+
+export const fetchRoadEvents = () =>
+	load<RoadEventRecord>('/api/road-events', () => import('./sample-road-events.json'));
 
 /** Credit under the legend. Sample data says so, so nobody mistakes it for the real thing. */
-export const ROAD_SOURCE_LABEL = import.meta.env.DEV
-	? 'Sample data, not real conditions'
-	: 'Road conditions: Ontario 511';
+export const roadSourceLabel = () =>
+	usingSample ? 'Sample data, not real conditions' : 'Road conditions: Ontario 511';
