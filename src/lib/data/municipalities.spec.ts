@@ -6,9 +6,9 @@ import { createProjection, projectPlaces } from '#lib/map/projection.js';
 const ONTARIO = { west: -95.2, east: -74.3, south: 41.6, north: 56.9 };
 
 describe('municipalities', () => {
-	it('lists 54 municipalities with unique names', () => {
-		expect(municipalities).toHaveLength(54);
-		expect(new Set(municipalities.map((m) => m.name)).size).toBe(54);
+	it('lists 55 municipalities with unique names', () => {
+		expect(municipalities).toHaveLength(55);
+		expect(new Set(municipalities.map((m) => m.name)).size).toBe(55);
 	});
 
 	it('keeps every coordinate inside Ontario', () => {

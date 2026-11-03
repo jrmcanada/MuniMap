@@ -16,6 +16,7 @@ export const municipalities: Municipality[] = [
 	{ name: 'Carling', longitude: -80.239, latitude: 45.433 },
 	{ name: 'Casey', longitude: -79.567, latitude: 47.621 },
 	{ name: 'Chamberlain', longitude: -79.953, latitude: 47.888 },
+	{ name: 'Chapleau', longitude: -83.4, latitude: 47.844 },
 	{ name: 'Charlton and Dack', longitude: -79.953, latitude: 47.796 },
 	{ name: 'Cockburn Island', longitude: -83.374, latitude: 45.921 },
 	{ name: 'Dawson', longitude: -94.517, latitude: 48.767 },
