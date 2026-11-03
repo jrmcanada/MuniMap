@@ -1,8 +1,8 @@
 # Delivery
 
-## Current state (2026-10-23)
+## Current state (2026-11-03)
 
-- Phases 0 to 6 are done. Phases 0 to 5 are merged to `main`: scaffold, map, radar, municipality panel, status bar and kiosk behaviour. Also merged: 54 municipalities, the 20 second rotation, click a pin to jump to it, the logo, the 7% bottom strip, the card style side panel (wind compass, sun arc), and credits sized to match.
+- Phases 0 to 6 are done. Phases 0 to 5 are merged to `main`: scaffold, map, radar, municipality panel, status bar and kiosk behaviour. Also merged: 55 municipalities (Chapleau was added 2026-11-03), the 20 second rotation, click a pin to jump to it, the logo, the 7% bottom strip, the card style side panel (wind compass, sun arc), and credits sized to match.
 - Map interaction: mouse wheel zooms at the pointer (up to 8x), dragging pans, and the map returns to the full view after 30 quiet seconds. Radar is enlarged when zoomed, not refetched. A green diamond (the logo green) marks the Sudbury office, and major highways are drawn from Natural Earth (`scripts/build-highways.mjs`).
 - Fixed: sunrise and sunset were computed for the next day, so the sun showed as down all day.
 - Clicking the office diamond shows a card titled The Managed Municipality with Sudbury weather (site `on-40`) and the census totals for all municipalities.
@@ -12,17 +12,21 @@
 - The project was renamed from TMM Map to MuniMap (repo, folder, package, scripts). The logo file `tmm-logo.png` keeps its name because TMM is the company.
 - Not yet tried on the real display PC. `scripts/start-kiosk.ps1` was tested for the server, its restart, the one-copy guard and the stop script (without opening Edge). The kiosk server uses port 4183. The Edge launch flags, wake lock in kiosk mode and the logon shortcut need one run on the PC, following `docs/kiosk-setup.md`.
 - Keyboard: the left and right arrow keys step to the previous or next municipality in the rotation (`PanelSchedule.step`). The new one gets a full 20 second slot and any pin is dropped; stepping back stops at the first slot. Clicking a pin still holds for 60 seconds. There are no other key controls.
-- 134 unit and component tests and 16 e2e tests pass.
+- Road conditions and events from Ontario 511 are merged (PR #23). Highways are coloured by condition (clear, wet, snow covered, icy; "No Report" roads are left undrawn) and a legend sits at the bottom left, credited to Ontario 511. Closures (red circle), collisions (orange triangle) and roadwork (yellow square) are symbols on the map; clicking one opens a detail card with the road, description, direction, lanes, expected end and last update. The card closes with the × button, a click on empty map or a pin, any zoom or pan, or after 30 seconds. Code is in `src/lib/roads/` and `src/lib/map/RoadEventCard.svelte`.
+- The 511 key never reaches the browser. The page asks `/api/road-conditions` and `/api/road-events` (server routes in `src/routes/api/`, loaders in `src/lib/server/ontario511.ts`), which add the key from the `ONTARIO_511_KEY` variable (declared in `src/env.ts`), trim the feeds to the fields used and cache for a minute. The map refreshes every 5 minutes and keeps the last good data if a refresh fails. With no key or no answer the production page shows no road layer and never sample data; `npm run dev` falls back to labelled sample data.
+- 164 unit and component tests and 18 e2e tests pass.
 
 ## Next action
 
+0. Owner adds `ONTARIO_511_KEY` in Netlify (Project configuration, Environment variables), marked secret and scoped to Functions, then redeploys. Check `https://munimap.netlify.app/api/road-events` while signed in: a list of events means it works, a 503 means the variable is not reaching the function. Until then the live site shows no roads. A local `.env` (git ignored) already holds the key for `npm run dev`.
 1. Owner tries `docs/kiosk-setup.md` on the display PC and reports anything Edge does differently.
 2. Owner signs in to Netlify once in the kiosk's Edge profile (`start-kiosk.ps1 -Url https://munimap.netlify.app`), then stops and restarts the script to see whether the sign in lasts. If it does not, decide between a public site and serving the display from its local copy.
 
 ## Decisions
 
 - Docs replaced: old screensaver plan and specs deleted.
-- No Supabase, no auth. Netlify adapter installed; deployed in Phase 6. The display can be served from the PC itself (`vite preview`, which works with the Netlify adapter's build because the page has no server routes).
+- No Supabase, no auth. Netlify adapter installed; deployed in Phase 6. The display can be served from the PC itself (`vite preview` runs the Netlify adapter's build), but the road layer then needs `ONTARIO_511_KEY` in that PC's environment or `.env`; without it the map shows no roads.
+- Road events: closures and collisions always show. Roadwork shows only where it shuts the road (86 of 537 in the first real pull), because the other jobs would bury the map, and it keeps its roadwork symbol rather than becoming a red closure. A collision that shuts a road counts as a closure. Real feed facts checked 2026-11-03: polylines are precision 5, times are Unix seconds, conditions are "Bare and dry road", "Bare and wet road" and "No Report", and 511 limits calls to 10 a minute.
 - Pins mark municipalities only. Boundary from Natural Earth, coordinates from CGNDB.
 - Base map is Web Mercator for radar alignment. GeoMet takes one layer per request, so rain and snow are fetched separately and composited.
 - Radar older than 1 hour (by newest frame) is hidden. Label is Toronto time. Radar frames are requested at most 1600 CSS pixels wide.
@@ -38,7 +42,7 @@
 
 - Layout: the owner chose to keep the current layout (2026-10-26). The other mockups are still on the private canvas at https://claude.ai/artifact/TrLWv5HPcXMdbmFvKuPxQL.
 - Credit text has no minimum size, as requested, so it is about 8.6px at 1024 by 768.
-- To add a municipality: add it to `municipalities.md` and `src/lib/data/municipalities.ts`, then rerun `scripts/build-municipality-data.mjs` with the Statistics Canada CSV (the link is at the top of the script). The tests that count municipalities need the new total.
+- To add a municipality: add it to `municipalities.md` and `src/lib/data/municipalities.ts`, then rerun `scripts/build-municipality-data.mjs` with the Statistics Canada CSV (the link is at the top of the script) and `scripts/build-office-trips.mjs`, and run Prettier on `office-trips.json`. The two tests that count municipalities (`municipalities.spec.ts` and the status bar e2e) need the new total. The trips script moves a few long distances by under a kilometre each run; only keep the new entry.
 - Landmark facts were checked against web sources but should be read by someone who knows the towns. Only ten municipalities have one; more can be added to `src/lib/data/landmarks.ts`. Drive distances come from the OSRM demo server (`scripts/build-office-trips.mjs`, rerun when municipalities change).
 - A stale `npm run dev` left running on a lower port can serve old styles; use the port the newest server prints.
 - Dawson and Head, Clara, Maria coordinates are the least certain matches.
@@ -46,3 +50,7 @@
 - The highlight label can cover neighbouring pins in the dense Timiskaming cluster. Accepted for now.
 - Killarney's station reports no temperature at the moment, so it is left out of the ticker's temperature reading and its municipalities show forecast only.
 - Edge's own memory can grow over weeks. A weekly Edge restart was left out; the supervisor script restarts Edge if it dies.
+- The Ontario 511 key was pasted into a chat. It only reads public road data, so the risk is low, but ask 511 for a new key if the transcript is ever shared.
+- A road symbol under a municipality pin is hidden by it, because the pin wins the click. Zooming in separates them.
+- Statistics Canada lists Chapleau's land area as 13.2 km², which looks small for the township; the figure is used as published.
+- The e2e test "clicking the office marker" clicks a fixed pixel and sometimes fails when the machine is busy; it passes on a rerun and alone.
