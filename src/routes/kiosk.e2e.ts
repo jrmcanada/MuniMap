@@ -155,3 +155,12 @@ test('the arrow keys step through the municipalities', async ({ page }) => {
 	await expect(showing(first)).toHaveCount(1);
 	await expect(headings).toHaveCount(1);
 });
+
+test('shows no road conditions until the real feed is connected', async ({ page }) => {
+	// The production build must never draw the made up sample roads.
+	await page.goto('/');
+	await expect(page.getByRole('heading', { level: 2 })).toBeVisible();
+	await page.waitForTimeout(1500);
+	await expect(page.getByText('Sample data, not real conditions')).toHaveCount(0);
+	await expect(page.getByText('Snow covered', { exact: true })).toHaveCount(0);
+});

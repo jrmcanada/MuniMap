@@ -1,7 +1,10 @@
-import { geoPath, type GeoProjection } from 'd3-geo';
+import { geoPath, type GeoPath, type GeoProjection } from 'd3-geo';
+import type { RoadSegment } from '#lib/roads/roadConditions.js';
+import { ROAD_STATUSES } from '#lib/roads/status.js';
 import { placeLabel } from './label.js';
 import type { HighwayData, MapColors, MapData, PinPoint } from './types.js';
 
+const ROAD_LINE_WIDTH = 2.5;
 const PIN_RADIUS = 4;
 const OFFICE_RADIUS = 9;
 const HIGHLIGHT_RADIUS = 11;
@@ -21,6 +24,12 @@ export function readColors(element: Element): MapColors {
 		neighbour: read('--map-neighbour'),
 		border: read('--map-border'),
 		highway: read('--map-highway'),
+		roads: {
+			clear: read('--road-clear'),
+			wet: read('--road-wet'),
+			snow: read('--road-snow'),
+			ice: read('--road-ice')
+		},
 		office: read('--map-office'),
 		water: read('--map-water'),
 		pin: read('--map-pin'),
@@ -54,7 +63,8 @@ export function drawBase(
 	data: MapData,
 	highways: HighwayData,
 	projection: GeoProjection,
-	colors: MapColors
+	colors: MapColors,
+	roads: RoadSegment[] = []
 ): void {
 	const path = geoPath(projection, ctx);
 	ctx.lineWidth = 1;
@@ -82,6 +92,31 @@ export function drawBase(
 	ctx.beginPath();
 	for (const feature of highways.features) path(feature);
 	ctx.stroke();
+
+	drawRoadConditions(ctx, roads, path, colors);
+}
+
+/** Draws each condition's roads over the plain highways, one stroke per status. */
+function drawRoadConditions(
+	ctx: CanvasRenderingContext2D,
+	roads: RoadSegment[],
+	path: GeoPath,
+	colors: MapColors
+): void {
+	ctx.lineWidth = ROAD_LINE_WIDTH;
+	ctx.lineCap = 'round';
+	ctx.lineJoin = 'round';
+	for (const status of ROAD_STATUSES) {
+		ctx.strokeStyle = colors.roads[status];
+		ctx.beginPath();
+		for (const road of roads) {
+			if (road.status === status) {
+				path({ type: 'LineString', coordinates: road.coordinates });
+			}
+		}
+		ctx.stroke();
+	}
+	ctx.lineCap = 'butt';
 }
 
 /** Marks the company office with a diamond, drawn larger than a client pin so it stands apart. */

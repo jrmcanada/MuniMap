@@ -11,6 +11,9 @@
 	import { formatRadarTime } from '#lib/radar/format.js';
 	import { RadarPlayer } from '#lib/radar/player.js';
 	import { canvasBbox } from '#lib/radar/wms.js';
+	import { startRoadFeed } from '#lib/roads/feed.js';
+	import type { RoadSegment } from '#lib/roads/roadConditions.js';
+	import { fetchRoadConditions, ROAD_SOURCE_LABEL } from '#lib/roads/source.js';
 	import {
 		drawBase,
 		drawOffice,
@@ -21,6 +24,7 @@
 		readRadarOpacity
 	} from './draw.js';
 	import type { GeoProjection } from 'd3-geo';
+	import RoadLegend from './RoadLegend.svelte';
 	import { createProjection, projectPlaces, zoomProjection } from './projection.js';
 	import type { HighwayData, MapColors, MapData, PinPoint } from './types.js';
 	import { FULL_VIEW, panBy, wheelFactor, zoomAt, type View } from './view.js';
@@ -72,6 +76,8 @@
 	let dragMoved = false;
 
 	let radarTime = $state<string | null>(null);
+	let roads: RoadSegment[] = [];
+	let hasRoads = $state(false);
 
 	const feed = new RadarFeed(() => {
 		// A still frame has no loop to pick up new radar, so it redraws itself.
@@ -122,7 +128,7 @@
 		baseCtx.setTransform(1, 0, 0, 1, 0, 0);
 		baseCtx.clearRect(0, 0, base!.width, base!.height);
 		baseCtx.setTransform(ratio, 0, 0, ratio, 0, 0);
-		drawBase(baseCtx, mapData, highways, projection, colors);
+		drawBase(baseCtx, mapData, highways, projection, colors, roads);
 		baseStale = false;
 	}
 
@@ -258,6 +264,13 @@
 		motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
 		motionQuery.addEventListener('change', start);
 		layout();
+		// The land is only redrawn on a change, so new road conditions mark it stale.
+		const stopRoads = startRoadFeed(fetchRoadConditions, (segments) => {
+			roads = segments;
+			hasRoads = segments.length > 0;
+			baseStale = true;
+			if (motionQuery.matches) draw(0, false);
+		});
 		// Not passive, so zoom() can stop the page zooming too.
 		canvas.addEventListener('wheel', zoom, { passive: false });
 
@@ -271,6 +284,7 @@
 		observer.observe(container);
 
 		return () => {
+			stopRoads();
 			cancelAnimationFrame(frame);
 			clearTimeout(resizeTimer);
 			clearTimeout(zoomResetTimer);
@@ -300,6 +314,7 @@
 			onpointercancel={endDrag}
 		></canvas>
 	</div>
+	{#if hasRoads}<RoadLegend source={ROAD_SOURCE_LABEL} />{/if}
 	{#if radarTime}<p class="caption">{radarTime}</p>{/if}
 </div>
 

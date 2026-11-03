@@ -124,6 +124,11 @@
 	/* Water matches the background, so open sea and lakes read as one. */
 	--map-water: oklch(0.15 0.02 250);
 	--map-highway: oklch(0.5 0.05 250);
+	/* Road conditions. Lightness and hue both change, so the four read apart without relying on colour alone. */
+	--road-clear: oklch(0.78 0.17 150);
+	--road-wet: oklch(0.68 0.14 240);
+	--road-snow: oklch(0.95 0.03 250);
+	--road-ice: oklch(0.7 0.22 330);
 	/* The green of the company logo. */
 	--map-office: #2de690;
 	--map-radar-opacity: 0.45;
