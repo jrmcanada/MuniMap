@@ -21,6 +21,7 @@ describe('SunArc', () => {
 
 		expect(document.querySelector('.body')).toBeNull();
 		expect(document.querySelector('.travelled')).toBeNull();
+		expect(document.querySelectorAll('.times')).toHaveLength(1);
 		expect(document.querySelector('svg')!.getAttribute('aria-label')).toBe('The sun is down.');
 	});
 
@@ -32,13 +33,15 @@ describe('SunArc', () => {
 			moon: {
 				position: { x: 150, y: 18 },
 				phase: 0.4,
-				rise: '5:12 pm',
-				set: '4:48 am',
 				risen: true
-			}
+			},
+			moonTimes: { rise: '5:12 pm', set: '4:48 am' }
 		});
+		await expect.element(page.getByText('Sunrise 8:03 am')).toBeVisible();
 		await expect.element(page.getByText('Moonrise 5:12 pm')).toBeVisible();
 		await expect.element(page.getByText('Moonset 4:48 am')).toBeVisible();
+		const rows = [...document.querySelectorAll('.times')].map((row) => row.textContent);
+		expect(rows).toEqual(['Sunrise 8:03 amSunset 6:21 pm', 'Moonrise 5:12 pmMoonset 4:48 am']);
 
 		expect(document.querySelector('.moon-lit')).not.toBeNull();
 		expect(document.querySelector('.night')).toBeNull();
@@ -55,10 +58,9 @@ describe('SunArc', () => {
 			moon: {
 				position: { x: 20, y: 80 },
 				phase: 0.4,
-				rise: '2:00 am',
-				set: '1:05 pm',
 				risen: false
-			}
+			},
+			moonTimes: { rise: '2:00 am', set: '1:05 pm' }
 		});
 		await expect.element(page.getByText('Moonrise 2:00 am')).toBeVisible();
 		await expect.element(page.getByText('Moonset 1:05 pm')).toBeVisible();
@@ -69,20 +71,16 @@ describe('SunArc', () => {
 		);
 	});
 
-	it('keeps the sun times and no moon while the sun is up', async () => {
+	it('shows the sun times and the moon times together, with no moon drawn while the sun is up', async () => {
 		render(SunArc, {
 			position: { x: 64, y: 33 },
 			sunrise: '8:03 am',
 			sunset: '6:21 pm',
-			moon: {
-				position: { x: 150, y: 18 },
-				phase: 0.4,
-				rise: '5:12 pm',
-				set: '4:48 am',
-				risen: true
-			}
+			moonTimes: { rise: '5:12 pm', set: '4:48 am' }
 		});
 		await expect.element(page.getByText('Sunrise 8:03 am')).toBeVisible();
+		await expect.element(page.getByText('Moonrise 5:12 pm')).toBeVisible();
+		await expect.element(page.getByText('Moonset 4:48 am')).toBeVisible();
 		expect(document.querySelector('.moon-lit')).toBeNull();
 	});
 });

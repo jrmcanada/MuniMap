@@ -19,26 +19,25 @@
 	const current = $derived(weather?.current ?? null);
 
 	/**
-	 * The moon for a night panel: on its arc while it is up, otherwise waiting on the horizon where
-	 * it will rise, with the times of its next pass.
+	 * The moon's times, always, and its drawing for a night panel: on its arc while it is up,
+	 * otherwise waiting on the horizon where it will rise. The times are for the pass it is in, or
+	 * the next one when it is down.
 	 */
-	function moonAt(now: Date) {
+	function moonAt(now: Date, sunUp: boolean) {
 		const { latitude, longitude } = municipality;
 		const up = moonPass(now, latitude, longitude);
 		const pass = up ?? nextMoonPass(now, latitude, longitude);
-		if (!pass) return null;
+		if (!pass) return { moon: null, moonTimes: null };
 		const position = up
 			? arcPosition(now, pass.rise, pass.set)
 			: { x: SUN_ARC.left, y: SUN_ARC.baseline };
-		return position
-			? {
-					position,
-					risen: up !== null,
-					phase: moonPhase(now),
-					rise: formatClockTime(pass.rise, timeZone),
-					set: formatClockTime(pass.set, timeZone)
-				}
-			: null;
+		return {
+			moon: !sunUp && position ? { position, risen: up !== null, phase: moonPhase(now) } : null,
+			moonTimes: {
+				rise: formatClockTime(pass.rise, timeZone),
+				set: formatClockTime(pass.set, timeZone)
+			}
+		};
 	}
 
 	// Worked out once per card. A card is short lived, and the sun barely moves in that time.
@@ -55,7 +54,7 @@
 		if (!times) return null;
 
 		const position = sunPosition(now, times);
-		return { ...times, position, moon: position ? null : moonAt(now) };
+		return { ...times, position, ...moonAt(now, position !== null) };
 	});
 
 	let iconFailed = $state(false);
@@ -129,6 +128,7 @@
 			<SunArc
 				position={sun.position}
 				moon={sun.moon}
+				moonTimes={sun.moonTimes}
 				sunrise={formatClockTime(sun.sunrise, timeZone)}
 				sunset={formatClockTime(sun.sunset, timeZone)}
 			/>
