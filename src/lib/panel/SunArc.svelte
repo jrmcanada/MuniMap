@@ -98,7 +98,7 @@
 
 	.travelled {
 		fill: none;
-		stroke: var(--map-pin);
+		stroke: var(--panel-yellow);
 		stroke-width: 2.5;
 	}
 

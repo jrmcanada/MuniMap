@@ -165,6 +165,8 @@
 	--map-pin: oklch(0.75 0.18 55);
 	/* The pulse ring starts the same colour as the pin; kept separate so it can be tuned. */
 	--map-pin-glow: oklch(0.75 0.18 55);
+	/* The yellow the pins used to be; the sun arc and the wind arrow keep it. */
+	--panel-yellow: oklch(0.82 0.17 80);
 }
 
 @layer base {
