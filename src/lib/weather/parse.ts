@@ -36,12 +36,13 @@ function parseCurrent(properties: unknown): CurrentConditions | null {
 	if (temperatureC === undefined || !observedAt) return null;
 
 	const speed = dig(current, 'wind', 'speed', 'value', 'en');
+	// The feed lists a wind chill for nearly every station, even on a 15 degree day, where the
+	// number means nothing. Wind chill is only defined at or below freezing.
+	const windChill = temperatureC <= 0 ? readNumber(current, 'windChill', 'value', 'en') : undefined;
 	return {
 		observedAt,
 		temperatureC,
-		feelsLikeC:
-			readNumber(current, 'windChill', 'value', 'en') ??
-			readNumber(current, 'humidex', 'value', 'en'),
+		feelsLikeC: windChill ?? readNumber(current, 'humidex', 'value', 'en'),
 		condition: readText(current, 'condition', 'en'),
 		iconUrl: readText(current, 'iconCode', 'url'),
 		windSpeedKmh: speed === 'calm' ? 'calm' : typeof speed === 'number' ? speed : undefined,
