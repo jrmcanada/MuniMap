@@ -50,7 +50,7 @@
 			</li>
 		{/each}
 	</ul>
-	<p class="caption">{mix.reporting} of {total} municipalities reporting</p>
+	<p class="caption">{mix.reporting} of {total} municipalities have a current reading</p>
 </div>
 
 <style>
