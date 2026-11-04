@@ -1,6 +1,8 @@
 <script lang="ts">
 	import type { Municipality } from '#lib/data/municipalities.js';
 	import { factsFor } from '#lib/data/facts.js';
+	import { municipalities } from '#lib/data/municipalities.js';
+	import { office } from '#lib/data/office.js';
 	import { formatClockTime } from '#lib/radar/format.js';
 	import { formatDegrees } from '#lib/weather/format.js';
 	import { moonPass, moonPhase, nextMoonPass } from '#lib/weather/moon.js';
@@ -73,6 +75,9 @@
 	<header class="tile heading">
 		<h2 class="name">{municipality.name}</h2>
 		<p class="district">{facts.district}</p>
+		{#if municipality.name === office.name}
+			<p class="district">{municipalities.length} municipalities</p>
+		{/if}
 	</header>
 
 	{#each weather?.warnings ?? [] as warning, index (index)}

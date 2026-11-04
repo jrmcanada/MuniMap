@@ -99,8 +99,6 @@
 		<span class="time">{formatClockTime(now, TIME_ZONE)}</span>
 	</div>
 
-	<p class="count">{municipalities.length} municipalities</p>
-
 	<div class="ticker" aria-live="off">
 		{#key fact?.id}
 			<p class="fact" in:fade={{ duration }} out:fade={{ duration }}>{fact?.text ?? ''}</p>
@@ -120,7 +118,7 @@
 		grid-column: 1 / -1;
 		container-type: size;
 		display: grid;
-		grid-template-columns: auto auto auto minmax(0, 1fr) auto;
+		grid-template-columns: auto auto minmax(0, 1fr) auto;
 		align-items: center;
 		gap: 0 2.5vw;
 		padding: 0 1.5vw;
@@ -158,12 +156,6 @@
 	.time {
 		font-size: max(14px, 42cqh);
 		font-weight: 700;
-	}
-
-	.count {
-		font-size: max(13px, 36cqh);
-		font-weight: 600;
-		white-space: nowrap;
 	}
 
 	/* Facts can use two lines; anything longer, including your own lines, is cut off. */
