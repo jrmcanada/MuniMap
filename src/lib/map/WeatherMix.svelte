@@ -12,7 +12,8 @@
 		rain: 'Rain',
 		snow: 'Snow',
 		clear: 'Clear',
-		other: 'Cloud, mist, fog'
+		cloud: 'Cloud',
+		fog: 'Mist, fog'
 	};
 	/** A segment this wide or wider has room for its percentage inside it. */
 	const LABEL_MIN_SHARE = 0.15;
@@ -130,8 +131,12 @@
 		background: var(--mix-clear);
 	}
 
-	.other {
-		background: var(--mix-other);
+	.cloud {
+		background: var(--mix-cloud);
+	}
+
+	.fog {
+		background: var(--mix-fog);
 	}
 
 	.caption {

@@ -18,11 +18,13 @@ describe('classifyCondition', () => {
 		['Mainly Clear', 'clear'],
 		['Sunny', 'clear'],
 		['Mainly Sunny', 'clear'],
-		['Mostly Cloudy', 'other'],
-		['Partly Cloudy', 'other'],
-		['Mist', 'other'],
-		['Fog', 'other'],
-		['Freezing Fog', 'other']
+		['Mostly Cloudy', 'cloud'],
+		['Partly Cloudy', 'cloud'],
+		['Mist', 'fog'],
+		['Fog', 'fog'],
+		['Freezing Fog', 'fog'],
+		['Haze', 'fog'],
+		['Overcast', 'cloud']
 	])('puts "%s" under %s', (text, kind) => {
 		expect(classifyCondition(text)).toBe(kind);
 	});
@@ -61,7 +63,7 @@ describe('conditionMix', () => {
 			s2: weather('Clear'),
 			s3: weather('Light Snow')
 		});
-		expect(result.counts).toEqual({ rain: 2, snow: 1, clear: 1, other: 0 });
+		expect(result.counts).toEqual({ rain: 2, snow: 1, clear: 1, cloud: 0, fog: 0 });
 		expect(result.reporting).toBe(4);
 	});
 
@@ -71,7 +73,7 @@ describe('conditionMix', () => {
 			s2: weather('Clear', { fetchedAt: NOW - 61 * 60_000 }),
 			s3: weather('Fog')
 		});
-		expect(result.counts).toEqual({ rain: 0, snow: 0, clear: 0, other: 1 });
+		expect(result.counts).toEqual({ rain: 0, snow: 0, clear: 0, cloud: 0, fog: 1 });
 		expect(result.reporting).toBe(1);
 		expect(mix({}).reporting).toBe(0);
 	});

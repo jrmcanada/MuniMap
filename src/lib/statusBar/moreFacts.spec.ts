@@ -168,16 +168,16 @@ describe('road sections', () => {
 });
 
 describe('the weather across the municipalities', () => {
-	const mix = (counts: { rain: number; snow: number; clear: number; other: number }) =>
+	const mix = (counts: { rain: number; snow: number; clear: number; cloud: number; fog: number }) =>
 		real({
 			weatherMix: {
 				counts,
-				reporting: counts.rain + counts.snow + counts.clear + counts.other
+				reporting: counts.rain + counts.snow + counts.clear + counts.cloud + counts.fog
 			}
 		});
 
 	it('says how many have rain, snow or clear skies', () => {
-		const inputs = mix({ rain: 29, snow: 2, clear: 1, other: 7 });
+		const inputs = mix({ rain: 29, snow: 2, clear: 1, cloud: 5, fog: 2 });
 		expect(mixFact(inputs, 'rain')!.text).toBe(
 			'29 of the 39 municipalities with a current reading have rain right now.'
 		);
@@ -191,7 +191,7 @@ describe('the weather across the municipalities', () => {
 	});
 
 	it('is skipped at zero and before the first load', () => {
-		expect(mixFact(mix({ rain: 5, snow: 0, clear: 0, other: 0 }), 'snow')).toBeNull();
+		expect(mixFact(mix({ rain: 5, snow: 0, clear: 0, cloud: 0, fog: 0 }), 'snow')).toBeNull();
 		expect(mixFact(real(), 'rain')).toBeNull();
 	});
 });

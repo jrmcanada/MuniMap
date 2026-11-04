@@ -2,7 +2,7 @@ import type { MunicipalityFacts } from '#lib/data/facts.js';
 import type { SiteWeather } from './types.js';
 
 /** The kinds of weather in the bar, in the order they are drawn and listed. */
-export const CONDITION_KINDS = ['rain', 'snow', 'clear', 'other'] as const;
+export const CONDITION_KINDS = ['rain', 'snow', 'clear', 'cloud', 'fog'] as const;
 export type ConditionKind = (typeof CONDITION_KINDS)[number];
 
 /** A site not fetched within this long is left out. */
@@ -15,14 +15,15 @@ const MAX_OBSERVATION_AGE_MS = 2 * 60 * 60 * 1000;
 
 /**
  * Sorts Environment Canada's condition text ("Light Rain", "Mainly Clear", "Mostly Cloudy") by
- * keyword. Snow is checked first, so rain and snow together counts as snow. Cloud, mist and fog are
- * neither rain, snow nor clear, so they fall into "other".
+ * keyword. Snow is checked first, so rain and snow together counts as snow. Mist, fog and the other
+ * things that cut visibility (haze, smoke) share "fog". Anything left over counts as cloud.
  */
 export function classifyCondition(text: string): ConditionKind {
 	if (/snow|flurr|blizzard|ice pellet|sleet/i.test(text)) return 'snow';
 	if (/rain|drizzle|shower|thunder/i.test(text)) return 'rain';
 	if (/^(mainly )?(clear|sunny)$/i.test(text.trim())) return 'clear';
-	return 'other';
+	if (/fog|mist|haze|smoke|dust/i.test(text)) return 'fog';
+	return 'cloud';
 }
 
 export interface ConditionMix {
@@ -47,7 +48,7 @@ export interface ConditionMixInputs {
  * the ticker's alert count. A site with no fresh reading or no condition text is left out.
  */
 export function conditionMix(inputs: ConditionMixInputs): ConditionMix {
-	const counts: Record<ConditionKind, number> = { rain: 0, snow: 0, clear: 0, other: 0 };
+	const counts: Record<ConditionKind, number> = { rain: 0, snow: 0, clear: 0, cloud: 0, fog: 0 };
 	let reporting = 0;
 	for (const { name } of inputs.municipalities) {
 		const weather = inputs.peekWeather(inputs.facts[name].siteId);
