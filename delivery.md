@@ -1,6 +1,6 @@
 # Delivery
 
-## Current state (2026-11-03)
+## Current state (2026-11-04)
 
 - Phases 0 to 6 are done. Phases 0 to 5 are merged to `main`: scaffold, map, radar, municipality panel, status bar and kiosk behaviour. Also merged: 55 municipalities (Chapleau was added 2026-11-03), the 20 second rotation, click a pin to jump to it, the logo, the 7% bottom strip, the card style side panel (wind compass, sun arc), and credits sized to match.
 - Map interaction: mouse wheel zooms at the pointer (up to 8x), dragging pans, and the map returns to the full view after 30 quiet seconds. Radar is enlarged when zoomed, not refetched. A green diamond (the logo green) marks the Sudbury office, and major highways are drawn from Natural Earth (`scripts/build-highways.mjs`).
@@ -14,7 +14,8 @@
 - Keyboard: the left and right arrow keys step to the previous or next municipality in the rotation (`PanelSchedule.step`). The new one gets a full 20 second slot and any pin is dropped; stepping back stops at the first slot. Clicking a pin still holds for 60 seconds. There are no other key controls.
 - Road conditions and events from Ontario 511 are merged (PR #23). Highways are coloured by condition (clear, wet, snow covered, icy; "No Report" roads are left undrawn) and a legend sits at the bottom left, credited to Ontario 511. Closures (red circle), collisions (orange triangle) and roadwork (yellow square) are symbols on the map; clicking one opens a detail card with the road, description, direction, lanes, expected end and last update. The card closes with the × button, a click on empty map or a pin, any zoom or pan, or after 30 seconds. Code is in `src/lib/roads/` and `src/lib/map/RoadEventCard.svelte`.
 - The 511 key never reaches the browser. The page asks `/api/road-conditions` and `/api/road-events` (server routes in `src/routes/api/`, loaders in `src/lib/server/ontario511.ts`), which add the key from the `ONTARIO_511_KEY` variable (declared in `src/env.ts`), trim the feeds to the fields used and cache for a minute. The map refreshes every 5 minutes and keeps the last good data if a refresh fails. With no key or no answer the production page shows no road layer and never sample data; `npm run dev` falls back to labelled sample data.
-- 164 unit and component tests and 18 e2e tests pass.
+- The status bar ticker has a road closures line, after the weather alerts line: "Ontario 511 reports N road closures in Ontario right now, apart from roadwork." It counts closures province wide (511 covers all of Ontario, so it does not claim they are near our municipalities) and leaves out roadwork, including roadwork that shuts a ramp. It says there are none when the feed is fresh and empty, and is skipped before the first load or when the road data is over 30 minutes old (`roadClosures` in `src/lib/statusBar/facts.ts`). The map reports each refresh to the page (`onRoadEvents`), which hands the latest events to the status bar, so there is no second 511 request.
+- 168 unit and component tests and 18 e2e tests pass.
 
 ## Next action
 
