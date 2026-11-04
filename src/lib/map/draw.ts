@@ -40,7 +40,7 @@ export function readColors(element: Element): MapColors {
 		},
 		office: read('--map-office'),
 		water: read('--map-water'),
-		pin: read('--map-pin'),
+		pin: read('--map-client-pin'),
 		pinGlow: read('--map-pin-glow'),
 		highlight: read('--map-highlight'),
 		label: read('--map-label'),

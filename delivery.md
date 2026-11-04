@@ -73,3 +73,4 @@
 - The holiday lines only cover fixed-date holidays; holidays that move each year, such as Thanksgiving, need a rule per holiday. The radar lines say precipitation is over a municipality's centre point, not over the whole town.
 - The five Ontario facts in `src/lib/data/ontarioFacts.ts` come from tourism and Wikipedia-derived sources and should be read by someone local. Highway 17's length was left out because the figure found was out of date, and Manitoulin Island is worded "widely called" the largest freshwater island because its ranking differs between sources.
 - The weather bar now has five kinds: rain, snow, clear, cloud, and mist and fog together (haze and smoke count with mist and fog; any other unrecognised text counts as cloud). The legend stays on one row.
+- The client markers on the map are orange (`--map-client-pin` in `src/routes/layout.css`). The sun arc and the wind arrow still use the yellow `--map-pin`.

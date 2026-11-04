@@ -164,7 +164,9 @@
 	--map-label-halo: oklch(0.15 0.02 250 / 0.9);
 	--map-pin: oklch(0.82 0.17 80);
 	/* The pulse ring starts the same colour as the pin; kept separate so it can be tuned. */
-	--map-pin-glow: oklch(0.82 0.17 80);
+	--map-pin-glow: oklch(0.75 0.18 55);
+	/* Client markers on the map: orange. Separate from --map-pin, which the side panels also use. */
+	--map-client-pin: oklch(0.75 0.18 55);
 }
 
 @layer base {
