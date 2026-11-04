@@ -62,13 +62,43 @@ describe('parseSiteWeather', () => {
 		const { current } = parseSiteWeather(feature, NOW);
 		expect(current).toMatchObject({
 			temperatureC: 2.1,
-			feelsLikeC: -4,
 			condition: 'Mainly Clear',
 			windSpeedKmh: 11,
 			windDirection: 'WNW',
 			windGustKmh: 30,
 			humidityPercent: 55
 		});
+	});
+
+	it('uses the wind chill only at or below freezing', () => {
+		const withTemperature = (celsius: number) => ({
+			properties: {
+				...feature.properties,
+				currentConditions: {
+					...feature.properties.currentConditions,
+					temperature: { value: en(celsius) }
+				}
+			}
+		});
+		// The feed gives a wind chill of -4 at any temperature; it only means something in the cold.
+		expect(parseSiteWeather(withTemperature(-1.2), NOW).current?.feelsLikeC).toBe(-4);
+		expect(parseSiteWeather(withTemperature(0), NOW).current?.feelsLikeC).toBe(-4);
+		expect(parseSiteWeather(withTemperature(2.1), NOW).current?.feelsLikeC).toBeUndefined();
+		expect(parseSiteWeather(withTemperature(16.7), NOW).current?.feelsLikeC).toBeUndefined();
+	});
+
+	it('uses the humidex when the feed gives one', () => {
+		const warm = {
+			properties: {
+				...feature.properties,
+				currentConditions: {
+					...feature.properties.currentConditions,
+					temperature: { value: en(24) },
+					humidex: { value: en(29) }
+				}
+			}
+		};
+		expect(parseSiteWeather(warm, NOW).current?.feelsLikeC).toBe(29);
 	});
 
 	it('keeps the first 3 forecast periods', () => {

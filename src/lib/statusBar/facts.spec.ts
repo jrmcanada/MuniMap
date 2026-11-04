@@ -140,10 +140,10 @@ describe('factSlots, live facts', () => {
 		expect(textOf(factSlots(inputs(Array(10).fill(4))), 'temperatures')).toBeUndefined();
 	});
 
-	it('ignores readings observed more than an hour ago', () => {
+	it('ignores readings observed more than two hours ago', () => {
 		const old = inputs(Array(10).fill(5), {
 			peekWeather: () =>
-				weather(5, { current: { observedAt: '2026-10-23T01:00:00Z', temperatureC: 5 } })
+				weather(5, { current: { observedAt: '2026-10-23T00:30:00Z', temperatureC: 5 } })
 		});
 		expect(textOf(factSlots(old), 'temperatures')).toBeUndefined();
 	});

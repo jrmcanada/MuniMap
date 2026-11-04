@@ -76,9 +76,15 @@ describe('conditionMix', () => {
 		expect(mix({}).reporting).toBe(0);
 	});
 
-	it('leaves out a reading observed over an hour ago', () => {
+	it('leaves out a reading observed over two hours ago, but keeps one from the last hour or so', () => {
 		const old = weather('Clear');
-		old.current!.observedAt = '2026-11-04T13:30:00Z';
+		old.current!.observedAt = '2026-11-04T12:30:00Z';
 		expect(mix({ s1: old }).reporting).toBe(0);
+
+		// Stations report hourly and the reading arrives late, so one 75 minutes old is still current.
+		const recent = weather('Clear');
+		recent.current!.observedAt = '2026-11-04T13:45:00Z';
+		// Towns A and B share this site, so it counts for both.
+		expect(mix({ s1: recent }).reporting).toBe(2);
 	});
 });

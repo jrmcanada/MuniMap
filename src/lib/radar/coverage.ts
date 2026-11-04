@@ -5,6 +5,8 @@ const MIN_ALPHA = 64;
 export interface RadarCoverage {
 	/** Names of the municipalities with precipitation over them. */
 	wet: string[];
+	/** Whether there is precipitation over the company office. */
+	officeWet: boolean;
 	/** The radar frame's own time, as an ISO string. */
 	observedAt: string;
 }

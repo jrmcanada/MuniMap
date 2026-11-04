@@ -5,8 +5,13 @@ import type { SiteWeather } from './types.js';
 export const CONDITION_KINDS = ['rain', 'snow', 'clear', 'other'] as const;
 export type ConditionKind = (typeof CONDITION_KINDS)[number];
 
-/** A reading older than this is left out, like the ticker's "right now" facts. */
-const MAX_AGE_MS = 60 * 60 * 1000;
+/** A site not fetched within this long is left out. */
+const MAX_FETCH_AGE_MS = 60 * 60 * 1000;
+/**
+ * A station reading counts for this long. Stations report hourly and the reading arrives 15 to 35
+ * minutes late, so a one hour limit would drop most stations for part of every hour.
+ */
+const MAX_OBSERVATION_AGE_MS = 2 * 60 * 60 * 1000;
 
 /**
  * Sorts Environment Canada's condition text ("Light Rain", "Mainly Clear", "Mostly Cloudy") by
@@ -49,7 +54,8 @@ export function conditionMix(inputs: ConditionMixInputs): ConditionMix {
 		const current = weather?.current;
 		if (!weather || !current?.condition) continue;
 		const observed = Date.parse(current.observedAt);
-		if (inputs.now - weather.fetchedAt > MAX_AGE_MS || inputs.now - observed > MAX_AGE_MS) continue;
+		if (inputs.now - weather.fetchedAt > MAX_FETCH_AGE_MS) continue;
+		if (inputs.now - observed > MAX_OBSERVATION_AGE_MS) continue;
 		counts[classifyCondition(current.condition)]++;
 		reporting++;
 	}
