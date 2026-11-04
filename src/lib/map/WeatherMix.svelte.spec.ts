@@ -11,7 +11,9 @@ describe('WeatherMix', () => {
 			mix: { counts: { rain: 12, snow: 3, clear: 20, other: 5 }, reporting: 40 },
 			total: 55
 		});
-		await expect.element(page.getByText('40 of 55 municipalities reporting')).toBeVisible();
+		await expect
+			.element(page.getByText('40 of 55 municipalities have a current reading'))
+			.toBeVisible();
 		const rows = [...document.querySelectorAll('li')].map((row) => row.textContent);
 		expect(rows).toEqual(['Rain12', 'Snow3', 'Clear20', 'Cloud, mist, fog5']);
 		expect(document.querySelector('.bar')!.getAttribute('aria-label')).toBe(
