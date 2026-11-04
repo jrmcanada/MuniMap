@@ -4,6 +4,7 @@ import { landmarks } from '#lib/data/landmarks.js';
 import { municipalities } from '#lib/data/municipalities.js';
 import { office } from '#lib/data/office.js';
 import officeTrips from '#lib/data/office-trips.json';
+import type { RoadEvent } from '#lib/roads/events.js';
 import type { SiteWeather } from '#lib/weather/types.js';
 import { factSlots, nextSlot, startSlot, type FactInputs } from './facts.js';
 
@@ -56,6 +57,7 @@ function inputs(readings: (number | null)[], extra: Partial<FactInputs> = {}): F
 			const reading = readings[Number(siteId.slice(1))];
 			return reading === null ? null : weather(reading);
 		},
+		roadEvents: null,
 		customMessages: [],
 		now: NOW,
 		...extra
@@ -98,6 +100,7 @@ describe('factSlots, census facts', () => {
 			random: Math.random,
 			facts: municipalityFacts,
 			peekWeather: () => null,
+			roadEvents: null,
 			customMessages: [],
 			now: NOW
 		});
@@ -164,6 +167,48 @@ describe('factSlots, live facts', () => {
 			'No weather alerts for any of our municipalities.'
 		);
 		expect(textOf(factSlots(inputs([5, 5, 5, 5, 5, 5, 5, 5, 5, null])), 'alerts')).toBeUndefined();
+	});
+
+	describe('road closures', () => {
+		const event = (id: number, kind: RoadEvent['kind']): RoadEvent => ({
+			id,
+			kind,
+			roadway: 'HWY 17',
+			description: '',
+			direction: null,
+			lanesAffected: null,
+			updatedAt: null,
+			plannedEndAt: null,
+			longitude: -80,
+			latitude: 46
+		});
+		const snapshot = (kinds: RoadEvent['kind'][], loadedAt = NOW - 60_000) => ({
+			events: kinds.map((kind, index) => event(index, kind)),
+			loadedAt
+		});
+		const closures = (roadEvents: FactInputs['roadEvents']) =>
+			textOf(factSlots(inputs(Array(10).fill(5), { roadEvents })), 'road-closures');
+
+		it('counts closures, leaving out roadwork and collisions that leave the road open', () => {
+			expect(closures(snapshot(['closure', 'closure', 'roadwork', 'collision']))).toBe(
+				'Ontario 511 reports 2 road closures in Ontario right now, apart from roadwork.'
+			);
+		});
+
+		it('says closure in the singular for one', () => {
+			expect(closures(snapshot(['closure']))).toContain('1 road closure in');
+		});
+
+		it('says there are none when the feed is fresh and has none', () => {
+			expect(closures(snapshot(['roadwork']))).toBe(
+				'Ontario 511 reports no road closures in Ontario right now, apart from roadwork.'
+			);
+		});
+
+		it('is skipped before the first load and when the data is over half an hour old', () => {
+			expect(closures(null)).toBeUndefined();
+			expect(closures(snapshot(['closure'], NOW - 31 * 60_000))).toBeUndefined();
+		});
 	});
 
 	it('keeps the census facts and the radar line when nothing live is available', () => {
@@ -274,6 +319,7 @@ describe('factSlots, travel and place facts', () => {
 			random: () => 0,
 			facts: municipalityFacts,
 			peekWeather: () => null,
+			roadEvents: null,
 			customMessages: [],
 			now: NOW
 		});

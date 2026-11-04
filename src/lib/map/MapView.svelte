@@ -11,7 +11,7 @@
 	import { formatRadarTime } from '#lib/radar/format.js';
 	import { RadarPlayer } from '#lib/radar/player.js';
 	import { canvasBbox } from '#lib/radar/wms.js';
-	import { toEvents, type RoadEvent } from '#lib/roads/events.js';
+	import { toEvents, type RoadEvent, type RoadEventSnapshot } from '#lib/roads/events.js';
 	import { startRoadFeed } from '#lib/roads/feed.js';
 	import { toSegments, type RoadSegment } from '#lib/roads/roadConditions.js';
 	import { fetchRoadConditions, fetchRoadEvents, roadSourceLabel } from '#lib/roads/source.js';
@@ -41,12 +41,15 @@
 
 	let {
 		highlight = null,
-		onSelect
+		onSelect,
+		onRoadEvents
 	}: {
 		/** Name of the municipality to ring and label, or null for none. */
 		highlight?: string | null;
 		/** Called with the name of the municipality whose pin was clicked, or of the office. */
 		onSelect?: (name: string) => void;
+		/** Called with the road events each time a refresh from Ontario 511 succeeds. */
+		onRoadEvents?: (snapshot: RoadEventSnapshot) => void;
 	} = $props();
 
 	// ontario-map.json: Natural Earth (public domain) 50m provinces and states plus 10m lakes,
@@ -322,6 +325,7 @@
 		});
 		const stopEvents = startRoadFeed(fetchRoadEvents, toEvents, (found) => {
 			events = found;
+			onRoadEvents?.({ events: found, loadedAt: Date.now() });
 			roadsChanged();
 		});
 		// Not passive, so zoom() can stop the page zooming too.

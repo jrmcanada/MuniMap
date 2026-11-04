@@ -10,6 +10,7 @@
 	import { PanelSchedule } from '#lib/panel/schedule.js';
 	import StatusBar from '#lib/statusBar/StatusBar.svelte';
 	import { WeatherCache } from '#lib/weather/cache.js';
+	import type { RoadEventSnapshot } from '#lib/roads/events.js';
 	import type { SiteWeather } from '#lib/weather/types.js';
 
 	const SLOT_MS = 20_000;
@@ -28,6 +29,8 @@
 	let slot = $state(0);
 	let pinned = $state<string | null>(null);
 	let weather = $state<SiteWeather | null>(null);
+	// Not reactive: the status bar reads it when its ticker moves on, so nothing redraws.
+	let roadEvents: RoadEventSnapshot | null = null;
 
 	// The office is never in the rotation; it appears only when its marker is clicked.
 	const current = $derived(
@@ -114,10 +117,14 @@
 
 <main class="screen">
 	<section class="map-area">
-		<MapView highlight={current.name} onSelect={showMunicipality} />
+		<MapView
+			highlight={current.name}
+			onSelect={showMunicipality}
+			onRoadEvents={(snapshot) => (roadEvents = snapshot)}
+		/>
 	</section>
 	<MunicipalityPanel municipality={current} {weather} />
-	<StatusBar peekWeather={(siteId) => cache.peek(siteId)} />
+	<StatusBar peekWeather={(siteId) => cache.peek(siteId)} peekRoadEvents={() => roadEvents} />
 	<Kiosk busy={pinned !== null} />
 </main>
 
