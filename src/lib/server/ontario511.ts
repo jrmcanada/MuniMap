@@ -33,6 +33,8 @@ export async function loadRoadConditions(
 ): Promise<RoadConditionRecord[]> {
 	const records = await loadFeed(ROAD_CONDITIONS_PATH, key, fetcher);
 	return records.map((record) => ({
+		RoadwayName: record.RoadwayName,
+		LocationDescription: record.LocationDescription,
 		Condition: record.Condition,
 		EncodedPolyline: record.EncodedPolyline
 	})) as RoadConditionRecord[];

@@ -3,19 +3,12 @@ import { sunTimes } from '#lib/weather/sun.js';
 import { localDate, timeZoneAt } from '#lib/weather/timeZone.js';
 import type { FactInputs, TickerFact } from './facts.js';
 import { distanceKm } from './moreFacts.js';
-import { TIME_ZONE, TORONTO_KM2, decimal, formatTravelTime, number } from './text.js';
+import { TIME_ZONE, TORONTO_KM2, decimal, formatTravelTime, listNames, number } from './text.js';
 
 /** Land area of Prince Edward Island in km². Sources quote 5,660 and 5,686, so it is only used as "about". */
 const PEI_KM2 = 5_660;
 /** Municipalities with no road to them, where a road trip would only reach the nearest road. */
 const NO_ROAD_ACCESS = new Set(['Cockburn Island']);
-
-const trio = (names: string[]) =>
-	names.length <= 3
-		? names.length === 2
-			? names.join(' and ')
-			: names.slice(0, -1).join(', ') + (names.length > 2 ? ' and ' : '') + names.slice(-1)
-		: `${names.slice(0, 2).join(', ')} and ${names.length - 2} more`;
 
 // --- Roads and time zones ----------------------------------------------------------------------
 
@@ -43,7 +36,7 @@ export function timeZoneFact(inputs: FactInputs): TickerFact | null {
 	if (central.length === 0) return null;
 	return {
 		id: 'time-zone',
-		text: `${trio(central)} ${central.length === 1 ? 'keeps' : 'keep'} Central time, an hour behind ${inputs.office.city}.`
+		text: `${listNames(central)} ${central.length === 1 ? 'keeps' : 'keep'} Central time, an hour behind ${inputs.office.city}.`
 	};
 }
 

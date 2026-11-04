@@ -24,16 +24,16 @@ export interface RoadSegment {
 	coordinates: [number, number][];
 }
 
-/**
- * Turns feed records into drawable segments. A record whose condition is not recognised, or whose
- * line is empty or malformed, is skipped: a missing road is better than a wrong colour.
- */
 /** The road segments from the latest successful refresh, and when it arrived (epoch milliseconds). */
 export interface RoadSegmentSnapshot {
 	segments: RoadSegment[];
 	loadedAt: number;
 }
 
+/**
+ * Turns feed records into drawable segments. A record whose condition is not recognised, or whose
+ * line is empty or malformed, is skipped: a missing road is better than a wrong colour.
+ */
 export function toSegments(records: RoadConditionRecord[]): RoadSegment[] {
 	const segments: RoadSegment[] = [];
 	for (const record of records) {

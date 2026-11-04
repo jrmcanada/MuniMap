@@ -8,6 +8,8 @@ describe('Ontario 511 feeds', () => {
 	it('asks with the key and keeps only the fields the map uses', async () => {
 		const fetcher = answer([
 			{
+				RoadwayName: '17',
+				LocationDescription: 'From A to B',
 				Condition: ['Bare and wet road'],
 				EncodedPolyline: ['abc'],
 				Region: 'x',
@@ -15,7 +17,14 @@ describe('Ontario 511 feeds', () => {
 			}
 		]);
 		const records = await loadRoadConditions('secret', fetcher);
-		expect(records).toEqual([{ Condition: ['Bare and wet road'], EncodedPolyline: ['abc'] }]);
+		expect(records).toEqual([
+			{
+				RoadwayName: '17',
+				LocationDescription: 'From A to B',
+				Condition: ['Bare and wet road'],
+				EncodedPolyline: ['abc']
+			}
+		]);
 		expect(fetcher).toHaveBeenCalledWith(expect.stringContaining('key=secret'));
 	});
 

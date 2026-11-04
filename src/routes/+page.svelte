@@ -89,7 +89,11 @@
 	// (see WeatherCache.load), so a failed site is retried here without hammering the others.
 	onMount(() => {
 		const siteIds = [
-			...new Set(municipalities.map((municipality) => municipalityFacts[municipality.name].siteId))
+			...new Set([
+				// The office's own station, for the ticker's office weather lines.
+				factsFor(office.name).siteId,
+				...municipalities.map((municipality) => municipalityFacts[municipality.name].siteId)
+			])
 		];
 		let stopped = false;
 		let running = false;
