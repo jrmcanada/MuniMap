@@ -26,8 +26,11 @@
 <style>
 	.legend {
 		padding: 0.3rem 0.5rem;
+		/* A solid, lighter card with an edge, so the panel stands out from the map behind it. */
+		border: 1px solid var(--map-panel-border);
 		border-radius: 0.3rem;
-		background: var(--map-label-halo);
+		background: var(--map-panel-background);
+		box-shadow: var(--map-panel-shadow);
 		font-size: 0.75rem;
 		font-weight: 600;
 		color: var(--map-caption);
