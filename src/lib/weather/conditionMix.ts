@@ -1,7 +1,7 @@
 import type { MunicipalityFacts } from '#lib/data/facts.js';
 import type { SiteWeather } from './types.js';
 
-/** The slices of the weather pie, in the order they are drawn and listed. */
+/** The kinds of weather in the bar, in the order they are drawn and listed. */
 export const CONDITION_KINDS = ['rain', 'snow', 'clear', 'other'] as const;
 export type ConditionKind = (typeof CONDITION_KINDS)[number];
 

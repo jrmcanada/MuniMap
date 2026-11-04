@@ -125,8 +125,8 @@
 	--map-water: oklch(0.15 0.02 250);
 	--map-highway: oklch(0.5 0.05 250);
 	/* Road conditions. Lightness and hue both change, so the four read apart without relying on colour alone. */
-	/* Weather pie. Checked with the data viz palette validator against the map's dark surface;
-	   "other" is a neutral grey on purpose, and every wedge is also labelled with its count. */
+	/* Weather bar. Checked with the data viz palette validator against the map's dark surface;
+	   "other" is a neutral grey on purpose, and every segment is also labelled with its count. */
 	--mix-rain: #3b82d6;
 	--mix-snow: #2fa9a0;
 	--mix-clear: #c08210;

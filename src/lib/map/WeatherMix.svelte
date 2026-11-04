@@ -5,7 +5,7 @@
 		type ConditionMix
 	} from '#lib/weather/conditionMix.js';
 
-	/** How many municipalities there are in all, so the caption says how many are in the pie. */
+	/** How many municipalities there are in all, so the caption says how many are in the bar. */
 	let { mix, total }: { mix: ConditionMix; total: number } = $props();
 
 	const LABELS: Record<ConditionKind, string> = {
@@ -14,59 +14,52 @@
 		clear: 'Clear',
 		other: 'Cloud, mist, fog'
 	};
-	const CENTRE = 50;
-	const RADIUS = 46;
+	/** A segment this wide or wider has room for its percentage inside it. */
+	const LABEL_MIN_SHARE = 0.15;
 
-	const point = (turns: number) => {
-		const angle = turns * 2 * Math.PI - Math.PI / 2;
-		return `${CENTRE + RADIUS * Math.cos(angle)} ${CENTRE + RADIUS * Math.sin(angle)}`;
-	};
-
-	/** One wedge per kind that has any municipalities, clockwise from the top in the fixed order. */
-	const slices = $derived.by(() => {
-		let from = 0;
-		return CONDITION_KINDS.filter((kind) => mix.counts[kind] > 0).map((kind) => {
+	/** One segment per kind that has any municipalities, left to right in the fixed order. */
+	const segments = $derived(
+		CONDITION_KINDS.filter((kind) => mix.counts[kind] > 0).map((kind) => {
 			const share = mix.counts[kind] / mix.reporting;
-			const to = from + share;
-			const path =
-				share === 1
-					? null
-					: `M${CENTRE} ${CENTRE} L${point(from)} A${RADIUS} ${RADIUS} 0 ${share > 0.5 ? 1 : 0} 1 ${point(to)} Z`;
-			from = to;
-			return { kind, path };
-		});
-	});
+			return {
+				kind,
+				share,
+				percent: Math.round(share * 100),
+				labelled: share >= LABEL_MIN_SHARE
+			};
+		})
+	);
+
+	const summary = $derived(
+		`Weather across the municipalities: ${CONDITION_KINDS.map((kind) => `${LABELS[kind]} ${mix.counts[kind]}`).join(', ')}`
+	);
 </script>
 
 <div class="mix">
-	<svg viewBox="0 0 100 100" role="img" aria-label="Weather across the municipalities">
-		{#each slices as { kind, path } (kind)}
-			{#if path}
-				<path class={kind} d={path} />
-			{:else}
-				<circle class={kind} cx={CENTRE} cy={CENTRE} r={RADIUS} />
-			{/if}
+	<div class="bar" role="img" aria-label={summary}>
+		{#each segments as { kind, share, percent, labelled } (kind)}
+			<span class="segment {kind}" style:flex-basis="{share * 100}%">
+				{#if labelled}{percent}%{/if}
+			</span>
 		{/each}
-	</svg>
-	<div>
-		<p class="title">Weather now</p>
-		<ul>
-			{#each CONDITION_KINDS as kind (kind)}
-				<li class:none={mix.counts[kind] === 0}>
-					<span class="swatch {kind}"></span>{LABELS[kind]}<b>{mix.counts[kind]}</b>
-				</li>
-			{/each}
-		</ul>
-		<p class="caption">{mix.reporting} of {total} municipalities reporting</p>
 	</div>
+	<ul>
+		{#each CONDITION_KINDS as kind (kind)}
+			<li class:none={mix.counts[kind] === 0}>
+				<span class="swatch {kind}"></span>{LABELS[kind]}<b>{mix.counts[kind]}</b>
+			</li>
+		{/each}
+	</ul>
+	<p class="caption">{mix.reporting} of {total} municipalities reporting</p>
 </div>
 
 <style>
 	.mix {
 		display: flex;
-		align-items: center;
-		gap: 0.6rem;
-		padding: 0.3rem 0.5rem;
+		flex-direction: column;
+		gap: 0.3rem;
+		width: 20rem;
+		padding: 0.35rem 0.5rem;
 		border-radius: 0.3rem;
 		background: var(--map-label-halo);
 		font-size: 0.75rem;
@@ -74,29 +67,29 @@
 		color: var(--map-caption);
 	}
 
-	svg {
-		flex: none;
-		width: 4.5rem;
-		height: 4.5rem;
+	/* A 2px gap between segments, so neighbours never rely on hue alone. */
+	.bar {
+		display: flex;
+		gap: 2px;
+		height: 1.1rem;
 	}
 
-	/* A gap in the surface colour between wedges, so neighbours never rely on hue alone. */
-	path,
-	circle {
-		stroke: var(--panel-background);
-		stroke-width: 2;
-	}
-
-	p {
-		margin: 0;
-	}
-
-	.title {
-		color: var(--panel-text);
+	.segment {
+		flex: 0 0 auto;
+		min-width: 3px;
+		display: flex;
+		align-items: center;
+		padding-left: 0.4rem;
+		border-radius: 0.2rem;
+		font-weight: 700;
+		color: white;
 	}
 
 	ul {
-		margin: 0.15rem 0;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.1rem 0.7rem;
+		margin: 0;
 		padding: 0;
 		list-style: none;
 	}
@@ -104,12 +97,10 @@
 	li {
 		display: flex;
 		align-items: center;
-		gap: 0.35rem;
+		gap: 0.3rem;
 	}
 
 	li b {
-		margin-left: auto;
-		padding-left: 0.5rem;
 		color: var(--panel-text);
 	}
 
@@ -118,32 +109,29 @@
 	}
 
 	.swatch {
-		width: 0.7rem;
-		height: 0.7rem;
+		width: 0.6rem;
+		height: 0.6rem;
 		border-radius: 50%;
 	}
 
 	.rain {
-		fill: var(--mix-rain);
 		background: var(--mix-rain);
 	}
 
 	.snow {
-		fill: var(--mix-snow);
 		background: var(--mix-snow);
 	}
 
 	.clear {
-		fill: var(--mix-clear);
 		background: var(--mix-clear);
 	}
 
 	.other {
-		fill: var(--mix-other);
 		background: var(--mix-other);
 	}
 
 	.caption {
+		margin: 0;
 		font-weight: 400;
 	}
 </style>

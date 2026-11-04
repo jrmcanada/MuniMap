@@ -34,7 +34,7 @@
 	let roadEvents: RoadEventSnapshot | null = null;
 	let weatherMix = $state<ConditionMix | null>(null);
 
-	/** The pie reads every site's cached weather, so it is redone as sites load and as readings age. */
+	/** The bar reads every site's cached weather, so it is redone as sites load and as readings age. */
 	function refreshWeatherMix() {
 		weatherMix = conditionMix({
 			municipalities,

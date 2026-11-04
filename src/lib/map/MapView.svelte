@@ -53,7 +53,7 @@
 		onSelect?: (name: string) => void;
 		/** Called with the road events each time a refresh from Ontario 511 succeeds. */
 		onRoadEvents?: (snapshot: RoadEventSnapshot) => void;
-		/** What the weather is across the municipalities, for the pie above the road legend. */
+		/** What the weather is across the municipalities, for the bar above the road legend. */
 		weatherMix?: ConditionMix | null;
 	} = $props();
 
@@ -418,7 +418,7 @@
 		height: 100%;
 	}
 
-	/* The weather pie above the road legend, in the lower left corner. */
+	/* The weather bar above the road legend, in the lower left corner. */
 	.key {
 		position: absolute;
 		left: 0.75rem;
