@@ -5,7 +5,7 @@ import type { RoadEventSnapshot } from '#lib/roads/events.js';
 import { formatDegrees } from '#lib/weather/format.js';
 import { sunTimes } from '#lib/weather/sun.js';
 import { localDate } from '#lib/weather/timeZone.js';
-import type { SiteWeather } from '#lib/weather/types.js';
+import type { SiteWeather, WarningLevel } from '#lib/weather/types.js';
 
 export interface TickerFact {
 	id: string;
@@ -446,65 +446,214 @@ const RADAR_FACT: TickerFact = {
 	text: 'The radar on the map shows the last 3 hours and updates every 6 minutes.'
 };
 
+/** How many alert lines the ticker can show at once, worst first. */
+const MAX_ALERT_LINES = 3;
+const ALERT_RANK: Record<WarningLevel, number> = { red: 0, orange: 1, yellow: 2, other: 3 };
+
 /**
- * Every ticker slot in order, worked out from current data. A slot is null when its fact
- * can't be stated yet, so the ticker skips it instead of showing a blank.
+ * Each warning or advisory in effect (plain statements are left out), worst first, with the
+ * forecast sites it covers and how many of our municipalities use those sites.
+ */
+function activeAlerts(inputs: FactInputs) {
+	const found = new Map<string, { level: WarningLevel; sites: Map<string, string> }>();
+	for (const { siteId, siteName, weather } of liveSites(inputs)) {
+		for (const { description, level } of weather?.warnings ?? []) {
+			if (level === 'other') continue;
+			const alert = found.get(description) ?? { level, sites: new Map() };
+			alert.sites.set(siteId, siteName);
+			found.set(description, alert);
+		}
+	}
+	return [...found]
+		.map(([description, { level, sites }]) => ({
+			description,
+			level,
+			siteNames: [...sites.values()].sort(),
+			municipalities: inputs.municipalities.filter(({ name }) =>
+				sites.has(inputs.facts[name].siteId)
+			).length
+		}))
+		.sort(
+			(a, b) =>
+				ALERT_RANK[a.level] - ALERT_RANK[b.level] ||
+				b.municipalities - a.municipalities ||
+				a.description.localeCompare(b.description)
+		);
+}
+
+/** "YELLOW WARNING - RAINFALL" as "Yellow warning - rainfall". */
+const sentenceCase = (text: string) => text.charAt(0) + text.slice(1).toLowerCase();
+
+/** The nth alert in effect, named, or null when fewer are active. */
+function alertDetailFact(inputs: FactInputs, index: number): TickerFact | null {
+	const alert = activeAlerts(inputs)[index];
+	if (!alert) return null;
+	const where =
+		alert.siteNames.length <= 2
+			? `near ${alert.siteNames.join(' and ')}`
+			: `across ${alert.siteNames.length} forecast areas`;
+	return {
+		id: `alert-detail-${index}`,
+		text: `${sentenceCase(alert.description)} is in effect ${where}, covering ${alert.municipalities} of our municipalities.`
+	};
+}
+
+/**
+ * One kind of ticker line. `copies` is how many slots it gets in a lap, so a kind with several
+ * copies comes up several times, and slots of one `group` are kept from following one another.
+ */
+interface SlotSpec {
+	group: string;
+	copies?: number;
+	build: (inputs: FactInputs) => TickerFact | null;
+}
+
+const TRAVEL = 'travel';
+const SLOT_SPECS: SlotSpec[] = [
+	{ group: 'largest', build: largestFact },
+	{ group: 'smallest', build: smallestFact },
+	{ group: TRAVEL, copies: 4, build: driveFact },
+	{ group: TRAVEL, copies: 4, build: cycleFact },
+	{ group: TRAVEL, copies: 4, build: walkFact },
+	{ group: 'landmark', copies: 6, build: landmarkFact },
+	{ group: 'growth', build: growthFact },
+	{ group: 'area', build: areaFact },
+	{ group: 'reach', build: reachFact },
+	{ group: 'temperatures', build: warmestAndColdest },
+	{ group: 'north', build: (inputs) => compassFact(inputs, 'north') },
+	{ group: 'alerts', build: alerts },
+	...Array.from({ length: MAX_ALERT_LINES }, (_, index) => ({
+		group: 'alert-detail',
+		build: (inputs: FactInputs) => alertDetailFact(inputs, index)
+	})),
+	{ group: 'road-closures', build: roadClosures },
+	{ group: 'densest', build: densestFact },
+	{ group: 'farthest', build: farthestFact },
+	{ group: 'daylight', build: daylightFact },
+	{ group: 'south', build: (inputs) => compassFact(inputs, 'south') },
+	{ group: 'sparsest', build: sparsestFact },
+	{ group: 'wind', build: windiest },
+	{ group: 'toronto', build: torontoFact },
+	{ group: 'west', build: (inputs) => compassFact(inputs, 'west') },
+	{ group: 'decline', build: declineFact },
+	{ group: 'closest', build: closestFact },
+	{ group: 'east', build: (inputs) => compassFact(inputs, 'east') },
+	{ group: 'smallest-area', build: smallestAreaFact },
+	{ group: 'longest-name', build: longestNameFact },
+	{ group: 'growing', build: growingFact },
+	{ group: 'busiest-district', build: busiestDistrictFact },
+	{ group: 'size-gap', build: sizeGapFact },
+	{ group: 'radar', build: () => RADAR_FACT }
+];
+
+const CUSTOM_GROUP = 'custom';
+
+/**
+ * Every ticker slot, worked out from current data. A slot is null when its fact can't be stated
+ * yet, so the ticker skips it instead of showing a blank. The order here is only a list: the
+ * ticker shows the slots in a fresh random order each lap (see TickerOrder).
  */
 export function factSlots(inputs: FactInputs): (TickerFact | null)[] {
 	return [
-		largestFact(inputs),
-		smallestFact(inputs),
-		driveFact(inputs),
-		landmarkFact(inputs),
-		growthFact(inputs),
-		areaFact(inputs),
-		cycleFact(inputs),
-		reachFact(inputs),
-		warmestAndColdest(inputs),
-		compassFact(inputs, 'north'),
-		walkFact(inputs),
-		alerts(inputs),
-		roadClosures(inputs),
-		densestFact(inputs),
-		landmarkFact(inputs),
-		farthestFact(inputs),
-		daylightFact(inputs),
-		compassFact(inputs, 'south'),
-		sparsestFact(inputs),
-		driveFact(inputs),
-		windiest(inputs),
-		landmarkFact(inputs),
-		torontoFact(inputs),
-		compassFact(inputs, 'west'),
-		declineFact(inputs),
-		cycleFact(inputs),
-		landmarkFact(inputs),
-		closestFact(inputs),
-		compassFact(inputs, 'east'),
-		smallestAreaFact(inputs),
-		walkFact(inputs),
-		landmarkFact(inputs),
-		longestNameFact(inputs),
-		growingFact(inputs),
-		busiestDistrictFact(inputs),
-		sizeGapFact(inputs),
-		RADAR_FACT,
+		...SLOT_SPECS.flatMap(({ copies = 1, build }) =>
+			Array.from({ length: copies }, () => build(inputs))
+		),
 		...inputs.customMessages.map((text, index) =>
 			text.trim() ? { id: `custom-${index}`, text: text.trim() } : null
 		)
 	];
 }
 
-/** The next slot after `cursor` that has a fact, wrapping round, or -1 when none has. */
-export function nextSlot(slots: (TickerFact | null)[], cursor: number): number {
-	for (let step = 1; step <= slots.length; step++) {
-		const index = (cursor + step) % slots.length;
-		if (slots[index]) return index;
-	}
-	return -1;
+/** The group of each slot `factSlots` returns, in the same order. */
+export function slotGroups(customMessageCount: number): string[] {
+	return [
+		...SLOT_SPECS.flatMap(({ group, copies = 1 }) => Array<string>(copies).fill(group)),
+		...Array<string>(customMessageCount).fill(CUSTOM_GROUP)
+	];
 }
 
-/** A random slot that has a fact to start the ticker on, so the display doesn't always open the same way. */
-export function startSlot(slots: (TickerFact | null)[], random: () => number): number {
-	return nextSlot(slots, Math.floor(random() * slots.length) - 1);
+/**
+ * Slot numbers in a random order, with no two slots of one group side by side where that can be
+ * helped, and the first not in `avoidFirst` so a new lap does not repeat the last line shown.
+ */
+export function shuffledOrder(
+	groups: string[],
+	random: () => number,
+	avoidFirst?: string
+): number[] {
+	const remaining = groups.map((_, index) => index);
+	const order: number[] = [];
+	let previous = avoidFirst;
+	while (remaining.length > 0) {
+		// A group with so many slots left that it needs every other one must go next, or the last
+		// of them would end up side by side.
+		const left = new Map<string, number>();
+		for (const index of remaining) left.set(groups[index], (left.get(groups[index]) ?? 0) + 1);
+		const [crowded, count] = [...left].sort(([, x], [, y]) => y - x)[0];
+		const urgent = 2 * count - 1 >= remaining.length && crowded !== previous;
+
+		const allowed = remaining.filter((index) =>
+			urgent ? groups[index] === crowded : groups[index] !== previous
+		);
+		const pool = allowed.length > 0 ? allowed : remaining;
+		const chosen = pool[Math.floor(random() * pool.length)];
+		remaining.splice(remaining.indexOf(chosen), 1);
+		order.push(chosen);
+		previous = groups[chosen];
+	}
+	return order;
+}
+
+/**
+ * Walks the slots in a fresh random order each lap, so the ticker never settles into a pattern.
+ * Every slot comes up once a lap; empty slots are skipped, and a changed slot count starts a lap.
+ */
+export class TickerOrder {
+	#order: number[] = [];
+	#position = -1;
+	#lastGroup: string | undefined;
+
+	constructor(private readonly random: () => number) {}
+
+	/** The next fact to show, or null when no slot has one. */
+	next(slots: (TickerFact | null)[], groups: string[]): TickerFact | null {
+		if (this.#order.length !== slots.length) this.#startLap(groups);
+		for (let tried = 0; tried < slots.length; tried++) {
+			this.#position++;
+			if (this.#position >= this.#order.length) {
+				this.#startLap(groups);
+				this.#position = 0;
+			}
+			this.#avoidRepeat(slots, groups);
+			const index = this.#order[this.#position];
+			const fact = slots[index];
+			if (fact) {
+				this.#lastGroup = groups[index];
+				return fact;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Empty slots are skipped, which can bring two slots of one group together. If the slot up next
+	 * repeats the last group shown, it swaps places with the next one in the lap that does not.
+	 */
+	#avoidRepeat(slots: (TickerFact | null)[], groups: string[]) {
+		const here = this.#order[this.#position];
+		if (!slots[here] || groups[here] !== this.#lastGroup) return;
+		for (let later = this.#position + 1; later < this.#order.length; later++) {
+			const candidate = this.#order[later];
+			if (slots[candidate] && groups[candidate] !== this.#lastGroup) {
+				this.#order[this.#position] = candidate;
+				this.#order[later] = here;
+				return;
+			}
+		}
+	}
+
+	#startLap(groups: string[]) {
+		this.#order = shuffledOrder(groups, this.random, this.#lastGroup);
+		this.#position = -1;
+	}
 }
