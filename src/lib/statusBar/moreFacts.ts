@@ -236,9 +236,9 @@ export function roadHazardFact(inputs: FactInputs): TickerFact | null {
 // --- Weather across the municipalities ------------------------------------------------------
 
 const MIX_WORDS: Partial<Record<ConditionKind, string>> = {
-	rain: 'have rain',
-	snow: 'have snow',
-	clear: 'have clear skies'
+	rain: 'rain',
+	snow: 'snow',
+	clear: 'clear skies'
 };
 
 /** How many of the municipalities with a reading have rain, snow or clear skies. Skipped at zero. */
@@ -247,7 +247,7 @@ export function mixFact(inputs: FactInputs, kind: 'rain' | 'snow' | 'clear'): Ti
 	if (!mix || mix.reporting === 0 || mix.counts[kind] === 0) return null;
 	return {
 		id: `mix-${kind}`,
-		text: `${mix.counts[kind]} of the ${mix.reporting} municipalities with a current reading ${MIX_WORDS[kind]} right now.`
+		text: `${mix.counts[kind]} of the ${mix.reporting} municipalities with a current reading ${mix.counts[kind] === 1 ? 'has' : 'have'} ${MIX_WORDS[kind]} right now.`
 	};
 }
 

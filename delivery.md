@@ -21,7 +21,7 @@
 - Weather alert lines name the warnings in effect, worst first, up to three at once, for example "Yellow warning - rainfall is in effect near Wawa and White River, covering 3 of our municipalities." Plain statements are left out. The older count line stays.
 - More ticker lines, in `src/lib/statusBar/moreFacts.ts`: sunrise and sunset in Sudbury; days to the longest or shortest day of the year (dated the 21st); moon phase and how much is lit; the next full moon and the next new moon; all round trips from the office laid end to end against the Earth's circumference; the east-west and north-south span in a straight line; the share of wet road sections, and snow covered or icy sections; how many municipalities have rain, snow or clear skies; the coldest forecast low and warmest forecast high; how many municipalities the radar shows precipitation over, and the wettest district. Live lines are skipped when their data is missing or stale (road data 30 minutes, radar frame 30 minutes, weather 1 hour). The map and page hand their latest data to the status bar (`onRoadConditions`, `onRadarCoverage`, the weather bar's counts), so no line makes a second request.
 - Radar coverage (`src/lib/radar/coverage.ts`) reads the newest radar frame at each municipality's centre point whenever a newer frame arrives; a pixel at least 25% opaque counts as precipitation. It says precipitation is over the centre point, not over the whole town.
-- A lap is now about 75 slots, roughly 10 minutes at 8 seconds a slot. There are 17 landmarks.
+- A lap is now 64 slots, about 8.5 minutes at 8 seconds a slot, fewer when live lines are skipped. There are 17 landmarks.
 - 227 unit and component tests and 18 e2e tests pass.
 
 ## Next action
