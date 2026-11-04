@@ -49,5 +49,33 @@ export const landmarks: Landmark[] = [
 	{
 		municipality: 'Clearview',
 		text: 'Clearview includes the village of Creemore, home of Creemore Springs Brewery.'
+	},
+	{
+		municipality: 'East Ferris',
+		text: 'The Dionne quintuplets were born in 1934 near Corbeil, in East Ferris, and all five survived infancy.'
+	},
+	{
+		municipality: 'Billings',
+		text: 'Billings Township has Bridal Veil Falls at Kagawong, a drop of about 11 metres on Manitoulin Island.'
+	},
+	{
+		municipality: 'Carling',
+		text: 'Killbear Provincial Park, on the Georgian Bay shore, lies in Carling Township.'
+	},
+	{
+		municipality: 'Chapleau',
+		text: "Near Chapleau, the Crown Game Preserve set up in 1925 is billed as the world's largest, at over 7,000 km²."
+	},
+	{
+		municipality: 'Latchford',
+		text: 'Latchford began in 1903 as Montreal River Station, a railway stop, and was later named for F. R. Latchford.'
+	},
+	{
+		municipality: 'Matachewan',
+		text: 'Gold was found near Matachewan in 1916, and its mines produced nearly a million ounces between 1934 and 1957.'
+	},
+	{
+		municipality: 'Fauquier-Strickland',
+		text: "Fauquier-Strickland's best known landmark is a roadside groundhog statue at Fauquier, on the Groundhog River."
 	}
 ];

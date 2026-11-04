@@ -1,11 +1,30 @@
 import type { MunicipalityFacts } from '#lib/data/facts.js';
 import type { Landmark } from '#lib/data/landmarks.js';
 import type { Municipality } from '#lib/data/municipalities.js';
+import type { RadarCoverage } from '#lib/radar/coverage.js';
 import type { RoadEventSnapshot } from '#lib/roads/events.js';
+import type { RoadSegmentSnapshot } from '#lib/roads/roadConditions.js';
+import type { ConditionMix } from '#lib/weather/conditionMix.js';
 import { formatDegrees } from '#lib/weather/format.js';
 import { sunTimes } from '#lib/weather/sun.js';
 import { localDate } from '#lib/weather/timeZone.js';
 import type { SiteWeather, WarningLevel } from '#lib/weather/types.js';
+import { MAX_LIVE_AGE_MS, MAX_ROAD_AGE_MS, MIN_TEMPERATURE_SITES, liveSites } from './live.js';
+import {
+	allTripsFact,
+	forecastFact,
+	mixFact,
+	radarDistrictFact,
+	radarMunicipalitiesFact,
+	moonPhaseFact,
+	nextMoonFact,
+	roadHazardFact,
+	roadWetFact,
+	solsticeFact,
+	spanFact,
+	sunTimesFact
+} from './moreFacts.js';
+import { TIME_ZONE, decimal, formatTravelTime, number, plural } from './text.js';
 
 export interface TickerFact {
 	id: string;
@@ -32,17 +51,17 @@ export interface FactInputs {
 	peekWeather: (siteId: string) => SiteWeather | null;
 	/** Latest road events from Ontario 511, or null before the first load. */
 	roadEvents: RoadEventSnapshot | null;
+	/** Latest road conditions from Ontario 511, or null before the first load. */
+	roadSections: RoadSegmentSnapshot | null;
+	/** What the weather is across the municipalities, or null before any site has loaded. */
+	weatherMix: ConditionMix | null;
+	/** Where the radar shows precipitation, or null before the first frame. */
+	radar: RadarCoverage | null;
 	customMessages: string[];
 	/** Epoch milliseconds. */
 	now: number;
 }
 
-/** Road events older than this are not stated as fact; the feed refreshes every 5 minutes. */
-const MAX_ROAD_AGE_MS = 30 * 60 * 1000;
-/** "Right now" facts ignore weather older than this. */
-const MAX_LIVE_AGE_MS = 60 * 60 * 1000;
-/** Below this many sites, "warmest" and "coldest" would just be the first ones to load. */
-const MIN_TEMPERATURE_SITES = 8;
 const WALKING_KMH = 5;
 const CYCLING_KMH = 20;
 /** Driving time is worked out at this steady speed, not taken from the routing service. */
@@ -51,10 +70,6 @@ const DRIVING_KMH = 90;
 const travelMinutes = (km: number, kmh: number) => (km / kmh) * 60;
 /** Land area of the City of Toronto, 2021 census, for scale. */
 const TORONTO_KM2 = 631;
-const TIME_ZONE = 'America/Toronto';
-
-const number = new Intl.NumberFormat('en-CA');
-const decimal = new Intl.NumberFormat('en-CA', { maximumFractionDigits: 1 });
 
 type NumericKey = 'population' | 'populationChangePercent' | 'landAreaKm2' | 'densityPerKm2';
 
@@ -69,25 +84,6 @@ function extreme(
 		.map(({ name }) => ({ name, value: inputs.facts[name][key] }))
 		.sort((a, b) => sign * (a.value - b.value) || a.name.localeCompare(b.name));
 	return first;
-}
-
-/**
- * Forecast sites in use, each with the weather held for it. The cache already drops anything
- * fetched over 2 hours ago; "right now" facts are stricter and want a fetch within the hour.
- */
-function liveSites(
-	inputs: FactInputs
-): { siteId: string; siteName: string; weather: SiteWeather | null }[] {
-	const sites = new Map<string, string>();
-	for (const { name } of inputs.municipalities) {
-		const { siteId, siteName } = inputs.facts[name];
-		sites.set(siteId, siteName);
-	}
-	return [...sites].map(([siteId, siteName]) => {
-		const weather = inputs.peekWeather(siteId);
-		const fresh = weather && inputs.now - weather.fetchedAt <= MAX_LIVE_AGE_MS;
-		return { siteId, siteName, weather: fresh ? weather : null };
-	});
 }
 
 function warmestAndColdest(inputs: FactInputs): TickerFact | null {
@@ -197,23 +193,6 @@ function reachFact(inputs: FactInputs): TickerFact {
 		id: 'reach',
 		text: `We serve ${inputs.municipalities.length} municipalities across ${areas.size} districts and counties, home to ${number.format(people)} people.`
 	};
-}
-
-const plural = (count: number, word: string) => `${count} ${word}${count === 1 ? '' : 's'}`;
-const unit = (count: number, word: string, compound: boolean) =>
-	compound ? `${count} ${word}` : plural(count, word);
-
-/**
- * "2 hours 15 minutes" for a short trip, "11.4 days" for one so long it reads better that way.
- * `compound` gives "2 hour 15 minute", for use before a noun as in "a 2 hour 15 minute drive".
- */
-function formatTravelTime(minutes: number, compound = false): string {
-	if (minutes >= 48 * 60) return `${decimal.format(minutes / (24 * 60))} days`;
-	const hours = Math.floor(minutes / 60);
-	const rest = Math.round(minutes % 60);
-	if (hours === 0) return unit(rest, 'minute', compound);
-	const hoursText = unit(hours, 'hour', compound);
-	return rest === 0 ? hoursText : `${hoursText} ${unit(rest, 'minute', compound)}`;
 }
 
 /** A municipality chosen at random, from those with a known trip from the office. */
@@ -543,6 +522,23 @@ const SLOT_SPECS: SlotSpec[] = [
 	{ group: 'growing', build: growingFact },
 	{ group: 'busiest-district', build: busiestDistrictFact },
 	{ group: 'size-gap', build: sizeGapFact },
+	{ group: 'daylight', build: sunTimesFact },
+	{ group: 'daylight', build: solsticeFact },
+	{ group: 'moon', build: moonPhaseFact },
+	{ group: 'moon', build: (inputs) => nextMoonFact(inputs, 'full') },
+	{ group: 'moon', build: (inputs) => nextMoonFact(inputs, 'new') },
+	{ group: 'all-trips', build: allTripsFact },
+	{ group: 'span', build: (inputs) => spanFact(inputs, 'east-west') },
+	{ group: 'span', build: (inputs) => spanFact(inputs, 'north-south') },
+	{ group: 'road-sections', build: roadWetFact },
+	{ group: 'road-sections', build: roadHazardFact },
+	{ group: 'weather-mix', build: (inputs) => mixFact(inputs, 'rain') },
+	{ group: 'weather-mix', build: (inputs) => mixFact(inputs, 'snow') },
+	{ group: 'weather-mix', build: (inputs) => mixFact(inputs, 'clear') },
+	{ group: 'forecast', build: (inputs) => forecastFact(inputs, 'low') },
+	{ group: 'forecast', build: (inputs) => forecastFact(inputs, 'high') },
+	{ group: 'radar-coverage', build: radarMunicipalitiesFact },
+	{ group: 'radar-coverage', build: radarDistrictFact },
 	{ group: 'radar', build: () => RADAR_FACT }
 ];
 

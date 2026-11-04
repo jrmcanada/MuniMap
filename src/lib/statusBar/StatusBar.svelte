@@ -10,7 +10,10 @@
 	import officeTrips from '#lib/data/office-trips.json';
 	import { tickerMessages } from '#lib/data/tickerMessages.js';
 	import { formatClockTime } from '#lib/radar/format.js';
+	import type { RadarCoverage } from '#lib/radar/coverage.js';
 	import type { RoadEventSnapshot } from '#lib/roads/events.js';
+	import type { RoadSegmentSnapshot } from '#lib/roads/roadConditions.js';
+	import type { ConditionMix } from '#lib/weather/conditionMix.js';
 	import type { SiteWeather } from '#lib/weather/types.js';
 	import { factSlots, slotGroups, TickerOrder } from './facts.js';
 
@@ -22,11 +25,20 @@
 	/** Weather held for a forecast site, already filtered for age and expired warnings. */
 	let {
 		peekWeather,
-		peekRoadEvents
+		peekRoadEvents,
+		peekRoadSections,
+		peekWeatherMix,
+		peekRadarCoverage
 	}: {
 		peekWeather: (siteId: string) => SiteWeather | null;
 		/** The latest road events, read each time the ticker builds its facts. */
 		peekRoadEvents: () => RoadEventSnapshot | null;
+		/** The latest road conditions, read the same way. */
+		peekRoadSections: () => RoadSegmentSnapshot | null;
+		/** What the weather is across the municipalities, read the same way. */
+		peekWeatherMix: () => ConditionMix | null;
+		/** Where the radar shows precipitation, read the same way. */
+		peekRadarCoverage: () => RadarCoverage | null;
 	} = $props();
 
 	const dateFormat = new Intl.DateTimeFormat('en-US', {
@@ -49,6 +61,9 @@
 			facts: municipalityFacts,
 			peekWeather,
 			roadEvents: peekRoadEvents(),
+			roadSections: peekRoadSections(),
+			weatherMix: peekWeatherMix(),
+			radar: peekRadarCoverage(),
 			customMessages: tickerMessages,
 			now: Date.now()
 		});

@@ -58,6 +58,9 @@ function inputs(readings: (number | null)[], extra: Partial<FactInputs> = {}): F
 			return reading === null ? null : weather(reading);
 		},
 		roadEvents: null,
+		roadSections: null,
+		radar: null,
+		weatherMix: null,
 		customMessages: [],
 		now: NOW,
 		...extra
@@ -101,6 +104,9 @@ describe('factSlots, census facts', () => {
 			facts: municipalityFacts,
 			peekWeather: () => null,
 			roadEvents: null,
+			roadSections: null,
+			radar: null,
+			weatherMix: null,
 			customMessages: [],
 			now: NOW
 		});
@@ -320,6 +326,9 @@ describe('factSlots, travel and place facts', () => {
 			facts: municipalityFacts,
 			peekWeather: () => null,
 			roadEvents: null,
+			roadSections: null,
+			radar: null,
+			weatherMix: null,
 			customMessages: [],
 			now: NOW
 		});
