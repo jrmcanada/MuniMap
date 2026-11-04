@@ -25,13 +25,9 @@
 
 <style>
 	.legend {
-		position: absolute;
-		left: 0.75rem;
-		bottom: 0.5rem;
 		padding: 0.3rem 0.5rem;
 		border-radius: 0.3rem;
 		background: var(--map-label-halo);
-		pointer-events: none;
 		font-size: 0.75rem;
 		font-weight: 600;
 		color: var(--map-caption);

@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { municipalities } from '#lib/data/municipalities.js';
 	import highwayData from '#lib/data/highways.json';
 	import { office } from '#lib/data/office.js';
 	import ontarioMap from '#lib/data/ontario-map.json';
@@ -11,6 +10,8 @@
 	import { formatRadarTime } from '#lib/radar/format.js';
 	import { RadarPlayer } from '#lib/radar/player.js';
 	import { canvasBbox } from '#lib/radar/wms.js';
+	import { municipalities } from '#lib/data/municipalities.js';
+	import type { ConditionMix } from '#lib/weather/conditionMix.js';
 	import { toEvents, type RoadEvent, type RoadEventSnapshot } from '#lib/roads/events.js';
 	import { startRoadFeed } from '#lib/roads/feed.js';
 	import { toSegments, type RoadSegment } from '#lib/roads/roadConditions.js';
@@ -28,6 +29,7 @@
 	import type { GeoProjection } from 'd3-geo';
 	import RoadEventCard from './RoadEventCard.svelte';
 	import RoadLegend from './RoadLegend.svelte';
+	import WeatherMix from './WeatherMix.svelte';
 	import { createProjection, projectPlaces, zoomProjection } from './projection.js';
 	import type { HighwayData, MapColors, MapData, PinPoint } from './types.js';
 	import { FULL_VIEW, panBy, wheelFactor, zoomAt, type View } from './view.js';
@@ -42,7 +44,8 @@
 	let {
 		highlight = null,
 		onSelect,
-		onRoadEvents
+		onRoadEvents,
+		weatherMix = null
 	}: {
 		/** Name of the municipality to ring and label, or null for none. */
 		highlight?: string | null;
@@ -50,6 +53,8 @@
 		onSelect?: (name: string) => void;
 		/** Called with the road events each time a refresh from Ontario 511 succeeds. */
 		onRoadEvents?: (snapshot: RoadEventSnapshot) => void;
+		/** What the weather is across the municipalities, for the bar above the road legend. */
+		weatherMix?: ConditionMix | null;
 	} = $props();
 
 	// ontario-map.json: Natural Earth (public domain) 50m provinces and states plus 10m lakes,
@@ -384,7 +389,12 @@
 			<RoadEventCard event={openEvent.event} onClose={closeEvent} />
 		</div>
 	{/if}
-	{#if hasRoadData}<RoadLegend source={roadSourceLabel()} />{/if}
+	{#if weatherMix?.reporting || hasRoadData}
+		<div class="key">
+			{#if weatherMix?.reporting}<WeatherMix mix={weatherMix} total={municipalities.length} />{/if}
+			{#if hasRoadData}<RoadLegend source={roadSourceLabel()} />{/if}
+		</div>
+	{/if}
 	{#if radarTime}<p class="caption">{radarTime}</p>{/if}
 </div>
 
@@ -406,6 +416,18 @@
 		display: block;
 		width: 100%;
 		height: 100%;
+	}
+
+	/* The weather bar above the road legend, in the lower left corner. */
+	.key {
+		position: absolute;
+		left: 0.75rem;
+		bottom: 0.5rem;
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 0.35rem;
+		pointer-events: none;
 	}
 
 	/* Anchored beside the symbol, on whichever side has room. */

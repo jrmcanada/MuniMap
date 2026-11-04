@@ -9,6 +9,7 @@
 	import { Rotation } from '#lib/panel/rotation.js';
 	import { PanelSchedule } from '#lib/panel/schedule.js';
 	import StatusBar from '#lib/statusBar/StatusBar.svelte';
+	import { conditionMix, type ConditionMix } from '#lib/weather/conditionMix.js';
 	import { WeatherCache } from '#lib/weather/cache.js';
 	import type { RoadEventSnapshot } from '#lib/roads/events.js';
 	import type { SiteWeather } from '#lib/weather/types.js';
@@ -31,6 +32,17 @@
 	let weather = $state<SiteWeather | null>(null);
 	// Not reactive: the status bar reads it when its ticker moves on, so nothing redraws.
 	let roadEvents: RoadEventSnapshot | null = null;
+	let weatherMix = $state<ConditionMix | null>(null);
+
+	/** The bar reads every site's cached weather, so it is redone as sites load and as readings age. */
+	function refreshWeatherMix() {
+		weatherMix = conditionMix({
+			municipalities,
+			facts: municipalityFacts,
+			peekWeather: (siteId) => cache.peek(siteId),
+			now: Date.now()
+		});
+	}
 
 	// The office is never in the rotation; it appears only when its marker is clicked.
 	const current = $derived(
@@ -84,14 +96,18 @@
 			for (const siteId of siteIds) {
 				if (stopped) break;
 				await cache.load(siteId);
+				refreshWeatherMix();
 			}
 			running = false;
 		}
 		void warmUp();
 		const timer = setInterval(() => void warmUp(), WARM_UP_MS);
+		// Readings age out after an hour even if no site is refetched.
+		const ageTimer = setInterval(refreshWeatherMix, WARM_UP_MS);
 		return () => {
 			stopped = true;
 			clearInterval(timer);
+			clearInterval(ageTimer);
 		};
 	});
 
@@ -121,6 +137,7 @@
 			highlight={current.name}
 			onSelect={showMunicipality}
 			onRoadEvents={(snapshot) => (roadEvents = snapshot)}
+			{weatherMix}
 		/>
 	</section>
 	<MunicipalityPanel municipality={current} {weather} />
