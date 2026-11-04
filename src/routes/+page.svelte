@@ -11,7 +11,9 @@
 	import StatusBar from '#lib/statusBar/StatusBar.svelte';
 	import { conditionMix, type ConditionMix } from '#lib/weather/conditionMix.js';
 	import { WeatherCache } from '#lib/weather/cache.js';
+	import type { RadarCoverage } from '#lib/radar/coverage.js';
 	import type { RoadEventSnapshot } from '#lib/roads/events.js';
+	import type { RoadSegmentSnapshot } from '#lib/roads/roadConditions.js';
 	import type { SiteWeather } from '#lib/weather/types.js';
 
 	const SLOT_MS = 20_000;
@@ -32,6 +34,8 @@
 	let weather = $state<SiteWeather | null>(null);
 	// Not reactive: the status bar reads it when its ticker moves on, so nothing redraws.
 	let roadEvents: RoadEventSnapshot | null = null;
+	let roadSections: RoadSegmentSnapshot | null = null;
+	let radarCoverage: RadarCoverage | null = null;
 	let weatherMix = $state<ConditionMix | null>(null);
 
 	/** The bar reads every site's cached weather, so it is redone as sites load and as readings age. */
@@ -137,11 +141,19 @@
 			highlight={current.name}
 			onSelect={showMunicipality}
 			onRoadEvents={(snapshot) => (roadEvents = snapshot)}
+			onRoadConditions={(snapshot) => (roadSections = snapshot)}
+			onRadarCoverage={(coverage) => (radarCoverage = coverage)}
 			{weatherMix}
 		/>
 	</section>
 	<MunicipalityPanel municipality={current} {weather} />
-	<StatusBar peekWeather={(siteId) => cache.peek(siteId)} peekRoadEvents={() => roadEvents} />
+	<StatusBar
+		peekWeather={(siteId) => cache.peek(siteId)}
+		peekRoadEvents={() => roadEvents}
+		peekRoadSections={() => roadSections}
+		peekWeatherMix={() => weatherMix}
+		peekRadarCoverage={() => radarCoverage}
+	/>
 	<Kiosk busy={pinned !== null} />
 </main>
 

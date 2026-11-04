@@ -8,13 +8,18 @@
 	import { nearestPin } from './hit.js';
 	import { RadarFeed } from '#lib/radar/feed.js';
 	import { formatRadarTime } from '#lib/radar/format.js';
+	import { echoesAt, type RadarCoverage } from '#lib/radar/coverage.js';
 	import { RadarPlayer } from '#lib/radar/player.js';
 	import { canvasBbox } from '#lib/radar/wms.js';
 	import { municipalities } from '#lib/data/municipalities.js';
 	import type { ConditionMix } from '#lib/weather/conditionMix.js';
 	import { toEvents, type RoadEvent, type RoadEventSnapshot } from '#lib/roads/events.js';
 	import { startRoadFeed } from '#lib/roads/feed.js';
-	import { toSegments, type RoadSegment } from '#lib/roads/roadConditions.js';
+	import {
+		toSegments,
+		type RoadSegment,
+		type RoadSegmentSnapshot
+	} from '#lib/roads/roadConditions.js';
 	import { fetchRoadConditions, fetchRoadEvents, roadSourceLabel } from '#lib/roads/source.js';
 	import {
 		drawBase,
@@ -45,6 +50,8 @@
 		highlight = null,
 		onSelect,
 		onRoadEvents,
+		onRoadConditions,
+		onRadarCoverage,
 		weatherMix = null
 	}: {
 		/** Name of the municipality to ring and label, or null for none. */
@@ -53,6 +60,10 @@
 		onSelect?: (name: string) => void;
 		/** Called with the road events each time a refresh from Ontario 511 succeeds. */
 		onRoadEvents?: (snapshot: RoadEventSnapshot) => void;
+		/** Called with the road segments each time a refresh from Ontario 511 succeeds. */
+		onRoadConditions?: (snapshot: RoadSegmentSnapshot) => void;
+		/** Called with which municipalities have precipitation over them, when a newer radar frame arrives. */
+		onRadarCoverage?: (coverage: RadarCoverage) => void;
 		/** What the weather is across the municipalities, for the bar above the road legend. */
 		weatherMix?: ConditionMix | null;
 	} = $props();
@@ -102,7 +113,31 @@
 	} | null>(null);
 	let hasRoadData = $state(false);
 
+	let coverageTime = '';
+	/** Reads the newest radar frame at each municipality, once per frame, for the ticker. */
+	function reportRadarCoverage() {
+		const newest = feed.frames().at(-1);
+		if (!newest || newest.time === coverageTime || !baseProjection) return;
+		coverageTime = newest.time;
+		const { image } = newest;
+		const scratch = new OffscreenCanvas(image.width, image.height).getContext('2d')!;
+		scratch.drawImage(image, 0, 0);
+		const pixels = scratch.getImageData(0, 0, image.width, image.height).data;
+		// The frame is held at a capped size and drawn stretched to the canvas.
+		const scale = image.width / width;
+		const points = projectPlaces(baseProjection, municipalities).map(({ x, y }) => ({
+			x: x * scale,
+			y: y * scale
+		}));
+		const wet = echoesAt(pixels, image.width, image.height, points);
+		onRadarCoverage?.({
+			wet: municipalities.filter((_, index) => wet[index]).map(({ name }) => name),
+			observedAt: newest.time
+		});
+	}
+
 	const feed = new RadarFeed(() => {
+		reportRadarCoverage();
 		// A still frame has no loop to pick up new radar, so it redraws itself.
 		if (motionQuery.matches) draw(0, false);
 	});
@@ -326,6 +361,7 @@
 		};
 		const stopRoads = startRoadFeed(fetchRoadConditions, toSegments, (segments) => {
 			roads = segments;
+			onRoadConditions?.({ segments, loadedAt: Date.now() });
 			roadsChanged();
 		});
 		const stopEvents = startRoadFeed(fetchRoadEvents, toEvents, (found) => {
