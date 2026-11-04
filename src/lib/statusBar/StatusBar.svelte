@@ -12,7 +12,7 @@
 	import { formatClockTime } from '#lib/radar/format.js';
 	import type { RoadEventSnapshot } from '#lib/roads/events.js';
 	import type { SiteWeather } from '#lib/weather/types.js';
-	import { factSlots, nextSlot, startSlot } from './facts.js';
+	import { factSlots, slotGroups, TickerOrder } from './facts.js';
 
 	const TIME_ZONE = 'America/Toronto';
 	const CLOCK_MS = 1000;
@@ -55,17 +55,15 @@
 	}
 
 	let now = $state(new Date());
-	// A random fact to start on; the ticker then moves on in order every few seconds.
-	const first = currentSlots();
-	let cursor = startSlot(first, Math.random);
-	let fact = $state(first[cursor] ?? null);
+	// Every lap is a fresh random order, so the ticker never repeats a pattern.
+	const groups = slotGroups(tickerMessages.length);
+	const order = new TickerOrder(Math.random);
+	let fact = $state(order.next(currentSlots(), groups));
 
 	onMount(() => {
 		const clock = setInterval(() => (now = new Date()), CLOCK_MS);
 		const ticker = setInterval(() => {
-			const slots = currentSlots();
-			cursor = nextSlot(slots, cursor);
-			fact = slots[cursor] ?? null;
+			fact = order.next(currentSlots(), groups);
 		}, TICKER_MS);
 		return () => {
 			clearInterval(clock);

@@ -6,7 +6,7 @@ import { office } from '#lib/data/office.js';
 import officeTrips from '#lib/data/office-trips.json';
 import type { RoadEvent } from '#lib/roads/events.js';
 import type { SiteWeather } from '#lib/weather/types.js';
-import { factSlots, nextSlot, startSlot, type FactInputs } from './facts.js';
+import { factSlots, shuffledOrder, slotGroups, TickerOrder, type FactInputs } from './facts.js';
 
 const NOW = Date.parse('2026-10-23T03:00:00Z');
 
@@ -338,39 +338,149 @@ describe('custom lines', () => {
 	});
 });
 
-describe('nextSlot', () => {
-	const slot = (id: string) => ({ id, text: id });
-
-	it('skips empty slots and wraps round', () => {
-		const slots = [slot('a'), null, slot('c'), null];
-		expect(nextSlot(slots, 0)).toBe(2);
-		expect(nextSlot(slots, 2)).toBe(0);
+describe('slot groups', () => {
+	it('gives drive, cycle and walk four slots each, and keeps them in one travel group', () => {
+		const slots = factSlots(inputs(Array(10).fill(5)));
+		const ids = slots.map((slot) => slot?.id);
+		for (const id of ['drive', 'cycle', 'walk'])
+			expect(ids.filter((x) => x === id)).toHaveLength(4);
+		const groups = slotGroups(0);
+		expect(groups).toHaveLength(slots.length - 0);
+		expect(groups.filter((group) => group === 'travel')).toHaveLength(12);
 	});
 
-	it('stays put when only one slot has a fact', () => {
-		expect(nextSlot([null, slot('b'), null], 1)).toBe(1);
-	});
-
-	it('returns -1 when nothing has a fact', () => {
-		expect(nextSlot([null, null], 0)).toBe(-1);
+	it('has one group for every slot, custom lines included', () => {
+		const withCustom = inputs(Array(10).fill(5), { customMessages: ['One', 'Two'] });
+		expect(slotGroups(2)).toHaveLength(factSlots(withCustom).length);
 	});
 });
 
-describe('startSlot', () => {
-	const slot = (id: string) => ({ id, text: id });
-	const slots = [slot('a'), null, slot('c'), slot('d')];
+describe('factSlots, alert lines', () => {
+	const alertInputs = (warnings: Record<string, SiteWeather['warnings']>) => {
+		const shared = inputs(Array(10).fill(5));
+		// Towns 0 and 1 share site s0.
+		shared.facts['Town 1'].siteId = 's0';
+		shared.facts['Town 1'].siteName = 'Site 0';
+		shared.peekWeather = (siteId) => weather(5, { warnings: warnings[siteId] ?? [] });
+		return shared;
+	};
+	const details = (slots: ReturnType<typeof factSlots>) =>
+		slots.filter((slot) => slot?.id.startsWith('alert-detail')).map((slot) => slot!.text);
 
-	it('starts on the slot the random number points at', () => {
-		expect(startSlot(slots, () => 0)).toBe(0);
-		expect(startSlot(slots, () => 0.5)).toBe(2);
-		expect(startSlot(slots, () => 0.99)).toBe(3);
+	it('names each warning, worst first, with the municipalities it covers', () => {
+		const slots = factSlots(
+			alertInputs({
+				s0: [
+					{ description: 'YELLOW WARNING - RAINFALL', level: 'yellow' },
+					{ description: 'RED WARNING - BLIZZARD', level: 'red' }
+				]
+			})
+		);
+		expect(details(slots)).toEqual([
+			'Red warning - blizzard is in effect near Site 0, covering 2 of our municipalities.',
+			'Yellow warning - rainfall is in effect near Site 0, covering 2 of our municipalities.'
+		]);
 	});
 
-	it('moves on to the next fact when it lands on an empty slot', () => {
-		expect(startSlot(slots, () => 0.3)).toBe(2);
+	it('counts forecast areas when more than two have the same alert', () => {
+		const rain = [{ description: 'YELLOW WARNING - RAINFALL', level: 'yellow' as const }];
+		const slots = factSlots(alertInputs({ s0: rain, s2: rain, s3: rain }));
+		expect(details(slots)).toEqual([
+			'Yellow warning - rainfall is in effect across 3 forecast areas, covering 4 of our municipalities.'
+		]);
 	});
 
-	it('returns -1 when no slot has a fact', () => {
-		expect(startSlot([null, null], () => 0.4)).toBe(-1);
+	it('leaves out plain statements and has no alert lines when nothing is in effect', () => {
+		const statement = [{ description: 'SPECIAL WEATHER STATEMENT', level: 'other' as const }];
+		expect(details(factSlots(alertInputs({ s0: statement })))).toEqual([]);
+		expect(details(factSlots(alertInputs({})))).toEqual([]);
+	});
+});
+
+describe('shuffledOrder', () => {
+	// A small seeded generator, so a failure can be repeated.
+	const seeded = (seed: number) => () => {
+		seed = (seed * 1664525 + 1013904223) % 4294967296;
+		return seed / 4294967296;
+	};
+	const groups = slotGroups(0);
+
+	it('uses every slot exactly once', () => {
+		const order = shuffledOrder(groups, seeded(1));
+		expect([...order].sort((a, b) => a - b)).toEqual(groups.map((_, index) => index));
+	});
+
+	it('differs from one shuffle to the next', () => {
+		const orders = new Set(
+			Array.from({ length: 20 }, (_, seed) => shuffledOrder(groups, seeded(seed)).join(','))
+		);
+		expect(orders.size).toBe(20);
+	});
+
+	it('never puts two slots of one group side by side', () => {
+		for (let seed = 0; seed < 200; seed++) {
+			const order = shuffledOrder(groups, seeded(seed));
+			for (let i = 1; i < order.length; i++) {
+				expect(groups[order[i]]).not.toBe(groups[order[i - 1]]);
+			}
+		}
+	});
+
+	it('does not open with the group it was told to avoid', () => {
+		for (let seed = 0; seed < 100; seed++) {
+			expect(groups[shuffledOrder(groups, seeded(seed), 'travel')[0]]).not.toBe('travel');
+		}
+	});
+});
+
+describe('TickerOrder', () => {
+	const fact = (id: string) => ({ id, text: id });
+	const seeded = (seed: number) => () => {
+		seed = (seed * 1664525 + 1013904223) % 4294967296;
+		return seed / 4294967296;
+	};
+
+	it('shows every fact once a lap, in a different order each lap', () => {
+		const slots = ['a', 'b', 'c', 'd', 'e', 'f'].map(fact);
+		const groups = slots.map((slot) => slot.id);
+		const order = new TickerOrder(seeded(3));
+		const laps = Array.from({ length: 6 }, () =>
+			slots.map(() => order.next(slots, groups)!.id).join('')
+		);
+		for (const lap of laps) expect([...lap].sort().join('')).toBe('abcdef');
+		expect(new Set(laps).size).toBeGreaterThan(1);
+	});
+
+	it('skips empty slots without losing the rest of the lap', () => {
+		const slots = [fact('a'), null, fact('c'), null];
+		const groups = ['a', 'b', 'c', 'd'];
+		const order = new TickerOrder(seeded(5));
+		const shown = Array.from({ length: 4 }, () => order.next(slots, groups)!.id).sort();
+		expect(shown).toEqual(['a', 'a', 'c', 'c']);
+	});
+
+	it('keeps a group from repeating when an empty slot between two of them is skipped', () => {
+		// Two travel lines with an empty slot between them: skipping it must not put them together.
+		const slots = [fact('drive'), null, fact('walk'), fact('radar'), fact('north')];
+		const groups = ['travel', 'gap', 'travel', 'radar', 'north'];
+		for (let seed = 0; seed < 100; seed++) {
+			const order = new TickerOrder(seeded(seed));
+			const shown = slots
+				.filter(Boolean)
+				.map(() => groups[slots.indexOf(order.next(slots, groups))]);
+			for (let i = 1; i < shown.length; i++) expect(shown[i]).not.toBe(shown[i - 1]);
+		}
+	});
+
+	it('returns null when no slot has a fact', () => {
+		expect(new TickerOrder(Math.random).next([null, null], ['a', 'b'])).toBeNull();
+	});
+
+	it('starts a new lap when the number of slots changes', () => {
+		const order = new TickerOrder(seeded(9));
+		expect(order.next([fact('a'), fact('b')], ['a', 'b'])).not.toBeNull();
+		const bigger = [fact('a'), fact('b'), fact('c')];
+		const laps = bigger.map(() => order.next(bigger, ['a', 'b', 'c'])!.id).sort();
+		expect(laps).toEqual(['a', 'b', 'c']);
 	});
 });
