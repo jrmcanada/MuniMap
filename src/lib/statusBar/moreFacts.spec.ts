@@ -240,7 +240,7 @@ describe('forecast extremes', () => {
 
 describe('radar coverage', () => {
 	const radar = (wet: string[], observedAt = '2026-11-03T19:54:00Z') =>
-		real({ radar: { wet, observedAt } });
+		real({ radar: { wet, officeWet: false, observedAt } });
 
 	it('says how many municipalities have precipitation over them', () => {
 		expect(radarMunicipalitiesFact(radar(['Baldwin', 'Espanola', 'Nairn']))!.text).toBe(

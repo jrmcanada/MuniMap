@@ -151,7 +151,7 @@ export function nextMoonFact(inputs: FactInputs, which: 'full' | 'new'): TickerF
 // --- How far it all stretches --------------------------------------------------------------
 
 /** Straight line distance in kilometres between two points, from longitude and latitude. */
-function distanceKm(a: { longitude: number; latitude: number }, b: typeof a): number {
+export function distanceKm(a: { longitude: number; latitude: number }, b: typeof a): number {
 	const rad = Math.PI / 180;
 	const half =
 		Math.sin(((b.latitude - a.latitude) * rad) / 2) ** 2 +

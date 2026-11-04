@@ -9,7 +9,24 @@ import { formatDegrees } from '#lib/weather/format.js';
 import { sunTimes } from '#lib/weather/sun.js';
 import { localDate } from '#lib/weather/timeZone.js';
 import type { SiteWeather, WarningLevel } from '#lib/weather/types.js';
-import { MAX_LIVE_AGE_MS, MAX_ROAD_AGE_MS, MIN_TEMPERATURE_SITES, liveSites } from './live.js';
+import {
+	MAX_OBSERVATION_AGE_MS,
+	MAX_ROAD_AGE_MS,
+	MIN_TEMPERATURE_SITES,
+	liveSites
+} from './live.js';
+import { clockChangeFact, greetingFact, holidayFact } from './calendarFacts.js';
+import {
+	belowFreezingFact,
+	busiestRoadFact,
+	calmestFact,
+	feelsLikeFact,
+	freshnessFact,
+	mostHumidFact,
+	radarDryDistrictFact,
+	radarOfficeFact,
+	windDirectionFact
+} from './liveFacts.js';
 import {
 	allTripsFact,
 	forecastFact,
@@ -24,7 +41,20 @@ import {
 	spanFact,
 	sunTimesFact
 } from './moreFacts.js';
-import { TIME_ZONE, decimal, formatTravelTime, number, plural } from './text.js';
+import {
+	andNamesFact,
+	commonLetterFact,
+	districtAreaFact,
+	districtGrowthFact,
+	districtPopulationFact,
+	largestVsTorontoFact,
+	peiFact,
+	shortestNameFact,
+	sunsetGapFact,
+	timeZoneFact,
+	windingFact
+} from './placeFacts.js';
+import { TIME_ZONE, TORONTO_KM2, decimal, formatTravelTime, number, plural } from './text.js';
 
 export interface TickerFact {
 	id: string;
@@ -68,8 +98,6 @@ const CYCLING_KMH = 20;
 const DRIVING_KMH = 90;
 
 const travelMinutes = (km: number, kmh: number) => (km / kmh) * 60;
-/** Land area of the City of Toronto, 2021 census, for scale. */
-const TORONTO_KM2 = 631;
 
 type NumericKey = 'population' | 'populationChangePercent' | 'landAreaKm2' | 'densityPerKm2';
 
@@ -90,7 +118,7 @@ function warmestAndColdest(inputs: FactInputs): TickerFact | null {
 	const readings = liveSites(inputs).flatMap(({ siteName, weather }) => {
 		const current = weather?.current;
 		const observed = current ? Date.parse(current.observedAt) : NaN;
-		return current && inputs.now - observed <= MAX_LIVE_AGE_MS
+		return current && inputs.now - observed <= MAX_OBSERVATION_AGE_MS
 			? [{ siteName, celsius: current.temperatureC }]
 			: [];
 	});
@@ -400,7 +428,8 @@ function windiest(inputs: FactInputs): TickerFact | null {
 	const readings = liveSites(inputs).flatMap(({ siteName, weather }) => {
 		const current = weather?.current;
 		const observed = current ? Date.parse(current.observedAt) : NaN;
-		return typeof current?.windSpeedKmh === 'number' && inputs.now - observed <= MAX_LIVE_AGE_MS
+		return typeof current?.windSpeedKmh === 'number' &&
+			inputs.now - observed <= MAX_OBSERVATION_AGE_MS
 			? [{ siteName, kmh: current.windSpeedKmh }]
 			: [];
 	});
@@ -539,6 +568,30 @@ const SLOT_SPECS: SlotSpec[] = [
 	{ group: 'forecast', build: (inputs) => forecastFact(inputs, 'high') },
 	{ group: 'radar-coverage', build: radarMunicipalitiesFact },
 	{ group: 'radar-coverage', build: radarDistrictFact },
+	{ group: 'cold', build: belowFreezingFact },
+	{ group: 'wind', build: calmestFact },
+	{ group: 'humidity', build: mostHumidFact },
+	{ group: 'wind', build: windDirectionFact },
+	{ group: 'feels-like', build: feelsLikeFact },
+	{ group: 'freshness', build: freshnessFact },
+	{ group: 'road-events', build: busiestRoadFact },
+	{ group: 'radar-coverage', build: radarOfficeFact },
+	{ group: 'radar-coverage', build: radarDryDistrictFact },
+	{ group: 'winding', build: windingFact },
+	{ group: 'time-zone', build: timeZoneFact },
+	{ group: 'time-zone', build: sunsetGapFact },
+	{ group: 'district', build: districtPopulationFact },
+	{ group: 'district', build: districtAreaFact },
+	{ group: 'district', build: districtGrowthFact },
+	{ group: 'names', build: andNamesFact },
+	{ group: 'names', build: shortestNameFact },
+	{ group: 'names', build: commonLetterFact },
+	{ group: 'size', build: peiFact },
+	{ group: 'size', build: largestVsTorontoFact },
+	{ group: 'calendar', build: clockChangeFact },
+	{ group: 'calendar', build: (inputs) => holidayFact(inputs, 0) },
+	{ group: 'calendar', build: (inputs) => holidayFact(inputs, 1) },
+	{ group: 'greeting', build: greetingFact },
 	{ group: 'radar', build: () => RADAR_FACT }
 ];
 

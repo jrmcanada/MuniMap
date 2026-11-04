@@ -1,6 +1,9 @@
 /** The office's time zone, which the daylight and moon dates are told in. */
 export const TIME_ZONE = 'America/Toronto';
 
+/** Land area of the City of Toronto, 2021 census, for scale. */
+export const TORONTO_KM2 = 631;
+
 export const number = new Intl.NumberFormat('en-CA');
 export const decimal = new Intl.NumberFormat('en-CA', { maximumFractionDigits: 1 });
 

@@ -125,13 +125,15 @@
 		const pixels = scratch.getImageData(0, 0, image.width, image.height).data;
 		// The frame is held at a capped size and drawn stretched to the canvas.
 		const scale = image.width / width;
-		const points = projectPlaces(baseProjection, municipalities).map(({ x, y }) => ({
+		// The office is read too, after the municipalities.
+		const points = projectPlaces(baseProjection, [...municipalities, office]).map(({ x, y }) => ({
 			x: x * scale,
 			y: y * scale
 		}));
 		const wet = echoesAt(pixels, image.width, image.height, points);
 		onRadarCoverage?.({
 			wet: municipalities.filter((_, index) => wet[index]).map(({ name }) => name),
+			officeWet: wet[municipalities.length],
 			observedAt: newest.time
 		});
 	}

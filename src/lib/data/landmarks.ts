@@ -77,5 +77,25 @@ export const landmarks: Landmark[] = [
 	{
 		municipality: 'Fauquier-Strickland',
 		text: "Fauquier-Strickland's best known landmark is a roadside groundhog statue at Fauquier, on the Groundhog River."
+	},
+	{
+		municipality: 'James',
+		text: 'Silver found in James Township in 1906 started a mining boom around Elk Lake.'
+	},
+	{
+		municipality: 'Georgian Bluffs',
+		text: 'Georgian Bluffs formed on January 1, 2001, from the townships of Derby, Keppel and Sarawak and Shallow Lake.'
+	},
+	{
+		municipality: 'Markstay-Warren',
+		text: 'Markstay-Warren was formed in 1999 by joining several townships, with villages Markstay, Warren and Hagar.'
+	},
+	{
+		municipality: 'Johnson',
+		text: "Johnson Township's Desbarats, 54 km east of Sault Ste. Marie, is the mainland gateway to St. Joseph Island."
+	},
+	{
+		municipality: 'Tehkummah',
+		text: 'Tehkummah Township includes South Baymouth, where the MS Chi-Cheemaun ferry docks on Manitoulin Island.'
 	}
 ];
