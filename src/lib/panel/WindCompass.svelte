@@ -66,7 +66,7 @@
 	}
 
 	.arrow {
-		fill: var(--panel-yellow);
+		fill: var(--map-pin);
 	}
 
 	.reading,
