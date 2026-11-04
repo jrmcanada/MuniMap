@@ -3,9 +3,9 @@
 	import { factsFor } from '#lib/data/facts.js';
 	import { formatClockTime } from '#lib/radar/format.js';
 	import { formatDegrees } from '#lib/weather/format.js';
-	import { moonPass, moonPhase } from '#lib/weather/moon.js';
+	import { moonPass, moonPhase, nextMoonPass } from '#lib/weather/moon.js';
 	import { sunTimes } from '#lib/weather/sun.js';
-	import { arcPosition, sunPosition } from '#lib/weather/sunArc.js';
+	import { arcPosition, SUN_ARC, sunPosition } from '#lib/weather/sunArc.js';
 	import { localDate, timeZoneAt } from '#lib/weather/timeZone.js';
 	import type { SiteWeather } from '#lib/weather/types.js';
 	import SunArc from './SunArc.svelte';
@@ -17,6 +17,29 @@
 	const facts = $derived(factsFor(municipality.name));
 	const timeZone = $derived(timeZoneAt(municipality.longitude));
 	const current = $derived(weather?.current ?? null);
+
+	/**
+	 * The moon for a night panel: on its arc while it is up, otherwise waiting on the horizon where
+	 * it will rise, with the times of its next pass.
+	 */
+	function moonAt(now: Date) {
+		const { latitude, longitude } = municipality;
+		const up = moonPass(now, latitude, longitude);
+		const pass = up ?? nextMoonPass(now, latitude, longitude);
+		if (!pass) return null;
+		const position = up
+			? arcPosition(now, pass.rise, pass.set)
+			: { x: SUN_ARC.left, y: SUN_ARC.baseline };
+		return position
+			? {
+					position,
+					risen: up !== null,
+					phase: moonPhase(now),
+					rise: formatClockTime(pass.rise, timeZone),
+					set: formatClockTime(pass.set, timeZone)
+				}
+			: null;
+	}
 
 	// Worked out once per card. A card is short lived, and the sun barely moves in that time.
 	const sun = $derived.by(() => {
@@ -32,16 +55,7 @@
 		if (!times) return null;
 
 		const position = sunPosition(now, times);
-		const pass = position ? null : moonPass(now, municipality.latitude, municipality.longitude);
-		const moonPosition = pass && arcPosition(now, pass.rise, pass.set);
-		const moon = pass &&
-			moonPosition && {
-				position: moonPosition,
-				phase: moonPhase(now),
-				rise: formatClockTime(pass.rise, timeZone),
-				set: formatClockTime(pass.set, timeZone)
-			};
-		return { ...times, position, moon };
+		return { ...times, position, moon: position ? null : moonAt(now) };
 	});
 
 	let iconFailed = $state(false);

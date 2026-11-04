@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { moonPass, moonPhase } from './moon.js';
+import { moonPass, moonPhase, nextMoonPass } from './moon.js';
 import { litMoonPath } from './moonShape.js';
 
 // Sudbury.
@@ -41,6 +41,23 @@ describe('moonPass', () => {
 
 	it('is up at midday at new moon', () => {
 		expect(moonPass(new Date('2026-10-10T17:00:00Z'), LATITUDE, LONGITUDE)).not.toBeNull();
+	});
+});
+
+describe('nextMoonPass', () => {
+	it('finds the coming rise and set while the moon is down', () => {
+		const night = new Date('2026-10-10T04:00:00Z');
+		const pass = nextMoonPass(night, LATITUDE, LONGITUDE)!;
+		expect(pass.rise.getTime()).toBeGreaterThan(night.getTime());
+		expect(pass.set.getTime()).toBeGreaterThan(pass.rise.getTime());
+		// The moon is up between them and down just before the rise.
+		const inside = new Date((pass.rise.getTime() + pass.set.getTime()) / 2);
+		expect(moonPass(inside, LATITUDE, LONGITUDE)).not.toBeNull();
+		expect(moonPass(new Date(pass.rise.getTime() - 60_000), LATITUDE, LONGITUDE)).toBeNull();
+	});
+
+	it('is null while the moon is already up', () => {
+		expect(nextMoonPass(new Date('2026-10-10T17:00:00Z'), LATITUDE, LONGITUDE)).toBeNull();
 	});
 });
 

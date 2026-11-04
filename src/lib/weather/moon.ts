@@ -107,6 +107,28 @@ export function moonPass(now: Date, latitude: number, longitude: number): MoonPa
 }
 
 /**
+ * The next time the moon is above the horizon after `now`, for when it is below it now: from
+ * its next rise to the set that follows. The rise is always within a day and a bit.
+ */
+export function nextMoonPass(now: Date, latitude: number, longitude: number): MoonPass | null {
+	const isUp = (time: number) => moonAltitude(new Date(time), latitude, longitude) > RISE_ALTITUDE;
+	const start = now.getTime();
+	if (isUp(start)) return null;
+
+	const scan = (from: number, limit: number): Date | null => {
+		for (let elapsed = SCAN_STEP_MS; elapsed <= limit; elapsed += SCAN_STEP_MS) {
+			const time = from + elapsed;
+			if (isUp(time) !== isUp(from)) return crossing(from + elapsed - SCAN_STEP_MS, time, isUp);
+		}
+		return null;
+	};
+	const rise = scan(start, LONGEST_PASS_MS);
+	if (!rise) return null;
+	const set = scan(rise.getTime() + 1000, LONGEST_PASS_MS);
+	return set ? { rise, set } : null;
+}
+
+/**
  * How far through its cycle the moon is: 0 new, 0.25 first quarter, 0.5 full, 0.75 last quarter.
  */
 export function moonPhase(time: Date): number {
