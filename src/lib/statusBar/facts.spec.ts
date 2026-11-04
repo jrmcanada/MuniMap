@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { municipalityFacts, type MunicipalityFacts } from '#lib/data/facts.js';
 import { landmarks } from '#lib/data/landmarks.js';
 import { municipalities } from '#lib/data/municipalities.js';
@@ -60,6 +60,8 @@ function inputs(readings: (number | null)[], extra: Partial<FactInputs> = {}): F
 		roadEvents: null,
 		roadSections: null,
 		radar: null,
+		trivia: [],
+		officeSiteId: 'on-40',
 		weatherMix: null,
 		customMessages: [],
 		now: NOW,
@@ -106,6 +108,8 @@ describe('factSlots, census facts', () => {
 			roadEvents: null,
 			roadSections: null,
 			radar: null,
+			trivia: [],
+			officeSiteId: 'on-40',
 			weatherMix: null,
 			customMessages: [],
 			now: NOW
@@ -328,6 +332,8 @@ describe('factSlots, travel and place facts', () => {
 			roadEvents: null,
 			roadSections: null,
 			radar: null,
+			trivia: [],
+			officeSiteId: 'on-40',
 			weatherMix: null,
 			customMessages: [],
 			now: NOW
@@ -344,6 +350,19 @@ describe('custom lines', () => {
 		const slots = factSlots(inputs(Array(10).fill(5), { customMessages: ['  Welcome  ', '  '] }));
 		expect(slots.map((slot) => slot?.text ?? null).slice(-2)).toEqual(['Welcome', null]);
 		expect(slots[slots.length - 2]?.id).toBe('custom-0');
+	});
+});
+
+describe('a failing line', () => {
+	it('is skipped without stopping the other lines', () => {
+		// With no trips object, the drive, cycle and walk lines throw; everything else still builds.
+		const broken = inputs(Array(10).fill(5), { trips: null as never });
+		const errors = vi.spyOn(console, 'error').mockImplementation(() => {});
+		const slots = factSlots(broken);
+		expect(slots.some((slot) => slot?.id === 'largest')).toBe(true);
+		expect(slots.some((slot) => slot?.id === 'drive')).toBe(false);
+		expect(errors).toHaveBeenCalled();
+		errors.mockRestore();
 	});
 });
 

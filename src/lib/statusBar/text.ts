@@ -4,6 +4,16 @@ export const TIME_ZONE = 'America/Toronto';
 /** Land area of the City of Toronto, 2021 census, for scale. */
 export const TORONTO_KM2 = 631;
 
+/** Driving time is worked out at this steady speed, not taken from the routing service. */
+export const DRIVING_KMH = 90;
+
+/** "A", "A and B", "A, B and C", or "A, B and N more" for longer lists. */
+export function listNames(names: string[]): string {
+	if (names.length <= 2) return names.join(' and ');
+	if (names.length === 3) return `${names[0]}, ${names[1]} and ${names[2]}`;
+	return `${names[0]}, ${names[1]} and ${names.length - 2} more`;
+}
+
 export const number = new Intl.NumberFormat('en-CA');
 export const decimal = new Intl.NumberFormat('en-CA', { maximumFractionDigits: 1 });
 

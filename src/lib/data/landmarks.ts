@@ -97,5 +97,29 @@ export const landmarks: Landmark[] = [
 	{
 		municipality: 'Tehkummah',
 		text: 'Tehkummah Township includes South Baymouth, where the MS Chi-Cheemaun ferry docks on Manitoulin Island.'
+	},
+	{
+		municipality: 'Huron Shores',
+		text: 'Iron Bridge, the centre of Huron Shores, was settled in 1879 and named for a bridge.'
+	},
+	{
+		municipality: 'Dawson',
+		text: 'Dawson was formed in 1997 from Atwood, Blue, Dilke and Worthington, at the mouth of the Rainy River.'
+	},
+	{
+		municipality: 'Mattawan',
+		text: 'Mattawan Township is home to the Otto Holden Generating Station, a dam on the Ottawa River.'
+	},
+	{
+		municipality: 'Nairn',
+		text: 'Nairn and Hyman, incorporated in 1896, began as a logging community on the Spanish River.'
+	},
+	{
+		municipality: 'Gordon-Barrie Island',
+		text: 'Janet Head Lighthouse, built in 1879 at Gore Bay, stands in Gordon/Barrie Island.'
+	},
+	{
+		municipality: 'Thornloe',
+		text: 'Thornloe was home to Thornloe Cheese, which opened in 1940 and stopped production in 2023.'
 	}
 ];

@@ -1,5 +1,6 @@
 import type { MunicipalityFacts } from '#lib/data/facts.js';
 import type { Landmark } from '#lib/data/landmarks.js';
+import type { Trivia } from '#lib/data/ontarioFacts.js';
 import type { Municipality } from '#lib/data/municipalities.js';
 import type { RadarCoverage } from '#lib/radar/coverage.js';
 import type { RoadEventSnapshot } from '#lib/roads/events.js';
@@ -16,6 +17,28 @@ import {
 	liveSites
 } from './live.js';
 import { clockChangeFact, greetingFact, holidayFact } from './calendarFacts.js';
+import {
+	districtTemperatureFact,
+	forecastPrecipFact,
+	officeForecastFact,
+	officeWeatherFact
+} from './outlookFacts.js';
+import {
+	biggerThanTorontoFact,
+	biggestGainFact,
+	busiestStationFact,
+	centreFact,
+	closestPairFact,
+	driveBandFact,
+	farthestPairFact,
+	medianPopulationFact,
+	northSouthDaylightFact,
+	shrankCountFact,
+	smallestTogetherFact,
+	totalChangeFact
+} from './peopleFacts.js';
+import { collisionsFact, hazardHighwaysFact } from './roadFacts.js';
+import { moonriseFact, sunCountdownFact, triviaFact } from './timeFacts.js';
 import {
 	belowFreezingFact,
 	busiestRoadFact,
@@ -54,7 +77,15 @@ import {
 	timeZoneFact,
 	windingFact
 } from './placeFacts.js';
-import { TIME_ZONE, TORONTO_KM2, decimal, formatTravelTime, number, plural } from './text.js';
+import {
+	DRIVING_KMH,
+	TIME_ZONE,
+	TORONTO_KM2,
+	decimal,
+	formatTravelTime,
+	number,
+	plural
+} from './text.js';
 
 export interface TickerFact {
 	id: string;
@@ -74,6 +105,10 @@ export interface FactInputs {
 	trips: Record<string, OfficeTrip>;
 	/** Remarkable things about individual municipalities; one is chosen at random per slot. */
 	landmarks: Landmark[];
+	/** Facts about Ontario; one is chosen at random per slot. */
+	trivia: Trivia[];
+	/** The forecast site that serves the Sudbury office, for the office weather lines. */
+	officeSiteId: string;
 	/** A number from 0 up to but not including 1; picks the municipality in the travel facts. */
 	random: () => number;
 	facts: Record<string, MunicipalityFacts>;
@@ -94,8 +129,6 @@ export interface FactInputs {
 
 const WALKING_KMH = 5;
 const CYCLING_KMH = 20;
-/** Driving time is worked out at this steady speed, not taken from the routing service. */
-const DRIVING_KMH = 90;
 
 const travelMinutes = (km: number, kmh: number) => (km / kmh) * 60;
 
@@ -592,8 +625,46 @@ const SLOT_SPECS: SlotSpec[] = [
 	{ group: 'calendar', build: (inputs) => holidayFact(inputs, 0) },
 	{ group: 'calendar', build: (inputs) => holidayFact(inputs, 1) },
 	{ group: 'greeting', build: greetingFact },
+	{ group: 'population', build: medianPopulationFact },
+	{ group: 'population', build: smallestTogetherFact },
+	{ group: 'size', build: biggerThanTorontoFact },
+	{ group: 'population-change', build: biggestGainFact },
+	{ group: 'population-change', build: shrankCountFact },
+	{ group: 'population-change', build: totalChangeFact },
+	{ group: 'daylight', build: northSouthDaylightFact },
+	{ group: 'drive-band', build: driveBandFact },
+	{ group: 'geography', build: closestPairFact },
+	{ group: 'geography', build: farthestPairFact },
+	{ group: 'geography', build: centreFact },
+	{ group: 'station', build: busiestStationFact },
+	{ group: 'forecast-precip', build: (inputs) => forecastPrecipFact(inputs, 'rain') },
+	{ group: 'forecast-precip', build: (inputs) => forecastPrecipFact(inputs, 'snow') },
+	{ group: 'district-temperatures', build: districtTemperatureFact },
+	{ group: 'office-weather', build: officeWeatherFact },
+	{ group: 'office-weather', build: officeForecastFact },
+	{ group: 'road-events', build: collisionsFact },
+	{ group: 'road-sections', build: hazardHighwaysFact },
+	{ group: 'moon', build: moonriseFact },
+	{ group: 'daylight', build: sunCountdownFact },
+	{ group: 'trivia', copies: 2, build: triviaFact },
 	{ group: 'radar', build: () => RADAR_FACT }
 ];
+
+/**
+ * Builds one line, or null if building it fails. A feed that sends something unexpected must cost
+ * the wall display one line, not the whole ticker.
+ */
+function attempt(
+	build: (inputs: FactInputs) => TickerFact | null,
+	inputs: FactInputs
+): TickerFact | null {
+	try {
+		return build(inputs);
+	} catch (cause) {
+		console.error('A ticker line could not be built', cause);
+		return null;
+	}
+}
 
 const CUSTOM_GROUP = 'custom';
 
@@ -605,7 +676,7 @@ const CUSTOM_GROUP = 'custom';
 export function factSlots(inputs: FactInputs): (TickerFact | null)[] {
 	return [
 		...SLOT_SPECS.flatMap(({ copies = 1, build }) =>
-			Array.from({ length: copies }, () => build(inputs))
+			Array.from({ length: copies }, () => attempt(build, inputs))
 		),
 		...inputs.customMessages.map((text, index) =>
 			text.trim() ? { id: `custom-${index}`, text: text.trim() } : null

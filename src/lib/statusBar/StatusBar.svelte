@@ -4,7 +4,9 @@
 	import { fade } from 'svelte/transition';
 	import logo from '#lib/assets/tmm-logo.png';
 	import { municipalityFacts } from '#lib/data/facts.js';
+	import { factsFor } from '#lib/data/facts.js';
 	import { landmarks } from '#lib/data/landmarks.js';
+	import { ontarioFacts } from '#lib/data/ontarioFacts.js';
 	import { municipalities } from '#lib/data/municipalities.js';
 	import { office } from '#lib/data/office.js';
 	import officeTrips from '#lib/data/office-trips.json';
@@ -56,6 +58,8 @@
 			municipalities,
 			office,
 			landmarks,
+			trivia: ontarioFacts,
+			officeSiteId: factsFor(office.name).siteId,
 			trips: officeTrips,
 			random: Math.random,
 			facts: municipalityFacts,

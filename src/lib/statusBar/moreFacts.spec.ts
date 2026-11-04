@@ -36,6 +36,8 @@ const real = (extra: Partial<FactInputs> = {}, now = NOW): FactInputs => ({
 	roadEvents: null,
 	roadSections: null,
 	radar: null,
+	trivia: [],
+	officeSiteId: 'on-40',
 	weatherMix: null,
 	customMessages: [],
 	now,
