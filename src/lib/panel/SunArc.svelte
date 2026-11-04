@@ -9,16 +9,14 @@
 		risen: boolean;
 		/** 0 new, 0.25 first quarter, 0.5 full, 0.75 last quarter. */
 		phase: number;
-		/** Moonrise and moonset as clock times, already formatted. */
-		rise: string;
-		set: string;
 	}
 
 	let {
 		position,
 		sunrise,
 		sunset,
-		moon = null
+		moon = null,
+		moonTimes = null
 	}: {
 		/** Where the sun is on the arc now, or null when it is below the horizon. */
 		position: SunPosition | null;
@@ -27,6 +25,8 @@
 		sunset: string;
 		/** The moon, shown whenever the sun is down. */
 		moon?: Moon | null;
+		/** Moonrise and moonset as clock times, already formatted, shown whether or not it is drawn. */
+		moonTimes?: { rise: string; set: string } | null;
 	} = $props();
 
 	const { left, right, baseline, radiusX, radiusY } = SUN_ARC;
@@ -65,10 +65,9 @@
 			<text class="night" x="150" y="64" text-anchor="middle">Sun is down</text>
 		{/if}
 	</svg>
-	{#if !position && moon}
-		<p class="times"><span>Moonrise {moon.rise}</span><span>Moonset {moon.set}</span></p>
-	{:else}
-		<p class="times"><span>Sunrise {sunrise}</span><span>Sunset {sunset}</span></p>
+	<p class="times"><span>Sunrise {sunrise}</span><span>Sunset {sunset}</span></p>
+	{#if moonTimes}
+		<p class="times"><span>Moonrise {moonTimes.rise}</span><span>Moonset {moonTimes.set}</span></p>
 	{/if}
 </div>
 
