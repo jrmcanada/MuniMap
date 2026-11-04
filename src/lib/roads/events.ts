@@ -38,6 +38,12 @@ export interface RoadEvent {
 	latitude: number;
 }
 
+/** The events from the latest successful refresh, and when it arrived (epoch milliseconds). */
+export interface RoadEventSnapshot {
+	events: RoadEvent[];
+	loadedAt: number;
+}
+
 const isCoordinate = (value: unknown, limit: number): value is number =>
 	typeof value === 'number' && Math.abs(value) <= limit;
 

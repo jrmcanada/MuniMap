@@ -10,6 +10,7 @@
 	import officeTrips from '#lib/data/office-trips.json';
 	import { tickerMessages } from '#lib/data/tickerMessages.js';
 	import { formatClockTime } from '#lib/radar/format.js';
+	import type { RoadEventSnapshot } from '#lib/roads/events.js';
 	import type { SiteWeather } from '#lib/weather/types.js';
 	import { factSlots, nextSlot, startSlot } from './facts.js';
 
@@ -19,7 +20,14 @@
 	const FADE_MS = 400;
 
 	/** Weather held for a forecast site, already filtered for age and expired warnings. */
-	let { peekWeather }: { peekWeather: (siteId: string) => SiteWeather | null } = $props();
+	let {
+		peekWeather,
+		peekRoadEvents
+	}: {
+		peekWeather: (siteId: string) => SiteWeather | null;
+		/** The latest road events, read each time the ticker builds its facts. */
+		peekRoadEvents: () => RoadEventSnapshot | null;
+	} = $props();
 
 	const dateFormat = new Intl.DateTimeFormat('en-US', {
 		timeZone: TIME_ZONE,
@@ -40,6 +48,7 @@
 			random: Math.random,
 			facts: municipalityFacts,
 			peekWeather,
+			roadEvents: peekRoadEvents(),
 			customMessages: tickerMessages,
 			now: Date.now()
 		});

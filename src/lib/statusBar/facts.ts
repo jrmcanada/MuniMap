@@ -1,6 +1,7 @@
 import type { MunicipalityFacts } from '#lib/data/facts.js';
 import type { Landmark } from '#lib/data/landmarks.js';
 import type { Municipality } from '#lib/data/municipalities.js';
+import type { RoadEventSnapshot } from '#lib/roads/events.js';
 import { formatDegrees } from '#lib/weather/format.js';
 import { sunTimes } from '#lib/weather/sun.js';
 import { localDate } from '#lib/weather/timeZone.js';
@@ -29,11 +30,15 @@ export interface FactInputs {
 	facts: Record<string, MunicipalityFacts>;
 	/** Weather held for a forecast site, already filtered for age and expired warnings. */
 	peekWeather: (siteId: string) => SiteWeather | null;
+	/** Latest road events from Ontario 511, or null before the first load. */
+	roadEvents: RoadEventSnapshot | null;
 	customMessages: string[];
 	/** Epoch milliseconds. */
 	now: number;
 }
 
+/** Road events older than this are not stated as fact; the feed refreshes every 5 minutes. */
+const MAX_ROAD_AGE_MS = 30 * 60 * 1000;
 /** "Right now" facts ignore weather older than this. */
 const MAX_LIVE_AGE_MS = 60 * 60 * 1000;
 /** Below this many sites, "warmest" and "coldest" would just be the first ones to load. */
@@ -129,6 +134,24 @@ function alerts(inputs: FactInputs): TickerFact | null {
 			affected === 0
 				? 'No weather alerts for any of our municipalities.'
 				: `Weather alerts are in effect for ${affected} of our municipalities.`
+	};
+}
+
+/**
+ * Closures other than roadwork, province wide: 511 covers all of Ontario, not only our
+ * municipalities, and the text says so. Roadwork that shuts a ramp is left out, since the feed
+ * lists dozens and they would drown out everything else.
+ */
+function roadClosures(inputs: FactInputs): TickerFact | null {
+	const snapshot = inputs.roadEvents;
+	if (!snapshot || inputs.now - snapshot.loadedAt > MAX_ROAD_AGE_MS) return null;
+	const count = snapshot.events.filter(({ kind }) => kind === 'closure').length;
+	return {
+		id: 'road-closures',
+		text:
+			count === 0
+				? 'Ontario 511 reports no road closures in Ontario right now, apart from roadwork.'
+				: `Ontario 511 reports ${count} road ${count === 1 ? 'closure' : 'closures'} in Ontario right now, apart from roadwork.`
 	};
 }
 
@@ -441,6 +464,7 @@ export function factSlots(inputs: FactInputs): (TickerFact | null)[] {
 		compassFact(inputs, 'north'),
 		walkFact(inputs),
 		alerts(inputs),
+		roadClosures(inputs),
 		densestFact(inputs),
 		landmarkFact(inputs),
 		farthestFact(inputs),
