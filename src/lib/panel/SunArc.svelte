@@ -3,8 +3,10 @@
 	import { SUN_ARC, type SunPosition } from '#lib/weather/sunArc.js';
 
 	interface Moon {
-		/** Where the moon is on the arc now. */
+		/** Where the moon is on the arc now; at the left end of the horizon until it rises. */
 		position: SunPosition;
+		/** False while the moon is still below the horizon, waiting to rise. */
+		risen: boolean;
 		/** 0 new, 0.25 first quarter, 0.5 full, 0.75 last quarter. */
 		phase: number;
 		/** Moonrise and moonset as clock times, already formatted. */
@@ -23,14 +25,20 @@
 		/** Sunrise and sunset as clock times, already formatted. */
 		sunrise: string;
 		sunset: string;
-		/** The moon, shown only while the sun is down and the moon is up. */
+		/** The moon, shown whenever the sun is down. */
 		moon?: Moon | null;
 	} = $props();
 
 	const { left, right, baseline, radiusX, radiusY } = SUN_ARC;
 	const fullArc = `M${left} ${baseline} A${radiusX} ${radiusY} 0 0 1 ${right} ${baseline}`;
 	const label = $derived(
-		position ? 'The sun is up.' : moon ? 'The sun is down and the moon is up.' : 'The sun is down.'
+		position
+			? 'The sun is up.'
+			: moon
+				? moon.risen
+					? 'The sun is down and the moon is up.'
+					: 'The sun is down and the moon has not risen yet.'
+				: 'The sun is down.'
 	);
 	const MOON_RADIUS = 9;
 </script>
@@ -46,7 +54,10 @@
 			/>
 			<circle class="body" cx={position.x} cy={position.y} r="7" />
 		{:else if moon}
-			<g transform={`translate(${moon.position.x} ${moon.position.y}) scale(${MOON_RADIUS})`}>
+			<g
+				class:waiting={!moon.risen}
+				transform={`translate(${moon.position.x} ${moon.position.y}) scale(${MOON_RADIUS})`}
+			>
 				<circle class="moon-dark" r="1" />
 				<path class="moon-lit" d={litMoonPath(moon.phase)} />
 			</g>
@@ -94,6 +105,11 @@
 
 	.body {
 		fill: var(--map-highlight);
+	}
+
+	/* Below the horizon, so not yet visible: shown faint, where it will rise. */
+	.waiting {
+		opacity: 0.45;
 	}
 
 	.moon-dark {
