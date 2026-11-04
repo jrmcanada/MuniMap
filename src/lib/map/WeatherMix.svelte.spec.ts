@@ -19,6 +19,15 @@ describe('WeatherMix', () => {
 		);
 	});
 
+	it('keeps all four labels on one row', () => {
+		render(WeatherMix, {
+			mix: { counts: { rain: 27, snow: 0, clear: 0, other: 7 }, reporting: 34 },
+			total: 55
+		});
+		const tops = [...document.querySelectorAll('li')].map((row) => row.getBoundingClientRect().top);
+		expect(new Set(tops).size).toBe(1);
+	});
+
 	it('sizes segments by share, in the fixed order, and writes the percentage only where it fits', () => {
 		render(WeatherMix, {
 			mix: { counts: { rain: 29, snow: 0, clear: 1, other: 9 }, reporting: 39 },

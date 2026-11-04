@@ -58,7 +58,8 @@
 		display: flex;
 		flex-direction: column;
 		gap: 0.3rem;
-		width: 20rem;
+		/* As wide as the one-row legend, whatever the screen scale; the bar stretches to match. */
+		width: max-content;
 		padding: 0.35rem 0.5rem;
 		border-radius: 0.3rem;
 		background: var(--map-label-halo);
@@ -87,8 +88,7 @@
 
 	ul {
 		display: flex;
-		flex-wrap: wrap;
-		gap: 0.1rem 0.7rem;
+		gap: 0.7rem;
 		margin: 0;
 		padding: 0;
 		list-style: none;
@@ -98,6 +98,7 @@
 		display: flex;
 		align-items: center;
 		gap: 0.3rem;
+		white-space: nowrap;
 	}
 
 	li b {
