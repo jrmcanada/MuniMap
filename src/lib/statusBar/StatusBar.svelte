@@ -104,6 +104,16 @@
 			<p class="fact" in:fade={{ duration }} out:fade={{ duration }}>{fact?.text ?? ''}</p>
 		{/key}
 	</div>
+
+	<form method="POST" action="/logout">
+		<button class="logout" type="submit" title="Logout" aria-label="Logout">
+			<svg viewBox="0 0 24 24" aria-hidden="true">
+				<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+				<path d="M16 17l5-5-5-5" />
+				<path d="M21 12H9" />
+			</svg>
+		</button>
+	</form>
 </footer>
 
 <style>
@@ -113,7 +123,7 @@
 		grid-column: 1 / -1;
 		container-type: size;
 		display: grid;
-		grid-template-columns: auto auto minmax(0, 1fr);
+		grid-template-columns: auto auto minmax(0, 1fr) auto;
 		align-items: center;
 		gap: 0 2.5vw;
 		padding: 0 1.5vw;
@@ -151,6 +161,36 @@
 	.time {
 		font-size: max(14px, 42cqh);
 		font-weight: 700;
+	}
+
+	/* The lower right corner of the screen. Just an icon; the tooltip comes from its title. */
+	.logout {
+		display: grid;
+		place-items: center;
+		width: max(24px, 50cqh);
+		height: max(24px, 50cqh);
+		padding: 0;
+		border: 0;
+		border-radius: 0.3rem;
+		background: none;
+		color: var(--panel-muted);
+		cursor: pointer;
+	}
+
+	.logout:hover,
+	.logout:focus-visible {
+		color: var(--panel-text);
+		background: var(--card-background);
+	}
+
+	.logout svg {
+		width: 70%;
+		height: 70%;
+		fill: none;
+		stroke: currentColor;
+		stroke-width: 2;
+		stroke-linecap: round;
+		stroke-linejoin: round;
 	}
 
 	/* Facts can use two lines; anything longer, including your own lines, is cut off. */

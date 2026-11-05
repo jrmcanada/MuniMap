@@ -11,6 +11,14 @@ test('shows a municipality in the panel', async ({ page }) => {
 	await expect(page.getByText(/Population/)).toBeVisible();
 });
 
+test('the logout button sits in the status bar and leads to the sign-in page', async ({ page }) => {
+	await page.goto('/');
+	const logout = page.getByRole('button', { name: 'Logout' });
+	await expect(logout).toHaveAttribute('title', 'Logout');
+	await logout.click();
+	await expect(page).toHaveURL(/\/login$/);
+});
+
 test('shows the status bar with the clock and a ticker fact', async ({ page }) => {
 	await page.goto('/');
 	const bar = page.locator('footer[aria-label="Status bar"]');
