@@ -104,11 +104,6 @@
 			<p class="fact" in:fade={{ duration }} out:fade={{ duration }}>{fact?.text ?? ''}</p>
 		{/key}
 	</div>
-
-	<p class="credits">
-		<span>Weather and radar: Environment Canada. Census: Statistics Canada.</span>
-		<span>Map: Natural Earth. Open Government Licence, Canada.</span>
-	</p>
 </footer>
 
 <style>
@@ -118,7 +113,7 @@
 		grid-column: 1 / -1;
 		container-type: size;
 		display: grid;
-		grid-template-columns: auto auto minmax(0, 1fr) auto;
+		grid-template-columns: auto auto minmax(0, 1fr);
 		align-items: center;
 		gap: 0 2.5vw;
 		padding: 0 1.5vw;
@@ -173,18 +168,5 @@
 		overflow: hidden;
 		font-size: max(12px, 32cqh);
 		line-height: 1.15;
-	}
-
-	.credits {
-		/* The same size as the credit line at the foot of the panel, set once on the page. */
-		font-size: var(--credit-size, 11px);
-		line-height: 1.15;
-		color: var(--panel-muted);
-		white-space: nowrap;
-	}
-
-	/* The line break goes before "Map". */
-	.credits span {
-		display: block;
 	}
 </style>
