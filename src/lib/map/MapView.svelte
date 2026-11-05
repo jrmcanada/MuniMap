@@ -37,7 +37,7 @@
 	import WeatherMix from './WeatherMix.svelte';
 	import { createProjection, projectPlaces, zoomProjection } from './projection.js';
 	import type { HighwayData, MapColors, MapData, PinPoint } from './types.js';
-	import { FULL_VIEW, panBy, wheelFactor, zoomAt, type View } from './view.js';
+	import { FULL_VIEW, panBy, pinchView, wheelFactor, zoomAt, type View } from './view.js';
 
 	/** How close a click or tap has to land to a pin to count, in CSS pixels. */
 	const HIT_RADIUS = 16;
@@ -96,6 +96,8 @@
 	let baseStale = false;
 	let drag: { x: number; y: number } | null = null;
 	let dragMoved = false;
+	/** Every finger or button held down on the map, in the order they went down, in screen pixels. */
+	let pressed: { id: number; x: number; y: number }[] = [];
 
 	let radarTime = $state<string | null>(null);
 	let roads: RoadSegment[] = [];
@@ -294,17 +296,48 @@
 	}
 
 	function startDrag(event: PointerEvent) {
-		drag = { x: event.clientX, y: event.clientY };
-		dragMoved = false;
+		pressed.push({ id: event.pointerId, x: event.clientX, y: event.clientY });
 		canvas.setPointerCapture(event.pointerId);
+		// A second finger turns the drag into a pinch, and a pinch is never a click.
+		dragMoved = pressed.length > 1;
+		drag = pressed.length > 1 ? null : { x: event.clientX, y: event.clientY };
 	}
 
-	function endDrag() {
-		drag = null;
-		canvas.style.cursor = '';
+	function endDrag(event: PointerEvent) {
+		pressed = pressed.filter((finger) => finger.id !== event.pointerId);
+		if (pressed.length === 1) {
+			// One finger is left after a pinch: carry on dragging from where it is.
+			drag = { x: pressed[0].x, y: pressed[0].y };
+		} else if (pressed.length === 0) {
+			drag = null;
+			canvas.style.cursor = '';
+		}
+	}
+
+	/** Zooms and pans with the first two fingers down; `before` is where the one that moved was. */
+	function pinch(moved: PinPoint, before: PinPoint) {
+		const rect = canvas.getBoundingClientRect();
+		const local = (point: PinPoint) => ({ x: point.x - rect.left, y: point.y - rect.top });
+		const fingers = pressed.slice(0, 2);
+		const now = fingers.map(local) as [PinPoint, PinPoint];
+		const earlier = fingers.map((finger) => local(finger === moved ? before : finger)) as [
+			PinPoint,
+			PinPoint
+		];
+		changeView(pinchView(view, earlier, now, { width, height }));
 	}
 
 	function movePointer(event: PointerEvent) {
+		const finger = pressed.find(({ id }) => id === event.pointerId);
+		if (finger) {
+			const before = { x: finger.x, y: finger.y };
+			finger.x = event.clientX;
+			finger.y = event.clientY;
+			if (pressed.length > 1) {
+				pinch(finger, before);
+				return;
+			}
+		}
 		if (!drag) {
 			const overSymbol = targetAt(event) || nearestPin(eventPins, pointOf(event), HIT_RADIUS) >= 0;
 			canvas.style.cursor = overSymbol ? 'pointer' : view.k > 1 ? 'grab' : '';

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { FULL_VIEW, MAX_ZOOM, panBy, wheelFactor, zoomAt } from './view.js';
+import { FULL_VIEW, MAX_ZOOM, panBy, pinchView, wheelFactor, zoomAt } from './view.js';
 
 const size = { width: 1000, height: 600 };
 
@@ -52,5 +52,49 @@ describe('wheelFactor', () => {
 		expect(wheelFactor(-100)).toBeGreaterThan(1);
 		expect(wheelFactor(100)).toBeLessThan(1);
 		expect(wheelFactor(0)).toBe(1);
+	});
+});
+
+describe('pinchView', () => {
+	const apart = (gap: number, y = 300): [{ x: number; y: number }, { x: number; y: number }] => [
+		{ x: 500 - gap / 2, y },
+		{ x: 500 + gap / 2, y }
+	];
+
+	it('zooms by how far the fingers spread, around the midpoint', () => {
+		const view = pinchView(FULL_VIEW, apart(100), apart(200), size);
+		expect(view.k).toBeCloseTo(2);
+		// The map point under the midpoint is still under it.
+		expect((500 - view.x) / view.k).toBeCloseTo(500);
+		expect((300 - view.y) / view.k).toBeCloseTo(300);
+	});
+
+	it('zooms out when the fingers come together, but not past the full view', () => {
+		const zoomed = pinchView(FULL_VIEW, apart(100), apart(400), size);
+		expect(pinchView(zoomed, apart(400), apart(200), size).k).toBeCloseTo(zoomed.k / 2);
+		expect(pinchView(zoomed, apart(400), apart(1), size)).toEqual(FULL_VIEW);
+	});
+
+	it('pans with the midpoint when the fingers move together', () => {
+		const zoomed = pinchView(FULL_VIEW, apart(100), apart(300), size);
+		const moved = pinchView(
+			zoomed,
+			apart(100),
+			[
+				{ x: 450, y: 300 },
+				{ x: 550, y: 300 }
+			].map((point) => ({ x: point.x + 60, y: point.y + 20 })) as [
+				{ x: number; y: number },
+				{ x: number; y: number }
+			],
+			size
+		);
+		expect(moved.k).toBe(zoomed.k);
+		expect(moved.x).toBeCloseTo(zoomed.x + 60);
+		expect(moved.y).toBeCloseTo(zoomed.y + 20);
+	});
+
+	it('does nothing when the fingers start on the same spot', () => {
+		expect(pinchView(FULL_VIEW, apart(0), apart(200), size)).toEqual(FULL_VIEW);
 	});
 });
