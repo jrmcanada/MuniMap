@@ -323,7 +323,7 @@
 
 	.footer {
 		margin-top: auto;
-		/* The page sets --credit-size so the status bar's credits are exactly this size. */
+		/* The page sets --credit-size, so this line scales with the screen. */
 		font-size: var(--credit-size, calc(var(--u) * 4));
 	}
 </style>
