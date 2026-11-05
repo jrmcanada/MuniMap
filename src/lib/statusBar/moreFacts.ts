@@ -247,7 +247,7 @@ export function mixFact(inputs: FactInputs, kind: 'rain' | 'snow' | 'clear'): Ti
 	if (!mix || mix.reporting === 0 || mix.counts[kind] === 0) return null;
 	return {
 		id: `mix-${kind}`,
-		text: `${mix.counts[kind]} of the ${mix.reporting} municipalities with a current reading ${mix.counts[kind] === 1 ? 'has' : 'have'} ${MIX_WORDS[kind]} right now.`
+		text: `${mix.counts[kind]} of the ${mix.reporting} municipalities with current weather ${mix.counts[kind] === 1 ? 'has' : 'have'} ${MIX_WORDS[kind]} right now.`
 	};
 }
 

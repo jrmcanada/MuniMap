@@ -12,7 +12,7 @@ describe('WeatherMix', () => {
 			total: 55
 		});
 		await expect
-			.element(page.getByText('40 of 55 municipalities have a current reading'))
+			.element(page.getByText('40 of 55 municipalities have current weather'))
 			.toBeVisible();
 		const rows = [...document.querySelectorAll('li')].map((row) => row.textContent);
 		expect(rows).toEqual(['Rain12', 'Snow3', 'Clear20', 'Cloud3', 'Mist, fog2']);

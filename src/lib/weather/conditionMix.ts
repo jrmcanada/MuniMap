@@ -26,10 +26,20 @@ export function classifyCondition(text: string): ConditionKind {
 	return 'cloud';
 }
 
+/**
+ * The weather a forecast describes, for a site whose station gives no usable reading. Only the first
+ * sentence counts ("Cloudy. 40 percent chance of showers near noon." is cloud), and a "chance of"
+ * phrase is dropped because a chance is not weather that is happening.
+ */
+function forecastCondition(summary: string): string {
+	const first = summary.split(/\.\s/)[0].replace(/\s+with \d+ percent chance of [^.]*/i, '');
+	return first.replace(/\.$/, '');
+}
+
 export interface ConditionMix {
 	/** Municipalities in each kind of weather. */
 	counts: Record<ConditionKind, number>;
-	/** Municipalities with a fresh reading that names a condition; the counts add up to this. */
+	/** Municipalities with a condition, observed or forecast; the counts add up to this. */
 	reporting: number;
 }
 
@@ -45,19 +55,22 @@ export interface ConditionMixInputs {
 /**
  * What the weather is across the municipalities right now. Each municipality counts once, using
  * its nearest forecast site, so sites shared by several municipalities weigh more, as they do in
- * the ticker's alert count. A site with no fresh reading or no condition text is left out.
+ * the ticker's alert count. A site whose station gives no fresh condition (many send only a
+ * temperature) uses the first period of its forecast instead. A site not fetched lately is left out.
  */
 export function conditionMix(inputs: ConditionMixInputs): ConditionMix {
 	const counts: Record<ConditionKind, number> = { rain: 0, snow: 0, clear: 0, cloud: 0, fog: 0 };
 	let reporting = 0;
 	for (const { name } of inputs.municipalities) {
 		const weather = inputs.peekWeather(inputs.facts[name].siteId);
-		const current = weather?.current;
-		if (!weather || !current?.condition) continue;
-		const observed = Date.parse(current.observedAt);
-		if (inputs.now - weather.fetchedAt > MAX_FETCH_AGE_MS) continue;
-		if (inputs.now - observed > MAX_OBSERVATION_AGE_MS) continue;
-		counts[classifyCondition(current.condition)]++;
+		if (!weather || inputs.now - weather.fetchedAt > MAX_FETCH_AGE_MS) continue;
+		const current = weather.current;
+		const fresh = current && inputs.now - Date.parse(current.observedAt) <= MAX_OBSERVATION_AGE_MS;
+		const forecast = weather.forecast[0]?.summary;
+		const condition =
+			fresh && current.condition ? current.condition : forecast && forecastCondition(forecast);
+		if (!condition) continue;
+		counts[classifyCondition(condition)]++;
 		reporting++;
 	}
 	return { counts, reporting };
