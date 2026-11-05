@@ -46,6 +46,31 @@ export function panBy(
 	};
 }
 
+type Point = { x: number; y: number };
+
+/**
+ * A two finger pinch: the map zooms by how much the fingers moved apart or together, and follows
+ * the midpoint between them, so the map under the fingers stays under the fingers.
+ */
+export function pinchView(
+	view: View,
+	from: [Point, Point],
+	to: [Point, Point],
+	size: { width: number; height: number }
+): View {
+	const gap = (fingers: [Point, Point]) =>
+		Math.hypot(fingers[0].x - fingers[1].x, fingers[0].y - fingers[1].y);
+	const middle = (fingers: [Point, Point]) => ({
+		x: (fingers[0].x + fingers[1].x) / 2,
+		y: (fingers[0].y + fingers[1].y) / 2
+	});
+	if (gap(from) === 0) return view;
+	const start = middle(from);
+	const end = middle(to);
+	const zoomed = zoomAt(view, start, gap(to) / gap(from), size);
+	return panBy(zoomed, end.x - start.x, end.y - start.y, size);
+}
+
 function clamp(value: number, min: number, max: number): number {
 	return Math.min(max, Math.max(min, value));
 }

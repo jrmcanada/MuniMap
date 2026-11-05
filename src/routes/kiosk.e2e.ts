@@ -196,3 +196,64 @@ test('shows the road legend, credited to Ontario 511, when the feed answers', as
 	await expect(page.getByText('Snow covered', { exact: true })).toBeVisible();
 	await expect(page.getByText('Sample data, not real conditions')).toHaveCount(0);
 });
+
+test.describe('on a touchscreen', () => {
+	// Reduced motion stops the map animating, so two screenshots of an unchanged view are identical.
+	test.use({ hasTouch: true, reducedMotion: 'reduce' });
+
+	test('pinches the map in and out, and drags it with one finger', async ({ page }) => {
+		// A stopped clock keeps the 20 second rotation from moving the highlight mid-test.
+		await page.clock.install({ time: new Date() });
+		await page.clock.pauseAt(new Date(Date.now() + 2000));
+		await page.goto('/');
+		const canvas = page.locator('canvas').first();
+		await expect(canvas).toBeVisible();
+		const box = (await canvas.boundingBox())!;
+		const centre = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+		// The radar can still be arriving, so wait until the map holds still.
+		const settled = async () => {
+			let last = await canvas.screenshot();
+			for (let attempt = 0; attempt < 20; attempt++) {
+				await page.waitForTimeout(400);
+				const next = await canvas.screenshot();
+				if (next.equals(last)) return next;
+				last = next;
+			}
+			return last;
+		};
+		const full = await settled();
+		expect((await canvas.screenshot()).equals(full)).toBe(true);
+
+		const touch = await page.context().newCDPSession(page);
+		const send = (
+			type: 'touchStart' | 'touchMove' | 'touchEnd',
+			points: { x: number; y: number; id: number }[]
+		) => touch.send('Input.dispatchTouchEvent', { type, touchPoints: points });
+		const fingers = (gap: number) => [
+			{ x: centre.x - gap / 2, y: centre.y, id: 1 },
+			{ x: centre.x + gap / 2, y: centre.y, id: 2 }
+		];
+
+		// Spread two fingers apart: the map zooms in.
+		await send('touchStart', fingers(60));
+		for (const gap of [100, 160, 240]) await send('touchMove', fingers(gap));
+		await send('touchEnd', []);
+		const zoomed = await settled();
+		expect(zoomed.equals(full)).toBe(false);
+
+		// One finger drags the zoomed map.
+		await send('touchStart', [{ x: centre.x, y: centre.y, id: 1 }]);
+		for (const step of [20, 60, 100])
+			await send('touchMove', [{ x: centre.x + step, y: centre.y + step / 2, id: 1 }]);
+		await send('touchEnd', []);
+		const dragged = await settled();
+		expect(dragged.equals(zoomed)).toBe(false);
+
+		// Pinching back together returns to the full view.
+		await send('touchStart', fingers(400));
+		for (const gap of [200, 80, 10]) await send('touchMove', fingers(gap));
+		await send('touchEnd', []);
+		// Pinching back in changes the view again. The exact return to the full view is in view.spec.ts.
+		expect((await settled()).equals(dragged)).toBe(false);
+	});
+});
