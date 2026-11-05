@@ -51,7 +51,7 @@
 			</li>
 		{/each}
 	</ul>
-	<p class="caption">{mix.reporting} of {total} municipalities have a current reading</p>
+	<p class="caption">{mix.reporting} of {total} municipalities have current weather</p>
 </div>
 
 <style>

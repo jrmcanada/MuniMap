@@ -67,9 +67,8 @@ describe('conditionMix', () => {
 		expect(result.reporting).toBe(4);
 	});
 
-	it('leaves out sites with no weather, no condition text, or an old reading', () => {
+	it('leaves out sites with no weather, or not fetched within the hour', () => {
 		const result = mix({
-			s1: weather(undefined),
 			s2: weather('Clear', { fetchedAt: NOW - 61 * 60_000 }),
 			s3: weather('Fog')
 		});
@@ -78,10 +77,34 @@ describe('conditionMix', () => {
 		expect(mix({}).reporting).toBe(0);
 	});
 
-	it('leaves out a reading observed over two hours ago, but keeps one from the last hour or so', () => {
+	it('uses the first forecast period when the station gives no condition', () => {
+		const forecast = (summary: string) => [{ name: 'Today', summary }];
+		const result = mix({
+			s1: weather(undefined, { forecast: forecast('Showers. Wind southwest 20 km/h.') }),
+			s2: weather(undefined, {
+				forecast: forecast('Cloudy. 40 percent chance of showers near noon. Showers beginning.')
+			}),
+			s3: weather(undefined, { forecast: forecast('Cloudy with 70 percent chance of showers.') })
+		});
+		// A and B share s1. A chance of showers is not weather that is happening, so it stays cloud.
+		expect(result.counts).toEqual({ rain: 2, snow: 0, clear: 0, cloud: 2, fog: 0 });
+		expect(result.reporting).toBe(4);
+		expect(mix({ s1: weather(undefined) }).reporting).toBe(0);
+	});
+
+	it('prefers a fresh reading to the forecast', () => {
+		const result = mix({
+			s3: weather('Clear', { forecast: [{ name: 'Today', summary: 'Showers.' }] })
+		});
+		expect(result.counts.clear).toBe(1);
+	});
+
+	it('uses the forecast for a reading over two hours old, and keeps one from the last hour or so', () => {
 		const old = weather('Clear');
 		old.current!.observedAt = '2026-11-04T12:30:00Z';
 		expect(mix({ s1: old }).reporting).toBe(0);
+		old.forecast = [{ name: 'Today', summary: 'Rain.' }];
+		expect(mix({ s1: old }).counts.rain).toBe(2);
 
 		// Stations report hourly and the reading arrives late, so one 75 minutes old is still current.
 		const recent = weather('Clear');

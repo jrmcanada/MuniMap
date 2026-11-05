@@ -179,14 +179,14 @@ describe('the weather across the municipalities', () => {
 	it('says how many have rain, snow or clear skies', () => {
 		const inputs = mix({ rain: 29, snow: 2, clear: 1, cloud: 5, fog: 2 });
 		expect(mixFact(inputs, 'rain')!.text).toBe(
-			'29 of the 39 municipalities with a current reading have rain right now.'
+			'29 of the 39 municipalities with current weather have rain right now.'
 		);
 		expect(mixFact(inputs, 'snow')!.text).toContain(
-			'2 of the 39 municipalities with a current reading have snow'
+			'2 of the 39 municipalities with current weather have snow'
 		);
 		// One municipality takes "has", not "have".
 		expect(mixFact(inputs, 'clear')!.text).toContain(
-			'1 of the 39 municipalities with a current reading has clear skies right now.'
+			'1 of the 39 municipalities with current weather has clear skies right now.'
 		);
 	});
 
