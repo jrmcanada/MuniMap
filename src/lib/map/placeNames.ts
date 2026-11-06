@@ -32,8 +32,8 @@ export function placeNameSize(mapWidth: number): number {
  * Decides where each place name goes. A name tries the right, left, above and below its place and
  * takes the first spot that is on the map and clear of every pin and name already placed. If none is
  * clear it is dropped, unless the place is marked `keep`, which is then put on the first side that is
- * on the map. A place marked `side: left` takes the left even beside a pin, unless a name is in the
- * way. Places with `keep` are placed first so they get the best spots.
+ * on the map. A place with a `side` (left or right) takes that side even beside a pin, unless a name
+ * is in the way. Places with `keep` are placed first so they get the best spots.
  * `positions[i]` is the screen position of `places[i]`; `pins` are the client and office pins.
  */
 export function layoutPlaceNames(
@@ -81,11 +81,12 @@ export function layoutPlaceNames(
 		const dot: Box = { x: x - 3, y: y - 3, width: 6, height: 6 };
 		const clear = (spot: PinPoint) => onMap(spot) && isClear(box(spot), others, MARGIN);
 
-		// A place that asks for the left gets it, even beside a pin, unless another name is in the way.
-		const leftWanted = place.side === 'left' && onMap(left) && isClear(box(left), marks, MARGIN);
-		const spot = leftWanted
-			? left
-			: (spots.find(clear) ?? (place.keep ? spots.find(onMap) : undefined));
+		// A place that asks for a side gets it, even beside a pin, unless another name is in the way.
+		const wanted = place.side === 'left' ? left : place.side === 'right' ? right : undefined;
+		const spot =
+			wanted && onMap(wanted) && isClear(box(wanted), marks, MARGIN)
+				? wanted
+				: (spots.find(clear) ?? (place.keep ? spots.find(onMap) : undefined));
 		if (!spot) continue;
 		taken.push(box(spot));
 		marks.push(box(spot));
