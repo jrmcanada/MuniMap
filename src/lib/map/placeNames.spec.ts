@@ -4,7 +4,12 @@ import { layoutPlaceNames, placesToName } from './placeNames.js';
 
 const size = { width: 1000, height: 600 };
 const measure = (text: string) => text.length * 6;
-const place = (name: string, keep?: true, side?: 'left' | 'right', down?: number): Place => ({
+const place = (
+	name: string,
+	keep?: true,
+	side?: 'left' | 'right' | 'below',
+	down?: number
+): Place => ({
 	name,
 	longitude: 0,
 	latitude: 0,
@@ -47,6 +52,14 @@ describe('layoutPlaceNames', () => {
 		const [level] = layout([place('Soo', undefined, 'left')], at);
 		const [lower] = layout([place('Soo', undefined, 'left', 0.5)], at);
 		expect(lower.textY - level.textY).toBe(6);
+	});
+
+	it('puts a name under its place when the place asks for it, even beside a pin', () => {
+		const pins = [{ x: 300, y: 312 }];
+		const [name] = layout([place('Prescott', undefined, 'below')], [{ x: 300, y: 300 }], pins);
+		expect(name.textY).toBeGreaterThan(300);
+		expect(name.textX).toBeLessThan(300);
+		expect(name.textX + measure('Prescott')).toBeGreaterThan(300);
 	});
 
 	it('moves a name to the left when the right side runs off the map', () => {

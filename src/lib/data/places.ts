@@ -1,7 +1,7 @@
 /**
  * Ontario towns and cities named on the map, so the pins have somewhere to sit. About 30, spread
  * across the map. Places that are also a client or the office (Wawa, Chapleau, Espanola, Tehkummah,
- * Ignace, Hornepayne, Sudbury) use the same position as their pin, and the map names them beside
+ * Ignace, Hornepayne, Gravenhurst, Ingersoll, Prescott, Smiths Falls, Sudbury) use the same position as their pin, and the map names them beside
  * it without a second dot. Add one by name and position; the map skips any name that would cover a
  * pin or another name, unless the place is marked keep.
  */
@@ -15,7 +15,7 @@ export interface Place {
 	 * Put the name on this side of the dot, even beside a pin, unless another name is in the way.
 	 * Without it the name takes the first clear side, trying the right first.
 	 */
-	side?: 'left' | 'right';
+	side?: 'left' | 'right' | 'below';
 	/** Move the name down, beside its dot, by this many text heights (0.5 is half a line). */
 	down?: number;
 }
@@ -54,8 +54,10 @@ export const places: Place[] = [
 	{ name: 'Ignace', keep: true, longitude: -91.677, latitude: 49.408 },
 	{ name: 'Hornepayne', keep: true, longitude: -84.782, latitude: 49.253 },
 	{ name: 'Wawa', keep: true, side: 'left', longitude: -84.774, latitude: 47.994 },
-	{ name: 'Bancroft', keep: true, longitude: -77.853, latitude: 45.06 },
 	{ name: 'Waterloo', keep: true, side: 'left', longitude: -80.52, latitude: 43.464 },
-	{ name: 'London', keep: true, longitude: -81.246, latitude: 42.984 },
+	{ name: 'Gravenhurst', keep: true, longitude: -79.339, latitude: 44.869 },
+	{ name: 'Ingersoll', keep: true, longitude: -80.874, latitude: 43.041 },
+	{ name: 'Prescott', keep: true, side: 'below', longitude: -75.517, latitude: 44.712 },
+	{ name: 'Smiths Falls', keep: true, side: 'left', longitude: -76.019, latitude: 44.901 },
 	{ name: 'Pembroke', longitude: -77.11, latitude: 45.83 }
 ];

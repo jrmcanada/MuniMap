@@ -40,6 +40,12 @@ const ONTARIO_DISTRICTS = new Set([
 	'Timiskaming'
 ]);
 
+// Census divisions whose usual name is not "<name> County".
+const DISTRICT_LABEL = {
+	Muskoka: 'Muskoka District',
+	'Leeds and Grenville': 'Leeds and Grenville United Counties'
+};
+
 const normalise = (name) =>
 	name
 		.toLowerCase()
@@ -135,9 +141,9 @@ for (const name of names) {
 	if (nearest.km > MAX_SITE_KM) throw new Error(`${name}: nearest site is ${nearest.km} km away`);
 
 	facts[name] = {
-		district: ONTARIO_DISTRICTS.has(divisionName)
-			? `${divisionName} District`
-			: `${divisionName} County`,
+		district:
+			DISTRICT_LABEL[divisionName] ??
+			(ONTARIO_DISTRICTS.has(divisionName) ? `${divisionName} District` : `${divisionName} County`),
 		population: Number(row[COLUMN.population]),
 		populationChangePercent: Number(row[COLUMN.change]),
 		landAreaKm2: Number(row[COLUMN.landArea]),

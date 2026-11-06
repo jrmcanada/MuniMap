@@ -121,5 +121,25 @@ export const landmarks: Landmark[] = [
 	{
 		municipality: 'Thornloe',
 		text: 'Thornloe was home to Thornloe Cheese, which opened in 1940 and stopped production in 2023.'
+	},
+	{
+		municipality: 'Gravenhurst',
+		text: 'Dr. Norman Bethune was born in Gravenhurst in 1890. The steamship RMS Segwun there dates from 1887.'
+	},
+	{
+		municipality: 'Ingersoll',
+		text: 'Ingersoll made a cheese of about 7,300 pounds in 1866, which was later shown in England.'
+	},
+	{
+		municipality: 'Prescott',
+		text: "Prescott's Fort Wellington dates from 1813-14, and was rebuilt after the 1838 Battle of the Windmill."
+	},
+	{
+		municipality: 'Smiths Falls',
+		text: 'A former Hershey chocolate factory in Smiths Falls became the home of cannabis firm Tweed, later Canopy Growth.'
+	},
+	{
+		municipality: 'Georgian Bay',
+		text: 'In Georgian Bay Township, the Big Chute Marine Railway hauls boats up and over an 18 m hill.'
 	}
 ];
