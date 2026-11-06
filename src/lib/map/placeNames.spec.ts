@@ -88,11 +88,11 @@ describe('placesToName', () => {
 		{ name: 'Gauthier', longitude: 2, latitude: 2 }
 	];
 
-	it('names only the chosen places until the map is zoomed all the way in', () => {
+	it('names only the chosen places until the map is zoomed in', () => {
 		expect(placesToName(towns, clients, false)).toBe(towns);
 	});
 
-	it('adds the municipalities zoomed all the way in, without repeating a place', () => {
+	it('adds the municipalities when zoomed in, without repeating a place', () => {
 		const names = placesToName(towns, clients, true).map(({ name }) => name);
 		expect(names).toEqual(['Dryden', 'Wawa', 'Gauthier']);
 	});
