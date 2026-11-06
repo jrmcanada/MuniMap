@@ -26,3 +26,21 @@ export function placeLabel(
 		y: Math.min(Math.max(y, EDGE), mapHeight - label.height - EDGE)
 	};
 }
+
+export interface Box {
+	x: number;
+	y: number;
+	width: number;
+	height: number;
+}
+
+/** True when `box`, grown by `margin` on every side, touches none of the `obstacles`. */
+export function isClear(box: Box, obstacles: Box[], margin: number): boolean {
+	return obstacles.every(
+		(other) =>
+			box.x + box.width + margin <= other.x ||
+			other.x + other.width + margin <= box.x ||
+			box.y + box.height + margin <= other.y ||
+			other.y + other.height + margin <= box.y
+	);
+}
