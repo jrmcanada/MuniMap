@@ -136,7 +136,7 @@ test('clicking the office marker shows the company card', async ({ page }) => {
 	await expect(
 		page.getByRole('heading', { level: 2, name: 'The Managed Municipality' })
 	).toBeVisible();
-	await expect(page.getByText('Sudbury office')).toBeVisible();
+	await expect(page.getByText('Sudbury office', { exact: true })).toBeVisible();
 	// The count of municipalities lives on this card, not in the status bar.
 	await expect(page.getByText('55 municipalities', { exact: true })).toBeVisible();
 });
