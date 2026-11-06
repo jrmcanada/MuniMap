@@ -36,6 +36,7 @@
 	import type { GeoProjection } from 'd3-geo';
 	import { layoutPlaceNames, placeNameSize, type PlacedName } from './placeNames.js';
 	import RoadEventCard from './RoadEventCard.svelte';
+	import RadarLegend from './RadarLegend.svelte';
 	import RoadLegend from './RoadLegend.svelte';
 	import WeatherMix from './WeatherMix.svelte';
 	import { createProjection, projectPlaces, zoomProjection } from './projection.js';
@@ -475,9 +476,10 @@
 			<RoadEventCard event={openEvent.event} onClose={closeEvent} />
 		</div>
 	{/if}
-	{#if weatherMix?.reporting || hasRoadData}
+	{#if radarTime || weatherMix?.reporting || hasRoadData}
 		<div class="key">
 			{#if weatherMix?.reporting}<WeatherMix mix={weatherMix} total={municipalities.length} />{/if}
+			{#if radarTime}<RadarLegend />{/if}
 			{#if hasRoadData}<RoadLegend source={roadSourceLabel()} />{/if}
 		</div>
 	{/if}
@@ -504,7 +506,7 @@
 		height: 100%;
 	}
 
-	/* The weather bar above the road legend, in the lower left corner. */
+	/* The weather bar, radar legend and road legend, stacked in the lower left corner. */
 	.key {
 		position: absolute;
 		left: 0.75rem;

@@ -163,6 +163,24 @@
 	--map-panel-shadow: 0 2px 8px oklch(0 0 0 / 0.4);
 	/* Place names sit behind the pins and radar, so they are dimmer than the highlighted label. */
 	--map-place-label: oklch(0.8 0.02 250);
+	/* The radar colour scale (Environment Canada), light drizzle on the left to extreme on the right. */
+	--radar-ramp: linear-gradient(
+		to right,
+		#a0d2ff,
+		#069bfe,
+		#00fe66,
+		#00c500,
+		#008e00,
+		#4a9200,
+		#feed00,
+		#feb400,
+		#fe7d00,
+		#fe2600,
+		#fe016c,
+		#ae29c1,
+		#6c069f,
+		#350050
+	);
 	--map-label-halo: oklch(0.15 0.02 250 / 0.9);
 	--map-pin: oklch(0.82 0.17 80);
 	/* The pulse ring starts the same colour as the pin; kept separate so it can be tuned. */
