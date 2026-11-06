@@ -131,14 +131,15 @@ test('clicking the office marker shows the company card', async ({ page }) => {
 	await page.setViewportSize({ width: 1920, height: 1080 });
 	await page.goto('/');
 	await expect(page.getByRole('heading', { level: 2 })).toBeVisible();
-	// Sudbury sits at about 61% across and 52% down the map at this size.
-	await page.mouse.click(1179, 565);
+	// The office diamond is at about (1045, 490) at this size. The spot moves whenever a municipality
+	// is added at the edge of the map, because the map is fitted to the pins.
+	await page.mouse.click(1045, 490);
 	await expect(
 		page.getByRole('heading', { level: 2, name: 'The Managed Municipality' })
 	).toBeVisible();
 	await expect(page.getByText('Sudbury office', { exact: true })).toBeVisible();
 	// The count of municipalities lives on this card, not in the status bar.
-	await expect(page.getByText('55 municipalities', { exact: true })).toBeVisible();
+	await expect(page.getByText('60 municipalities', { exact: true })).toBeVisible();
 });
 
 test('the arrow keys step through the municipalities', async ({ page }) => {

@@ -238,7 +238,7 @@ describe('road, time zone and sun lines', () => {
 
 	it('says how much earlier the sun sets in the east than in the west', () => {
 		expect(sunsetGapFact(real())!.text).toMatch(
-			/^The sun sets \d+ (hours?|minutes?)( \d+ minutes?)? earlier in Head, Clara, Maria than in Dawson today\.$/
+			/^The sun sets \d+ (hours?|minutes?)( \d+ minutes?)? earlier in Prescott than in Dawson today\.$/
 		);
 	});
 });
@@ -288,7 +288,7 @@ describe('name and size lines', () => {
 	it('counts the names with "and" and names the first', () => {
 		const names = municipalities.filter(({ name }) => / and /.test(name)).map(({ name }) => name);
 		const { text } = andNamesFact(real())!;
-		expect(text).toContain(`${names.length} of our 55 municipalities have "and" in their name`);
+		expect(text).toContain(`${names.length} of our 60 municipalities have "and" in their name`);
 		expect(text).toContain('such as Burpee and Mills.');
 	});
 
@@ -297,13 +297,13 @@ describe('name and size lines', () => {
 			'Joly has the shortest name of our municipalities, at 4 letters.'
 		);
 		expect(commonLetterFact(real())!.text).toMatch(
-			/^\d+ of our 55 municipalities start with the letter [A-Z], more than any other\.$/
+			/^\d+ of our 60 municipalities start with the letter [A-Z], more than any other\.$/
 		);
 	});
 
 	it('compares our total area with Prince Edward Island, and the largest municipality with Toronto', () => {
 		expect(peiFact(real())!.text).toBe(
-			'Together our municipalities are about 2.1 times the size of Prince Edward Island.'
+			'Together our municipalities are about 2.3 times the size of Prince Edward Island.'
 		);
 		expect(largestVsTorontoFact(real())!.text).toBe(
 			'Fauquier-Strickland alone is about 1.6 times the size of the City of Toronto.'

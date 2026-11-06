@@ -17,8 +17,10 @@ Espanola
 Evanturel
 Fauquier-Strickland
 Gauthier
+Georgian Bay
 Georgian Bluffs
 Gordon-Barrie Island
+Gravenhurst
 Harley
 Head, Clara, Maria
 Hilliard
@@ -28,6 +30,7 @@ Hornepayne
 Hudson
 Huron Shores
 Ignace
+Ingersoll
 James
 Jocelyn
 Johnson
@@ -44,7 +47,9 @@ McKellar
 Nairn
 Opasatika
 Plummer
+Prescott
 Prince
+Smiths Falls
 St. Charles
 St. Joseph
 Tarbutt

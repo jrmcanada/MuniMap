@@ -148,7 +148,7 @@ describe('growth and decline lines', () => {
 describe('daylight, drive and distance lines', () => {
 	it('compares daylight in the northernmost and southernmost municipality', () => {
 		expect(northSouthDaylightFact(real())!.text).toMatch(
-			/^Today Opasatika in the north gets \d+ hours \d+ minutes of daylight and Clearview in the south gets \d+ hours \d+ minutes\.$/
+			/^Today Opasatika in the north gets \d+ hours \d+ minutes of daylight and Ingersoll in the south gets \d+ hours \d+ minutes\.$/
 		);
 	});
 

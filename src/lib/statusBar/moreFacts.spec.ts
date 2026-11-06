@@ -123,11 +123,11 @@ describe('how far it stretches', () => {
 	it('measures east to west and north to south between the extreme municipalities', () => {
 		const eastWest = spanFact(real(), 'east-west').text;
 		expect(eastWest).toMatch(
-			/^From Head, Clara, Maria in the east to Dawson in the west, our municipalities stretch about 1,\d{3} km in a straight line\.$/
+			/^From Prescott in the east to Dawson in the west, our municipalities stretch about 1,\d{3} km in a straight line\.$/
 		);
 		const northSouth = spanFact(real(), 'north-south').text;
 		expect(northSouth).toMatch(
-			/^From Clearview in the south to Opasatika in the north, our municipalities stretch about \d{3} km in a straight line\.$/
+			/^From Ingersoll in the south to Opasatika in the north, our municipalities stretch about \d{3} km in a straight line\.$/
 		);
 	});
 });
@@ -246,7 +246,7 @@ describe('radar coverage', () => {
 
 	it('says how many municipalities have precipitation over them', () => {
 		expect(radarMunicipalitiesFact(radar(['Baldwin', 'Espanola', 'Nairn']))!.text).toBe(
-			'Radar shows precipitation over 3 of our 55 municipalities right now.'
+			'Radar shows precipitation over 3 of our 60 municipalities right now.'
 		);
 		expect(radarMunicipalitiesFact(radar([]))!.text).toBe(
 			'Radar shows no precipitation over any of our municipalities right now.'

@@ -170,6 +170,15 @@
 		"siteId": "on-144",
 		"siteName": "Gore Bay"
 	},
+	"Gravenhurst": {
+		"district": "Muskoka District",
+		"population": 13157,
+		"populationChangePercent": 6.9,
+		"landAreaKm2": 489.11,
+		"densityPerKm2": 26.9,
+		"siteId": "on-93",
+		"siteName": "Muskoka"
+	},
 	"Harley": {
 		"district": "Timiskaming District",
 		"population": 524,
@@ -241,6 +250,15 @@
 		"densityPerKm2": 16.7,
 		"siteId": "on-156",
 		"siteName": "Ignace"
+	},
+	"Ingersoll": {
+		"district": "Oxford County",
+		"population": 13693,
+		"populationChangePercent": 7.3,
+		"landAreaKm2": 12.73,
+		"densityPerKm2": 1075.3,
+		"siteId": "on-15",
+		"siteName": "Woodstock"
 	},
 	"James": {
 		"district": "Timiskaming District",
@@ -386,6 +404,15 @@
 		"siteId": "on-162",
 		"siteName": "Sault Ste. Marie"
 	},
+	"Prescott": {
+		"district": "Leeds and Grenville United Counties",
+		"population": 4078,
+		"populationChangePercent": -3.4,
+		"landAreaKm2": 4.94,
+		"densityPerKm2": 826,
+		"siteId": "on-8",
+		"siteName": "Brockville"
+	},
 	"Prince": {
 		"district": "Algoma District",
 		"population": 975,
@@ -394,6 +421,15 @@
 		"densityPerKm2": 11.5,
 		"siteId": "on-162",
 		"siteName": "Sault Ste. Marie"
+	},
+	"Smiths Falls": {
+		"district": "Lanark County",
+		"population": 9254,
+		"populationChangePercent": 5.4,
+		"landAreaKm2": 9.66,
+		"densityPerKm2": 958.1,
+		"siteId": "on-106",
+		"siteName": "Smiths Falls"
 	},
 	"St. Charles": {
 		"district": "Sudbury District",
@@ -466,6 +502,15 @@
 		"densityPerKm2": 26.6,
 		"siteId": "on-150",
 		"siteName": "Collingwood"
+	},
+	"Georgian Bay": {
+		"district": "Muskoka District",
+		"population": 3441,
+		"populationChangePercent": 36.9,
+		"landAreaKm2": 525.29,
+		"densityPerKm2": 6.6,
+		"siteId": "on-56",
+		"siteName": "Port Carling"
 	},
 	"Georgian Bluffs": {
 		"district": "Grey County",
