@@ -4,7 +4,13 @@ import { layoutPlaceNames } from './placeNames.js';
 
 const size = { width: 1000, height: 600 };
 const measure = (text: string) => text.length * 6;
-const place = (name: string, keep?: true): Place => ({ name, longitude: 0, latitude: 0, keep });
+const place = (name: string, keep?: true, side?: 'left'): Place => ({
+	name,
+	longitude: 0,
+	latitude: 0,
+	keep,
+	side
+});
 const layout = (
 	places: Place[],
 	positions: { x: number; y: number }[],
@@ -16,6 +22,17 @@ describe('layoutPlaceNames', () => {
 		const [name] = layout([place('Barrie')], [{ x: 300, y: 300 }]);
 		expect(name.textX).toBeGreaterThan(300);
 		expect(name.hasPin).toBe(false);
+	});
+
+	it('puts a name on the left of its place when the place asks for it', () => {
+		const [name] = layout([place('Wawa', undefined, 'left')], [{ x: 300, y: 300 }]);
+		expect(name.textX + measure('Wawa')).toBeLessThan(300);
+	});
+
+	it('keeps a left-side name on the left even when a pin is there', () => {
+		const pins = [{ x: 280, y: 300 }];
+		const [name] = layout([place('Wawa', undefined, 'left')], [{ x: 300, y: 300 }], pins);
+		expect(name.textX + measure('Wawa')).toBeLessThan(300);
 	});
 
 	it('moves a name to the left when the right side runs off the map', () => {

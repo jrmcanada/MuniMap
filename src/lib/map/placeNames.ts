@@ -31,8 +31,9 @@ export function placeNameSize(mapWidth: number): number {
 /**
  * Decides where each place name goes. A name tries the right, left, above and below its place and
  * takes the first spot that is on the map and clear of every pin and name already placed. If none is
- * clear it is dropped, unless the place is marked `keep`, which is then put on the right anyway.
- * Places with `keep` are placed first so they get the best spots.
+ * clear it is dropped, unless the place is marked `keep`, which is then put on the first side that is
+ * on the map. A place marked `side: left` takes the left even beside a pin, unless a name is in the
+ * way. Places with `keep` are placed first so they get the best spots.
  * `positions[i]` is the screen position of `places[i]`; `pins` are the client and office pins.
  */
 export function layoutPlaceNames(
@@ -49,6 +50,8 @@ export function layoutPlaceNames(
 		width: PIN_REACH * 2,
 		height: PIN_REACH * 2
 	}));
+	/** Names and dots already placed, apart from the pins. */
+	const marks: Box[] = [];
 	const order = places
 		.map((place, index) => ({ place, index }))
 		.sort((a, b) => Number(b.place.keep ?? false) - Number(a.place.keep ?? false));
@@ -62,9 +65,10 @@ export function layoutPlaceNames(
 		const width = measure(place.name);
 		const gap = ownPin >= 0 ? PIN_GAP : DOT_GAP;
 		const across = ownPin >= 0 ? PIN_GAP + 1 : DOT_GAP + 2;
+		const right = { x: x + gap, y: y - fontSize / 2 };
+		const left = { x: x - gap - width, y: y - fontSize / 2 };
 		const spots: PinPoint[] = [
-			{ x: x + gap, y: y - fontSize / 2 },
-			{ x: x - gap - width, y: y - fontSize / 2 },
+			...(place.side === 'left' ? [left, right] : [right, left]),
 			{ x: x - width / 2, y: y - across - fontSize },
 			{ x: x - width / 2, y: y + across }
 		];
@@ -77,10 +81,18 @@ export function layoutPlaceNames(
 		const dot: Box = { x: x - 3, y: y - 3, width: 6, height: 6 };
 		const clear = (spot: PinPoint) => onMap(spot) && isClear(box(spot), others, MARGIN);
 
-		const spot = spots.find(clear) ?? (place.keep ? spots.find(onMap) : undefined);
+		// A place that asks for the left gets it, even beside a pin, unless another name is in the way.
+		const leftWanted = place.side === 'left' && onMap(left) && isClear(box(left), marks, MARGIN);
+		const spot = leftWanted
+			? left
+			: (spots.find(clear) ?? (place.keep ? spots.find(onMap) : undefined));
 		if (!spot) continue;
 		taken.push(box(spot));
-		if (ownPin < 0) taken.push(dot);
+		marks.push(box(spot));
+		if (ownPin < 0) {
+			taken.push(dot);
+			marks.push(dot);
+		}
 		placed.push({ name: place.name, x, y, hasPin: ownPin >= 0, textX: spot.x, textY: spot.y });
 	}
 	return placed;
