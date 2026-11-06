@@ -4,12 +4,13 @@ import { layoutPlaceNames } from './placeNames.js';
 
 const size = { width: 1000, height: 600 };
 const measure = (text: string) => text.length * 6;
-const place = (name: string, keep?: true, side?: 'left' | 'right'): Place => ({
+const place = (name: string, keep?: true, side?: 'left' | 'right', down?: number): Place => ({
 	name,
 	longitude: 0,
 	latitude: 0,
 	keep,
-	side
+	side,
+	down
 });
 const layout = (
 	places: Place[],
@@ -39,6 +40,13 @@ describe('layoutPlaceNames', () => {
 		const pins = [{ x: 320, y: 300 }];
 		const [name] = layout([place('Espanola', undefined, 'right')], [{ x: 300, y: 300 }], pins);
 		expect(name.textX).toBeGreaterThan(300);
+	});
+
+	it('moves a name down by the number of text heights asked for', () => {
+		const at = [{ x: 300, y: 300 }];
+		const [level] = layout([place('Soo', undefined, 'left')], at);
+		const [lower] = layout([place('Soo', undefined, 'left', 0.5)], at);
+		expect(lower.textY - level.textY).toBe(6);
 	});
 
 	it('moves a name to the left when the right side runs off the map', () => {

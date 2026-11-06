@@ -16,6 +16,8 @@ export interface Place {
 	 * Without it the name takes the first clear side, trying the right first.
 	 */
 	side?: 'left' | 'right';
+	/** Move the name down, beside its dot, by this many text heights (0.5 is half a line). */
+	down?: number;
 }
 
 export const places: Place[] = [
@@ -26,7 +28,14 @@ export const places: Place[] = [
 	{ name: 'Thunder Bay', longitude: -89.25, latitude: 48.38 },
 	{ name: 'Geraldton', longitude: -86.95, latitude: 49.72 },
 	{ name: 'Marathon', longitude: -86.38, latitude: 48.72 },
-	{ name: 'Sault Ste. Marie', keep: true, side: 'left', longitude: -84.35, latitude: 46.52 },
+	{
+		name: 'Sault Ste. Marie',
+		keep: true,
+		side: 'left',
+		down: 0.6,
+		longitude: -84.35,
+		latitude: 46.52
+	},
 	{ name: 'Hearst', longitude: -83.67, latitude: 49.69 },
 	{ name: 'Kapuskasing', keep: true, longitude: -82.43, latitude: 49.42 },
 	{ name: 'Timmins', longitude: -81.33, latitude: 48.48 },
