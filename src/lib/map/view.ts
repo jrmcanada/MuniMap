@@ -7,6 +7,8 @@ export interface View {
 
 export const FULL_VIEW: View = { k: 1, x: 0, y: 0 };
 export const MAX_ZOOM = 8;
+/** From this zoom on, every municipality is named on the map, not just the chosen towns. */
+export const MUNICIPALITY_NAMES_ZOOM = 4;
 
 /** Zoom change for one wheel event; smooth for trackpads, about 16% per notch of a mouse wheel. */
 export function wheelFactor(deltaY: number): number {
