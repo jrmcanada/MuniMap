@@ -30,7 +30,7 @@ export const places: Place[] = [
 	{ name: 'Hearst', longitude: -83.67, latitude: 49.69 },
 	{ name: 'Kapuskasing', keep: true, longitude: -82.43, latitude: 49.42 },
 	{ name: 'Timmins', longitude: -81.33, latitude: 48.48 },
-	{ name: 'Espanola', keep: true, side: 'right', longitude: -81.757, latitude: 46.242 },
+	{ name: 'Espanola', keep: true, side: 'left', longitude: -81.757, latitude: 46.242 },
 	{ name: 'North Bay', keep: true, longitude: -79.46, latitude: 46.31 },
 	{ name: 'Parry Sound', keep: true, longitude: -80.04, latitude: 45.35 },
 	{ name: 'Owen Sound', keep: true, side: 'left', longitude: -80.94, latitude: 44.57 },
