@@ -4,7 +4,7 @@ import { layoutPlaceNames } from './placeNames.js';
 
 const size = { width: 1000, height: 600 };
 const measure = (text: string) => text.length * 6;
-const place = (name: string, keep?: true, side?: 'left'): Place => ({
+const place = (name: string, keep?: true, side?: 'left' | 'right'): Place => ({
 	name,
 	longitude: 0,
 	latitude: 0,
@@ -33,6 +33,12 @@ describe('layoutPlaceNames', () => {
 		const pins = [{ x: 280, y: 300 }];
 		const [name] = layout([place('Wawa', undefined, 'left')], [{ x: 300, y: 300 }], pins);
 		expect(name.textX + measure('Wawa')).toBeLessThan(300);
+	});
+
+	it('keeps a right-side name on the right even when a pin is there', () => {
+		const pins = [{ x: 320, y: 300 }];
+		const [name] = layout([place('Espanola', undefined, 'right')], [{ x: 300, y: 300 }], pins);
+		expect(name.textX).toBeGreaterThan(300);
 	});
 
 	it('moves a name to the left when the right side runs off the map', () => {
