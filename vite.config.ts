@@ -5,8 +5,8 @@ import adapter from '@sveltejs/adapter-netlify';
 import { sveltekit } from '@sveltejs/kit/vite';
 
 export default defineConfig({
-	// Always 5173. If something else holds the port, the dev server stops instead of moving to another.
-	server: { port: 5173, strictPort: true },
+	// Always 5176. If something else holds the port, the dev server stops instead of moving to another.
+	server: { port: 5176, strictPort: true },
 	plugins: [
 		tailwindcss(),
 		sveltekit({
