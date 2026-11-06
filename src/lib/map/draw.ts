@@ -3,6 +3,7 @@ import { EVENT_KINDS, type RoadEvent, type RoadEventKind } from '#lib/roads/even
 import type { RoadSegment } from '#lib/roads/roadConditions.js';
 import { ROAD_STATUSES } from '#lib/roads/status.js';
 import { placeLabel } from './label.js';
+import type { PlacedName } from './placeNames.js';
 import type { HighwayData, MapColors, MapData, PinPoint } from './types.js';
 
 const ROAD_LINE_WIDTH = 2.5;
@@ -15,6 +16,7 @@ const HIGHLIGHT_BREATH = 2;
 const HIGHLIGHT_LINE_WIDTH = 2.5;
 const LABEL_SIZE_RATIO = 0.013;
 const LABEL_MIN_SIZE = 14;
+const PLACE_DOT_RADIUS = 2.5;
 const PULSE_SECONDS = 6;
 const PULSE_MAX_SCALE = 3;
 
@@ -44,6 +46,7 @@ export function readColors(element: Element): MapColors {
 		pinGlow: read('--map-pin-glow'),
 		highlight: read('--map-highlight'),
 		label: read('--map-label'),
+		placeLabel: read('--map-place-label'),
 		labelHalo: read('--map-label-halo'),
 		fontFamily: style.fontFamily
 	};
@@ -207,6 +210,31 @@ export function drawOffice(
 	ctx.lineWidth = 2;
 	ctx.strokeStyle = colors.labelHalo;
 	ctx.stroke();
+}
+
+/** Writes the place names laid out by `layoutPlaceNames`: a small dot where there is no pin, and a quiet label. */
+export function drawPlaceNames(
+	ctx: CanvasRenderingContext2D,
+	names: PlacedName[],
+	fontSize: number,
+	colors: MapColors
+): void {
+	ctx.font = `500 ${fontSize}px ${colors.fontFamily}`;
+	ctx.textBaseline = 'top';
+	ctx.lineJoin = 'round';
+	ctx.lineWidth = fontSize / 4;
+	for (const { name, x, y, hasPin, textX, textY } of names) {
+		if (!hasPin) {
+			ctx.fillStyle = colors.placeLabel;
+			ctx.beginPath();
+			ctx.arc(x, y, PLACE_DOT_RADIUS, 0, Math.PI * 2);
+			ctx.fill();
+		}
+		ctx.strokeStyle = colors.labelHalo;
+		ctx.strokeText(name, textX, textY);
+		ctx.fillStyle = colors.placeLabel;
+		ctx.fillText(name, textX, textY);
+	}
 }
 
 /** Rings the pin the panel is showing and writes its name beside it. */

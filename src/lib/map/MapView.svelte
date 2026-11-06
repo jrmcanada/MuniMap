@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import highwayData from '#lib/data/highways.json';
 	import { office } from '#lib/data/office.js';
+	import { places } from '#lib/data/places.js';
 	import ontarioMap from '#lib/data/ontario-map.json';
 	import { beat } from '#lib/kiosk/heartbeat.js';
 	import { radarRequestSize } from '#lib/kiosk/radarSize.js';
@@ -23,6 +24,7 @@
 	import { fetchRoadConditions, fetchRoadEvents, roadSourceLabel } from '#lib/roads/source.js';
 	import {
 		drawBase,
+		drawPlaceNames,
 		drawEvents,
 		drawOffice,
 		drawHighlight,
@@ -32,6 +34,7 @@
 		readRadarOpacity
 	} from './draw.js';
 	import type { GeoProjection } from 'd3-geo';
+	import { layoutPlaceNames, placeNameSize, type PlacedName } from './placeNames.js';
 	import RoadEventCard from './RoadEventCard.svelte';
 	import RoadLegend from './RoadLegend.svelte';
 	import WeatherMix from './WeatherMix.svelte';
@@ -103,6 +106,7 @@
 	let roads: RoadSegment[] = [];
 	let events: RoadEvent[] = [];
 	let eventPins: PinPoint[] = [];
+	let placeNames: PlacedName[] = [];
 	let eventTimer: ReturnType<typeof setTimeout>;
 	/** The road event whose card is open, with where its symbol sits on the map. */
 	let openEvent = $state<{
@@ -184,6 +188,7 @@
 
 	/** Redraws the land and pin positions for the current view. Land never animates, so this runs only on a change. */
 	function renderBase() {
+		const placeFontSize = placeNameSize(width);
 		const projection = zoomProjection(baseProjection, view);
 		pins = projectPlaces(projection, municipalities);
 		[officePin] = projectPlaces(projection, [office]);
@@ -192,7 +197,16 @@
 		baseCtx.setTransform(1, 0, 0, 1, 0, 0);
 		baseCtx.clearRect(0, 0, base!.width, base!.height);
 		baseCtx.setTransform(ratio, 0, 0, ratio, 0, 0);
+		baseCtx.font = `500 ${placeFontSize}px ${colors.fontFamily}`;
 		drawBase(baseCtx, mapData, highways, projection, colors, roads);
+		placeNames = layoutPlaceNames(
+			places,
+			projectPlaces(projection, places),
+			[...pins, officePin],
+			{ width, height },
+			placeFontSize,
+			(text) => baseCtx.measureText(text).width
+		);
 		baseStale = false;
 	}
 
@@ -241,6 +255,7 @@
 		const time = radar ? formatRadarTime(radar.time) : null;
 		if (time !== radarTime) radarTime = time;
 
+		drawPlaceNames(ctx, placeNames, placeNameSize(width), colors);
 		drawEvents(ctx, events, eventPins, colors);
 		drawPins(ctx, pins, colors, seconds, animate);
 		drawOffice(ctx, officePin, colors);

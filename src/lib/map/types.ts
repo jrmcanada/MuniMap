@@ -28,6 +28,8 @@ export interface MapColors {
 	pinGlow: string;
 	highlight: string;
 	label: string;
+	/** Place names: quieter than the highlighted municipality's label. */
+	placeLabel: string;
 	labelHalo: string;
 	fontFamily: string;
 }

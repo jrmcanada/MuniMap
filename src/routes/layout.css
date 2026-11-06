@@ -161,6 +161,8 @@
 	--map-panel-background: oklch(0.28 0.03 250);
 	--map-panel-border: oklch(0.44 0.045 250);
 	--map-panel-shadow: 0 2px 8px oklch(0 0 0 / 0.4);
+	/* Place names sit behind the pins and radar, so they are dimmer than the highlighted label. */
+	--map-place-label: oklch(0.8 0.02 250);
 	--map-label-halo: oklch(0.15 0.02 250 / 0.9);
 	--map-pin: oklch(0.82 0.17 80);
 	/* The pulse ring starts the same colour as the pin; kept separate so it can be tuned. */
