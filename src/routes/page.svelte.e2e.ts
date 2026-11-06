@@ -8,7 +8,7 @@ test('shows the client map', async ({ page }) => {
 test('shows a municipality in the panel', async ({ page }) => {
 	await page.goto('/');
 	await expect(page.getByRole('heading', { level: 2 })).toBeVisible();
-	await expect(page.getByText(/Population/)).toBeVisible();
+	await expect(page.getByText('Population, 2021')).toBeVisible();
 });
 
 test('the logout button sits in the status bar and leads to the sign-in page', async ({ page }) => {
@@ -22,7 +22,7 @@ test('the logout button sits in the status bar and leads to the sign-in page', a
 test('shows the status bar with the clock and a ticker fact', async ({ page }) => {
 	await page.goto('/');
 	const bar = page.locator('footer[aria-label="Status bar"]');
-	await expect(bar.getByText('55 municipalities')).toHaveCount(0);
+	await expect(bar.getByText('55 municipalities', { exact: true })).toHaveCount(0);
 	// The clock only: a ticker message can also contain a time, such as a sunrise.
 	await expect(bar.locator('.time')).toHaveText(/^\d{1,2}:\d{2} [ap]m$/);
 	await expect(bar.locator('.fact').first()).not.toBeEmpty();
