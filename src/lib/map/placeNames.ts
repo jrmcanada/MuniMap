@@ -100,3 +100,19 @@ export function layoutPlaceNames(
 	}
 	return placed;
 }
+
+/**
+ * The places to name. Zoomed all the way in there is room, so every municipality is named too (the
+ * ones that are not already in `places`). They sit beside their own pins, and a name that would
+ * cover another is left out rather than drawn over it.
+ */
+export function placesToName(
+	places: Place[],
+	municipalities: { name: string; longitude: number; latitude: number }[],
+	zoomedAllTheWay: boolean
+): Place[] {
+	if (!zoomedAllTheWay) return places;
+	const named = new Set(places.map((place) => place.name));
+	const rest = municipalities.filter(({ name }) => !named.has(name));
+	return [...places, ...rest];
+}

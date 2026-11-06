@@ -34,14 +34,14 @@
 		readRadarOpacity
 	} from './draw.js';
 	import type { GeoProjection } from 'd3-geo';
-	import { layoutPlaceNames, placeNameSize, type PlacedName } from './placeNames.js';
+	import { layoutPlaceNames, placeNameSize, placesToName, type PlacedName } from './placeNames.js';
 	import RoadEventCard from './RoadEventCard.svelte';
 	import RadarLegend from './RadarLegend.svelte';
 	import RoadLegend from './RoadLegend.svelte';
 	import WeatherMix from './WeatherMix.svelte';
 	import { createProjection, projectPlaces, zoomProjection } from './projection.js';
 	import type { HighwayData, MapColors, MapData, PinPoint } from './types.js';
-	import { FULL_VIEW, panBy, pinchView, wheelFactor, zoomAt, type View } from './view.js';
+	import { FULL_VIEW, MAX_ZOOM, panBy, pinchView, wheelFactor, zoomAt, type View } from './view.js';
 
 	/** How close a click or tap has to land to a pin to count, in CSS pixels. */
 	const HIT_RADIUS = 16;
@@ -200,9 +200,10 @@
 		baseCtx.setTransform(ratio, 0, 0, ratio, 0, 0);
 		baseCtx.font = `500 ${placeFontSize}px ${colors.fontFamily}`;
 		drawBase(baseCtx, mapData, highways, projection, colors, roads);
+		const named = placesToName(places, municipalities, view.k >= MAX_ZOOM);
 		placeNames = layoutPlaceNames(
-			places,
-			projectPlaces(projection, places),
+			named,
+			projectPlaces(projection, named),
 			[...pins, officePin],
 			{ width, height },
 			placeFontSize,
