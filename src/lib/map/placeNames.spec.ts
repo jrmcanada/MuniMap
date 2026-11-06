@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import type { Place } from '#lib/data/places.js';
-import { layoutPlaceNames } from './placeNames.js';
+import { layoutPlaceNames, placesToName } from './placeNames.js';
 
 const size = { width: 1000, height: 600 };
 const measure = (text: string) => text.length * 6;
@@ -78,5 +78,22 @@ describe('layoutPlaceNames', () => {
 
 	it('skips a place that is off the map', () => {
 		expect(layout([place('Ottawa')], [{ x: 1200, y: 300 }])).toEqual([]);
+	});
+});
+
+describe('placesToName', () => {
+	const towns = [place('Dryden'), place('Wawa')];
+	const clients = [
+		{ name: 'Wawa', longitude: 1, latitude: 1 },
+		{ name: 'Gauthier', longitude: 2, latitude: 2 }
+	];
+
+	it('names only the chosen places until the map is zoomed all the way in', () => {
+		expect(placesToName(towns, clients, false)).toBe(towns);
+	});
+
+	it('adds the municipalities zoomed all the way in, without repeating a place', () => {
+		const names = placesToName(towns, clients, true).map(({ name }) => name);
+		expect(names).toEqual(['Dryden', 'Wawa', 'Gauthier']);
 	});
 });
