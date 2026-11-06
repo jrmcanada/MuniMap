@@ -41,7 +41,15 @@
 	import WeatherMix from './WeatherMix.svelte';
 	import { createProjection, projectPlaces, zoomProjection } from './projection.js';
 	import type { HighwayData, MapColors, MapData, PinPoint } from './types.js';
-	import { FULL_VIEW, MAX_ZOOM, panBy, pinchView, wheelFactor, zoomAt, type View } from './view.js';
+	import {
+		FULL_VIEW,
+		MUNICIPALITY_NAMES_ZOOM,
+		panBy,
+		pinchView,
+		wheelFactor,
+		zoomAt,
+		type View
+	} from './view.js';
 
 	/** How close a click or tap has to land to a pin to count, in CSS pixels. */
 	const HIT_RADIUS = 16;
@@ -200,7 +208,7 @@
 		baseCtx.setTransform(ratio, 0, 0, ratio, 0, 0);
 		baseCtx.font = `500 ${placeFontSize}px ${colors.fontFamily}`;
 		drawBase(baseCtx, mapData, highways, projection, colors, roads);
-		const named = placesToName(places, municipalities, view.k >= MAX_ZOOM);
+		const named = placesToName(places, municipalities, view.k >= MUNICIPALITY_NAMES_ZOOM);
 		placeNames = layoutPlaceNames(
 			named,
 			projectPlaces(projection, named),
