@@ -18,6 +18,7 @@
 	import type { ConditionMix } from '#lib/weather/conditionMix.js';
 	import type { SiteWeather } from '#lib/weather/types.js';
 	import { factSlots, slotGroups, TickerOrder } from './facts.js';
+	import { TickerHistory } from './tickerHistory.js';
 
 	const TIME_ZONE = 'America/Toronto';
 	const CLOCK_MS = 1000;
@@ -77,13 +78,38 @@
 	// Every lap is a fresh random order, so the ticker never repeats a pattern.
 	const groups = slotGroups(tickerMessages.length);
 	const order = new TickerOrder(Math.random);
-	let fact = $state(order.next(currentSlots(), groups));
+	const history = new TickerHistory();
+	/** A fact picked fresh is kept, so the left arrow can come back to it. */
+	function freshFact() {
+		const next = order.next(currentSlots(), groups);
+		if (next) history.record(next);
+		return next;
+	}
+	let fact = $state(freshFact());
+
+	function advance() {
+		fact = history.forward() ?? freshFact();
+	}
+
+	function retreat() {
+		fact = history.back() ?? fact;
+	}
+
+	let ticker: ReturnType<typeof setInterval>;
+	/** Starts the 8 second count again, so a fact the viewer just chose is not replaced at once. */
+	function restartTicker() {
+		clearInterval(ticker);
+		ticker = setInterval(advance, TICKER_MS);
+	}
+
+	function step(move: () => void) {
+		move();
+		restartTicker();
+	}
 
 	onMount(() => {
 		const clock = setInterval(() => (now = new Date()), CLOCK_MS);
-		const ticker = setInterval(() => {
-			fact = order.next(currentSlots(), groups);
-		}, TICKER_MS);
+		restartTicker();
 		return () => {
 			clearInterval(clock);
 			clearInterval(ticker);
@@ -99,11 +125,31 @@
 		<span class="time">{formatClockTime(now, TIME_ZONE)}</span>
 	</div>
 
+	<button
+		class="step"
+		type="button"
+		title="Previous message"
+		aria-label="Previous message"
+		onclick={() => step(retreat)}
+	>
+		<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" /></svg>
+	</button>
+
 	<div class="ticker" aria-live="off">
 		{#key fact?.id}
 			<p class="fact" in:fade={{ duration }} out:fade={{ duration }}>{fact?.text ?? ''}</p>
 		{/key}
 	</div>
+
+	<button
+		class="step"
+		type="button"
+		title="Next message"
+		aria-label="Next message"
+		onclick={() => step(advance)}
+	>
+		<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" /></svg>
+	</button>
 
 	<form method="POST" action="/logout">
 		<button class="logout" type="submit" title="Logout" aria-label="Logout">
@@ -123,9 +169,9 @@
 		grid-column: 1 / -1;
 		container-type: size;
 		display: grid;
-		grid-template-columns: auto auto minmax(0, 1fr) auto;
+		grid-template-columns: auto auto auto minmax(0, 1fr) auto auto;
 		align-items: center;
-		gap: 0 2.5vw;
+		gap: 0 1.2vw;
 		padding: 0 1.5vw;
 		min-width: 0;
 		min-height: 0;
@@ -163,8 +209,10 @@
 		font-weight: 700;
 	}
 
-	/* The lower right corner of the screen. Just an icon; the tooltip comes from its title. */
-	.logout {
+	/* Icon-only buttons: logout in the lower right corner, and the arrows either side of the ticker.
+	   The tooltip comes from the title. */
+	.logout,
+	.step {
 		display: grid;
 		place-items: center;
 		width: max(24px, 50cqh);
@@ -178,12 +226,15 @@
 	}
 
 	.logout:hover,
-	.logout:focus-visible {
+	.logout:focus-visible,
+	.step:hover,
+	.step:focus-visible {
 		color: var(--panel-text);
 		background: var(--card-background);
 	}
 
-	.logout svg {
+	.logout svg,
+	.step svg {
 		width: 70%;
 		height: 70%;
 		fill: none;
