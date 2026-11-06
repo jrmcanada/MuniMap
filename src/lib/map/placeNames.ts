@@ -65,8 +65,10 @@ export function layoutPlaceNames(
 		const width = measure(place.name);
 		const gap = ownPin >= 0 ? PIN_GAP : DOT_GAP;
 		const across = ownPin >= 0 ? PIN_GAP + 1 : DOT_GAP + 2;
-		const right = { x: x + gap, y: y - fontSize / 2 };
-		const left = { x: x - gap - width, y: y - fontSize / 2 };
+		// Beside the dot the name is centred on it, then moved down by `down` text heights if asked.
+		const sideY = y - fontSize / 2 + (place.down ?? 0) * fontSize;
+		const right = { x: x + gap, y: sideY };
+		const left = { x: x - gap - width, y: sideY };
 		const spots: PinPoint[] = [
 			...(place.side === 'left' ? [left, right] : [right, left]),
 			{ x: x - width / 2, y: y - across - fontSize },
