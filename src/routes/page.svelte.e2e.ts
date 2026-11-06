@@ -23,7 +23,8 @@ test('shows the status bar with the clock and a ticker fact', async ({ page }) =
 	await page.goto('/');
 	const bar = page.locator('footer[aria-label="Status bar"]');
 	await expect(bar.getByText('55 municipalities')).toHaveCount(0);
-	await expect(bar.getByText(/\d{1,2}:\d{2} [ap]m/)).toBeVisible();
+	// The clock only: a ticker message can also contain a time, such as a sunrise.
+	await expect(bar.locator('.time')).toHaveText(/^\d{1,2}:\d{2} [ap]m$/);
 	await expect(bar.locator('.fact').first()).not.toBeEmpty();
 });
 
