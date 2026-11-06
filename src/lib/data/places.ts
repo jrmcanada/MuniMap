@@ -25,7 +25,6 @@ export const places: Place[] = [
 	{ name: 'Hearst', longitude: -83.67, latitude: 49.69 },
 	{ name: 'Kapuskasing', keep: true, longitude: -82.43, latitude: 49.42 },
 	{ name: 'Timmins', longitude: -81.33, latitude: 48.48 },
-	{ name: 'Kirkland Lake', longitude: -80.03, latitude: 48.15 },
 	{ name: 'Espanola', keep: true, longitude: -81.757, latitude: 46.242 },
 	{ name: 'North Bay', keep: true, longitude: -79.46, latitude: 46.31 },
 	{ name: 'Parry Sound', keep: true, longitude: -80.04, latitude: 45.35 },
@@ -40,7 +39,7 @@ export const places: Place[] = [
 	{ name: 'Tehkummah', keep: true, longitude: -82.047, latitude: 45.632 },
 	{ name: 'Wawa', keep: true, longitude: -84.774, latitude: 47.994 },
 	{ name: 'Bancroft', keep: true, longitude: -77.853, latitude: 45.06 },
-	{ name: 'Guelph', keep: true, longitude: -80.248, latitude: 43.545 },
+	{ name: 'Waterloo', keep: true, longitude: -80.52, latitude: 43.464 },
 	{ name: 'London', keep: true, longitude: -81.246, latitude: 42.984 },
 	{ name: 'Pembroke', longitude: -77.11, latitude: 45.83 }
 ];
