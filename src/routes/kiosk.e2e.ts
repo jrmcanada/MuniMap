@@ -140,7 +140,7 @@ test('clicking the office marker shows the company card', async ({ page }) => {
 	await expect(page.getByText('Sudbury office', { exact: true })).toBeVisible();
 	// The count of municipalities is the top line of the totals panel on this card, not in the heading
 	// or the status bar.
-	await expect(page.locator('.census .count')).toHaveText('Municipalities60');
+	await expect(page.locator('.census .count')).toHaveText(/^Municipalities\s*60$/);
 	await expect(page.getByText('60 municipalities', { exact: true })).toHaveCount(0);
 });
 
