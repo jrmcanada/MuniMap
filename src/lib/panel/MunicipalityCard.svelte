@@ -75,9 +75,6 @@
 	<header class="tile heading">
 		<h2 class="name">{municipality.name}</h2>
 		<p class="district">{facts.district}</p>
-		{#if municipality.name === office.name}
-			<p class="district">{municipalities.length} municipalities</p>
-		{/if}
 	</header>
 
 	{#each weather?.warnings ?? [] as warning, index (index)}
@@ -141,6 +138,13 @@
 	{/if}
 
 	<dl class="tile census">
+		<!-- The office card's totals are across every municipality, so it says how many that is. -->
+		{#if municipality.name === office.name}
+			<div class="count">
+				<dt>Municipalities</dt>
+				<dd>{municipalities.length}</dd>
+			</div>
+		{/if}
 		<div>
 			<dt>Population, 2021</dt>
 			<dd>{number.format(facts.population)}</dd>
@@ -308,6 +312,10 @@
 		display: grid;
 		grid-template-columns: 1fr 1fr;
 		gap: calc(var(--u) * 3);
+	}
+
+	.count {
+		grid-column: 1 / -1;
 	}
 
 	dd {
