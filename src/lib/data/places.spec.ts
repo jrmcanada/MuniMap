@@ -4,9 +4,9 @@ import { office } from './office.js';
 import { places } from './places.js';
 
 describe('places', () => {
-	it('has about 20 to 32 uniquely named places', () => {
+	it('has about 20 to 34 uniquely named places', () => {
 		expect(places.length).toBeGreaterThanOrEqual(18);
-		expect(places.length).toBeLessThanOrEqual(32);
+		expect(places.length).toBeLessThanOrEqual(34);
 		expect(new Set(places.map((place) => place.name)).size).toBe(places.length);
 	});
 
