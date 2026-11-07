@@ -23,6 +23,7 @@ export interface Place {
 export const places: Place[] = [
 	{ name: 'Dryden', side: 'left', longitude: -92.83, latitude: 49.78 },
 	{ name: 'Sioux Lookout', longitude: -91.92, latitude: 50.1 },
+	{ name: 'Kenora', keep: true, longitude: -94.489, latitude: 49.767 },
 	{ name: 'Rainy River', keep: true, longitude: -94.567, latitude: 48.717 },
 	{ name: 'Atikokan', longitude: -91.62, latitude: 48.76 },
 	{ name: 'Thunder Bay', longitude: -89.25, latitude: 48.38 },
