@@ -166,7 +166,7 @@ export function freshnessFact(inputs: FactInputs): TickerFact | null {
 
 // --- Roads ------------------------------------------------------------------------------------
 
-/** The road with the most events held, from the closures, collisions and road-shutting roadwork shown. */
+/** The road with the most events held, from the closures, collisions, and road-shutting roadwork shown. */
 export function busiestRoadFact(inputs: FactInputs): TickerFact | null {
 	const snapshot = inputs.roadEvents;
 	if (!snapshot || inputs.now - snapshot.loadedAt > MAX_ROAD_AGE_MS) return null;
@@ -179,7 +179,7 @@ export function busiestRoadFact(inputs: FactInputs): TickerFact | null {
 	if (!top || top[1] < 2) return null;
 	return {
 		id: 'busiest-road',
-		text: `${top[0]} has the most closures, collisions and road-shutting roadwork reported right now: ${top[1]}.`
+		text: `${top[0]} has the most closures, collisions, and road-shutting roadwork reported right now: ${top[1]}.`
 	};
 }
 

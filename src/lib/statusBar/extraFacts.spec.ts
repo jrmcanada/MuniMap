@@ -177,7 +177,7 @@ describe('busiest road line', () => {
 
 	it('names the road with the most events, when it has at least two', () => {
 		expect(busiestRoadFact(events(['HWY 11', 'HWY 17', 'HWY 11']))!.text).toBe(
-			'HWY 11 has the most closures, collisions and road-shutting roadwork reported right now: 2.'
+			'HWY 11 has the most closures, collisions, and road-shutting roadwork reported right now: 2.'
 		);
 	});
 
@@ -225,7 +225,7 @@ describe('road, time zone and sun lines', () => {
 
 	it('names the municipalities on Central time', () => {
 		expect(timeZoneFact(real())!.text).toBe(
-			'Dawson, Ignace and Lake of the Woods keep Central time, an hour behind Sudbury.'
+			'Dawson, Ignace, and Lake of the Woods keep Central time, an hour behind Sudbury.'
 		);
 		const one = real({ municipalities: [{ name: 'Dawson', longitude: -94.5, latitude: 48.7 }] });
 		expect(timeZoneFact(one)!.text).toContain('Dawson keeps Central time');
