@@ -84,11 +84,11 @@ export const landmarks: Landmark[] = [
 	},
 	{
 		municipality: 'Georgian Bluffs',
-		text: 'Georgian Bluffs formed on January 1, 2001, from the townships of Derby, Keppel and Sarawak and Shallow Lake.'
+		text: 'Georgian Bluffs formed on January 1, 2001, from the townships of Derby, Keppel, Sarawak, and Shallow Lake.'
 	},
 	{
 		municipality: 'Markstay-Warren',
-		text: 'Markstay-Warren was formed in 1999 by joining several townships, with villages Markstay, Warren and Hagar.'
+		text: 'Markstay-Warren was formed in 1999 by joining several townships, with villages Markstay, Warren, and Hagar.'
 	},
 	{
 		municipality: 'Johnson',
@@ -104,7 +104,7 @@ export const landmarks: Landmark[] = [
 	},
 	{
 		municipality: 'Dawson',
-		text: 'Dawson was formed in 1997 from Atwood, Blue, Dilke and Worthington, at the mouth of the Rainy River.'
+		text: 'Dawson was formed in 1997 from Atwood, Blue, Dilke, and Worthington, at the mouth of the Rainy River.'
 	},
 	{
 		municipality: 'Mattawan',
