@@ -43,6 +43,8 @@ function forecastCondition(summary: string): string {
 export interface ConditionMix {
 	/** Municipalities in each kind of weather. */
 	counts: Record<ConditionKind, number>;
+	/** The municipalities in each kind of weather, in the order they were given. */
+	names: Record<ConditionKind, string[]>;
 	/** Municipalities with a condition, observed or forecast; the counts add up to this. */
 	reporting: number;
 }
@@ -64,6 +66,13 @@ export interface ConditionMixInputs {
  */
 export function conditionMix(inputs: ConditionMixInputs): ConditionMix {
 	const counts: Record<ConditionKind, number> = { rain: 0, snow: 0, clear: 0, cloud: 0, fog: 0 };
+	const names: Record<ConditionKind, string[]> = {
+		rain: [],
+		snow: [],
+		clear: [],
+		cloud: [],
+		fog: []
+	};
 	let reporting = 0;
 	for (const { name } of inputs.municipalities) {
 		const weather = inputs.peekWeather(inputs.facts[name].siteId);
@@ -74,8 +83,10 @@ export function conditionMix(inputs: ConditionMixInputs): ConditionMix {
 		const condition =
 			fresh && current.condition ? current.condition : forecast && forecastCondition(forecast);
 		if (!condition) continue;
-		counts[classifyCondition(condition)]++;
+		const kind = classifyCondition(condition);
+		counts[kind]++;
+		names[kind].push(name);
 		reporting++;
 	}
-	return { counts, reporting };
+	return { counts, names, reporting };
 }

@@ -172,6 +172,7 @@ describe('the weather across the municipalities', () => {
 		real({
 			weatherMix: {
 				counts,
+				names: { rain: [], snow: [], clear: [], cloud: [], fog: [] },
 				reporting: counts.rain + counts.snow + counts.clear + counts.cloud + counts.fog
 			}
 		});

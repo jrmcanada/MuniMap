@@ -68,6 +68,13 @@ describe('conditionMix', () => {
 		});
 		expect(result.counts).toEqual({ rain: 2, snow: 1, clear: 1, cloud: 0, fog: 0 });
 		expect(result.reporting).toBe(4);
+		expect(result.names).toEqual({
+			rain: ['A', 'B'],
+			snow: ['D'],
+			clear: ['C'],
+			cloud: [],
+			fog: []
+		});
 	});
 
 	it('leaves out sites with no weather, or not fetched within the hour', () => {

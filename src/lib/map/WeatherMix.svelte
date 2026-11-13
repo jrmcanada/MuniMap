@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onDestroy } from 'svelte';
 	import {
 		CONDITION_KINDS,
 		type ConditionKind,
@@ -31,17 +32,68 @@
 		})
 	);
 
+	/** How long the list stays up when nobody closes it, as for a road event card. */
+	const LIST_MS = 30_000;
+
+	let open = $state<ConditionKind | null>(null);
+	let closeTimer: ReturnType<typeof setTimeout> | undefined;
+	let root: HTMLElement;
+
+	/** The open list, sorted by name. It empties, and so closes, if the weather moves on. */
+	const listed = $derived(open ? [...mix.names[open]].sort((a, b) => a.localeCompare(b)) : []);
+
+	function close() {
+		clearTimeout(closeTimer);
+		open = null;
+	}
+
+	function toggle(kind: ConditionKind) {
+		if (open === kind) return close();
+		open = kind;
+		clearTimeout(closeTimer);
+		closeTimer = setTimeout(close, LIST_MS);
+	}
+
+	onDestroy(() => clearTimeout(closeTimer));
+
 	const summary = $derived(
 		`Weather across the municipalities: ${CONDITION_KINDS.map((kind) => `${LABELS[kind]} ${mix.counts[kind]}`).join(', ')}`
 	);
 </script>
 
-<div class="mix">
-	<div class="bar" role="img" aria-label={summary}>
+<svelte:window
+	onkeydown={(event) => event.key === 'Escape' && close()}
+	onpointerdown={(event) => !root.contains(event.target as Node) && close()}
+/>
+
+<div class="mix" bind:this={root}>
+	{#if open && listed.length}
+		<section
+			class="list"
+			style:border-left-color="var(--mix-{open})"
+			aria-label="{LABELS[open]} municipalities"
+		>
+			<header>
+				<h3>{LABELS[open]}<b>{listed.length}</b></h3>
+				<button type="button" class="close" aria-label="Close" onclick={close}>×</button>
+			</header>
+			<ul class="names">
+				{#each listed as name (name)}<li>{name}</li>{/each}
+			</ul>
+		</section>
+	{/if}
+	<div class="bar" role="group" aria-label={summary}>
 		{#each segments as { kind, share, percent, labelled } (kind)}
-			<span class="segment {kind}" style:flex-basis="{share * 100}%">
+			<button
+				type="button"
+				class="segment {kind}"
+				style:flex-basis="{share * 100}%"
+				aria-label="{LABELS[kind]}: list the {mix.counts[kind]} municipalities"
+				aria-expanded={open === kind}
+				onclick={() => toggle(kind)}
+			>
 				{#if labelled}{percent}%{/if}
-			</span>
+			</button>
 		{/each}
 	</div>
 	<ul>
@@ -56,6 +108,9 @@
 
 <style>
 	.mix {
+		position: relative;
+		/* The key that holds this card lets pointer events through to the map; the bar and list do not. */
+		pointer-events: auto;
 		display: flex;
 		flex-direction: column;
 		gap: 0.3rem;
@@ -84,10 +139,83 @@
 		min-width: 3px;
 		display: flex;
 		align-items: center;
-		padding-left: 0.4rem;
+		/* A button, reset so it looks exactly like the plain segment it replaces. */
+		margin: 0;
+		padding: 0 0 0 0.4rem;
 		border-radius: 0.2rem;
+		text-align: left;
+		font-family: inherit;
+		line-height: inherit;
 		font-weight: 700;
+		font-size: inherit;
 		color: white;
+		border: 0;
+		cursor: pointer;
+	}
+
+	.segment:focus-visible {
+		outline: 2px solid var(--panel-text);
+		outline-offset: 1px;
+	}
+
+	/* Opens upward from the bar, which sits low in the corner. */
+	.list {
+		position: absolute;
+		left: 0;
+		bottom: calc(100% + 0.35rem);
+		width: min(22rem, 90vw);
+		max-height: 60vh;
+		display: flex;
+		flex-direction: column;
+		padding: 0.5rem 0.7rem 0.6rem;
+		border: 1px solid var(--panel-border);
+		border-left: 0.3rem solid var(--panel-border);
+		border-radius: 0.5rem;
+		background: var(--card-background);
+		color: var(--panel-text);
+		font-size: 0.9rem;
+		box-shadow: 0 0.4rem 1.2rem oklch(0 0 0 / 0.45);
+	}
+
+	.list header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 0.5rem;
+	}
+
+	h3 {
+		margin: 0;
+		font-size: 1rem;
+	}
+
+	h3 b {
+		margin-left: 0.5rem;
+		color: var(--map-caption);
+	}
+
+	.close {
+		border: 0;
+		background: none;
+		color: inherit;
+		font-size: 1.3rem;
+		line-height: 1;
+		cursor: pointer;
+	}
+
+	.names {
+		display: block;
+		columns: 2;
+		gap: 1rem;
+		margin: 0.4rem 0 0;
+		overflow-y: auto;
+		font-weight: 400;
+	}
+
+	.names li {
+		display: block;
+		white-space: normal;
+		break-inside: avoid;
 	}
 
 	ul {

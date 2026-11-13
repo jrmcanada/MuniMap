@@ -260,3 +260,19 @@ test.describe('on a touchscreen', () => {
 		expect((await settled()).equals(dragged)).toBe(false);
 	});
 });
+
+test('clicking a section of the weather bar lists the municipalities in it', async ({ page }) => {
+	await serveTallWeather(page);
+	await page.setViewportSize({ width: 1920, height: 1080 });
+	await page.goto('/');
+	// Every site gets the stubbed "Mainly Clear", so the bar is one clear segment.
+	const segment = page.getByRole('button', { name: /^Clear: list the \d+ municipalities$/ });
+	await expect(segment).toBeVisible({ timeout: 20_000 });
+	await segment.click();
+	const list = page.getByRole('region', { name: 'Clear municipalities' });
+	await expect(list.getByRole('listitem').first()).toBeVisible();
+	expect(await list.getByRole('listitem').count()).toBeGreaterThan(1);
+	await page.screenshot({ path: 'test-results/weather-list.png' });
+	await page.keyboard.press('Escape');
+	await expect(list).toHaveCount(0);
+});
