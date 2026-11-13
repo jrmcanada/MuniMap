@@ -91,3 +91,4 @@
 - Kenora is named on the map (`src/lib/data/places.ts`, marked keep).
 - The weather bar counts "Mostly Sunny", "A few clouds", "A mix of sun and cloud" and "Partly Cloudy" as clear (`classifyCondition` in `src/lib/weather/conditionMix.ts`); "Mostly Cloudy" stays cloud.
 - Clicking a section of the weather bar opens a list of the municipalities in it (`WeatherMix.svelte`; `conditionMix` now also returns their names). It closes on a second click, the × button, Escape, a click elsewhere, or after 30 seconds. The segments look the same as before.
+- The weather bar also counts our Sudbury office (the green diamond), listed as "Sudbury office", so it now speaks of locations rather than municipalities: the caption and the ticker's rain, snow and clear lines (`refreshWeatherMix` in `src/routes/+page.svelte`).

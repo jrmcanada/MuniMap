@@ -38,11 +38,14 @@
 	let radarCoverage: RadarCoverage | null = null;
 	let weatherMix = $state<ConditionMix | null>(null);
 
+	/** The office is counted in the bar too, listed as "Sudbury office". */
+	const officePlace = { name: `${office.city} office` };
+
 	/** The bar reads every site's cached weather, so it is redone as sites load and as readings age. */
 	function refreshWeatherMix() {
 		weatherMix = conditionMix({
-			municipalities,
-			facts: municipalityFacts,
+			municipalities: [...municipalities, officePlace],
+			facts: { ...municipalityFacts, [officePlace.name]: factsFor(office.name) },
 			peekWeather: (siteId) => cache.peek(siteId),
 			now: Date.now()
 		});
