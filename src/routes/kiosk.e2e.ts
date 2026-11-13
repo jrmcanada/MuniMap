@@ -272,6 +272,7 @@ test('clicking a section of the weather bar lists the municipalities in it', asy
 	const list = page.getByRole('region', { name: 'Clear municipalities' });
 	await expect(list.getByRole('listitem').first()).toBeVisible();
 	expect(await list.getByRole('listitem').count()).toBeGreaterThan(1);
+	await expect(list.getByText('Sudbury office', { exact: true })).toBeVisible();
 	await page.screenshot({ path: 'test-results/weather-list.png' });
 	await page.keyboard.press('Escape');
 	await expect(list).toHaveCount(0);

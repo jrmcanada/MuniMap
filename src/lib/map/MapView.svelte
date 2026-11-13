@@ -487,7 +487,10 @@
 	{/if}
 	{#if radarTime || weatherMix?.reporting || hasRoadData}
 		<div class="key">
-			{#if weatherMix?.reporting}<WeatherMix mix={weatherMix} total={municipalities.length} />{/if}
+			{#if weatherMix?.reporting}<WeatherMix
+					mix={weatherMix}
+					total={municipalities.length + 1}
+				/>{/if}
 			{#if radarTime}<RadarLegend />{/if}
 			{#if hasRoadData}<RoadLegend source={roadSourceLabel()} />{/if}
 		</div>

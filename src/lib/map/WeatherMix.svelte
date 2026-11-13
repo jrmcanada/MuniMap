@@ -6,7 +6,7 @@
 		type ConditionMix
 	} from '#lib/weather/conditionMix.js';
 
-	/** How many municipalities there are in all, so the caption says how many are in the bar. */
+	/** How many places there are in all (the municipalities and the office), so the caption says how many are in the bar. */
 	let { mix, total }: { mix: ConditionMix; total: number } = $props();
 
 	const LABELS: Record<ConditionKind, string> = {
@@ -103,7 +103,7 @@
 			</li>
 		{/each}
 	</ul>
-	<p class="caption">{mix.reporting} of {total} municipalities have current weather</p>
+	<p class="caption">{mix.reporting} of {total} locations have current weather</p>
 </div>
 
 <style>
