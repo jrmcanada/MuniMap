@@ -13,8 +13,9 @@ const MAX_FETCH_AGE_MS = 60 * 60 * 1000;
  */
 const MAX_OBSERVATION_AGE_MS = 2 * 60 * 60 * 1000;
 
-/** Mostly sun counts as clear, including the few-clouds and sun-and-cloud mixes. Mostly cloudy does not. */
-const CLEAR_SKY = /^((mainly |mostly )?(clear|sunny)|a few clouds|a mix of sun and cloud)$/i;
+/** Mostly sun counts as clear, including the partly cloudy, few-clouds and sun-and-cloud mixes. Mostly cloudy does not. */
+const CLEAR_SKY =
+	/^((mainly |mostly )?(clear|sunny)|partly cloudy|a few clouds|a mix of sun and cloud)$/i;
 
 /**
  * Sorts Environment Canada's condition text ("Light Rain", "Mainly Clear", "Mostly Cloudy") by
