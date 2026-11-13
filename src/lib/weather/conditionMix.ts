@@ -13,6 +13,9 @@ const MAX_FETCH_AGE_MS = 60 * 60 * 1000;
  */
 const MAX_OBSERVATION_AGE_MS = 2 * 60 * 60 * 1000;
 
+/** Mostly sun counts as clear, including the few-clouds and sun-and-cloud mixes. Mostly cloudy does not. */
+const CLEAR_SKY = /^((mainly |mostly )?(clear|sunny)|a few clouds|a mix of sun and cloud)$/i;
+
 /**
  * Sorts Environment Canada's condition text ("Light Rain", "Mainly Clear", "Mostly Cloudy") by
  * keyword. Snow is checked first, so rain and snow together counts as snow. Mist, fog and the other
@@ -21,7 +24,7 @@ const MAX_OBSERVATION_AGE_MS = 2 * 60 * 60 * 1000;
 export function classifyCondition(text: string): ConditionKind {
 	if (/snow|flurr|blizzard|ice pellet|sleet/i.test(text)) return 'snow';
 	if (/rain|drizzle|shower|thunder/i.test(text)) return 'rain';
-	if (/^(mainly )?(clear|sunny)$/i.test(text.trim())) return 'clear';
+	if (CLEAR_SKY.test(text.trim())) return 'clear';
 	if (/fog|mist|haze|smoke|dust/i.test(text)) return 'fog';
 	return 'cloud';
 }
