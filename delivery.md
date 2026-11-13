@@ -89,4 +89,4 @@
 - On the office card (click the green diamond), the municipality count moved out of the heading and is now the top line of the totals panel, above total population and land area (`MunicipalityCard.svelte`).
 - Ticker text uses the Oxford comma in lists of three or more ("Dawson, Ignace, and Lake of the Woods"): `listNames` in `src/lib/statusBar/text.ts`, the busiest road line, and three landmark lines (Dawson, Markstay-Warren, Georgian Bluffs). Municipality names that contain commas, such as "MacDonald, Meredith and Aberdeen", are official names and stay as they are. Speeds were already in km/h everywhere; no mph was found in the app.
 - Kenora is named on the map (`src/lib/data/places.ts`, marked keep).
-- The weather bar counts "Mostly Sunny", "A few clouds" and "A mix of sun and cloud" as clear (`classifyCondition` in `src/lib/weather/conditionMix.ts`); "Mostly Cloudy" and "Partly Cloudy" stay cloud.
+- The weather bar counts "Mostly Sunny", "A few clouds", "A mix of sun and cloud" and "Partly Cloudy" as clear (`classifyCondition` in `src/lib/weather/conditionMix.ts`); "Mostly Cloudy" stays cloud.

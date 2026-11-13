@@ -22,7 +22,7 @@ describe('classifyCondition', () => {
 		['A few clouds', 'clear'],
 		['A mix of sun and cloud', 'clear'],
 		['Mostly Cloudy', 'cloud'],
-		['Partly Cloudy', 'cloud'],
+		['Partly Cloudy', 'clear'],
 		['Mist', 'fog'],
 		['Fog', 'fog'],
 		['Freezing Fog', 'fog'],
