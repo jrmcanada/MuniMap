@@ -57,6 +57,8 @@
 	const ZOOM_RESET_MS = 30_000;
 	/** How far the pointer must travel while pressed before a click becomes a drag, in CSS pixels. */
 	const DRAG_THRESHOLD = 4;
+	/** Wheel events closer together than this belong to one gesture and share its zoom point. */
+	const WHEEL_GESTURE_MS = 200;
 
 	let {
 		highlight = null,
@@ -102,6 +104,8 @@
 	let frame = 0;
 	let resizeTimer: ReturnType<typeof setTimeout>;
 	let zoomResetTimer: ReturnType<typeof setTimeout>;
+	let wheelAnchor: { x: number; y: number } | null = null;
+	let wheelGestureTimer: ReturnType<typeof setTimeout>;
 	let baseProjection: GeoProjection;
 	let ratio = 1;
 	let view: View = FULL_VIEW;
@@ -223,9 +227,16 @@
 	function zoom(event: WheelEvent) {
 		// Stops the browser zooming the whole page on ctrl + wheel or a trackpad pinch.
 		event.preventDefault();
-		const rect = canvas.getBoundingClientRect();
-		const point = { x: event.clientX - rect.left, y: event.clientY - rect.top };
-		changeView(zoomAt(view, point, wheelFactor(event.deltaY), { width, height }));
+		// The pointer can drift as the fingers spread, so a gesture zooms on where it started.
+		if (!wheelAnchor) {
+			const rect = canvas.getBoundingClientRect();
+			wheelAnchor = { x: event.clientX - rect.left, y: event.clientY - rect.top };
+		}
+		clearTimeout(wheelGestureTimer);
+		wheelGestureTimer = setTimeout(() => (wheelAnchor = null), WHEEL_GESTURE_MS);
+		changeView(
+			zoomAt(view, wheelAnchor, wheelFactor(event.deltaY, event.ctrlKey), { width, height })
+		);
 	}
 
 	function changeView(next: View) {
@@ -448,6 +459,7 @@
 			cancelAnimationFrame(frame);
 			clearTimeout(resizeTimer);
 			clearTimeout(zoomResetTimer);
+			clearTimeout(wheelGestureTimer);
 			canvas.removeEventListener('wheel', zoom);
 			motionQuery.removeEventListener('change', start);
 			observer.disconnect();

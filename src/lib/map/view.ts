@@ -10,9 +10,12 @@ export const MAX_ZOOM = 8;
 /** From this zoom on, every municipality is named on the map, not just the chosen towns. */
 export const MUNICIPALITY_NAMES_ZOOM = 4;
 
-/** Zoom change for one wheel event; smooth for trackpads, about 16% per notch of a mouse wheel. */
-export function wheelFactor(deltaY: number): number {
-	return Math.exp(-deltaY * 0.0015);
+/**
+ * Zoom change for one wheel event; about 16% per notch of a mouse wheel.
+ * A trackpad pinch arrives as ctrl + wheel with much smaller deltas, so it gets a faster rate.
+ */
+export function wheelFactor(deltaY: number, pinch: boolean): number {
+	return Math.exp(-deltaY * (pinch ? 0.02 : 0.0015));
 }
 
 /**

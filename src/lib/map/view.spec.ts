@@ -49,9 +49,13 @@ describe('panBy', () => {
 
 describe('wheelFactor', () => {
 	it('zooms in when scrolling up and out when scrolling down', () => {
-		expect(wheelFactor(-100)).toBeGreaterThan(1);
-		expect(wheelFactor(100)).toBeLessThan(1);
-		expect(wheelFactor(0)).toBe(1);
+		expect(wheelFactor(-100, false)).toBeGreaterThan(1);
+		expect(wheelFactor(100, false)).toBeLessThan(1);
+		expect(wheelFactor(0, false)).toBe(1);
+	});
+
+	it('zooms faster for a trackpad pinch than for the same wheel delta', () => {
+		expect(wheelFactor(-10, true)).toBeGreaterThan(wheelFactor(-10, false));
 	});
 });
 
