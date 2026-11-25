@@ -11,6 +11,11 @@ export const variables = defineEnvVars({
 		schema: (value) => value?.trim() || undefined,
 		description: 'The one password that lets people into the site.'
 	},
+	/** A second password for guests, whose sign in lasts a day. Unset turns guest sign in off. */
+	GUEST_PASSWORD: {
+		schema: (value) => value?.trim() || undefined,
+		description: 'The guest password; a guest stays signed in for one day.'
+	},
 	/** Set by Netlify itself ("true") on its builds and functions; never set by hand. */
 	NETLIFY: {
 		schema: (value) => value || undefined,
