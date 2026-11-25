@@ -2,6 +2,8 @@
 export const SESSION_COOKIE = 'munimap-session';
 /** The wall display stays signed in for a year; changing the password signs everyone out. */
 export const SESSION_MAX_AGE_SECONDS = 60 * 60 * 24 * 365;
+/** A guest stays signed in for a day; changing the guest password signs out only guests. */
+export const GUEST_SESSION_MAX_AGE_SECONDS = 60 * 60 * 24;
 
 const encoder = new TextEncoder();
 
@@ -10,6 +12,18 @@ const encoder = new TextEncoder();
  * cookie cannot work backwards to the password, and changing the password makes old cookies useless.
  */
 export async function sessionToken(password: string): Promise<string> {
+	return sign(password, 'munimap-session');
+}
+
+/**
+ * A guest's cookie: when it runs out (Unix seconds) and a hash of that time keyed by the guest
+ * password. The server checks the time itself, so keeping the cookie past a day does not help.
+ */
+export async function guestToken(guestPassword: string, expiresAt: number): Promise<string> {
+	return `guest.${expiresAt}.${await sign(guestPassword, `munimap-guest:${expiresAt}`)}`;
+}
+
+async function sign(password: string, message: string): Promise<string> {
 	const key = await crypto.subtle.importKey(
 		'raw',
 		encoder.encode(password),
@@ -17,7 +31,7 @@ export async function sessionToken(password: string): Promise<string> {
 		false,
 		['sign']
 	);
-	const signature = await crypto.subtle.sign('HMAC', key, encoder.encode('munimap-session'));
+	const signature = await crypto.subtle.sign('HMAC', key, encoder.encode(message));
 	return [...new Uint8Array(signature)].map((byte) => byte.toString(16).padStart(2, '0')).join('');
 }
 
@@ -43,10 +57,14 @@ export interface AccessInputs {
 	pathname: string;
 	/** The password set in the environment, if any. */
 	password: string | undefined;
+	/** The guest password set in the environment, if any. */
+	guestPassword: string | undefined;
 	/** True when running on Netlify, where a missing password must lock the site, not open it. */
 	onNetlify: boolean;
 	/** The session cookie the visitor sent, if any. */
 	cookie: string | undefined;
+	/** The current time in Unix seconds, to check a guest cookie has not run out. */
+	now: number;
 }
 
 /**
@@ -57,11 +75,20 @@ export interface AccessInputs {
 export async function accessFor({
 	pathname,
 	password,
+	guestPassword,
 	onNetlify,
-	cookie
+	cookie,
+	now
 }: AccessInputs): Promise<Access> {
 	if (!password) return onNetlify ? 'unconfigured' : 'allow';
 	if (pathname === '/login') return 'allow';
 	if (cookie && sameText(cookie, await sessionToken(password))) return 'allow';
+	if (cookie && guestPassword && (await isGuestCookie(cookie, guestPassword, now))) return 'allow';
 	return pathname.startsWith('/api/') ? 'unauthorized' : 'login';
+}
+
+async function isGuestCookie(cookie: string, guestPassword: string, now: number): Promise<boolean> {
+	const expiresAt = Number(cookie.split('.')[1]);
+	if (!Number.isInteger(expiresAt) || expiresAt <= now) return false;
+	return sameText(cookie, await guestToken(guestPassword, expiresAt));
 }
