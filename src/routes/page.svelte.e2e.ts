@@ -1,5 +1,11 @@
 import { expect, test } from '@playwright/test';
 
+// Ontario 511 allows ten calls a minute, and a test run loads the page far more often than that.
+// Every test gets empty road feeds; a test that needs roads routes its own, which takes precedence.
+test.beforeEach(async ({ page }) => {
+	await page.route('**/api/road-*', (route) => route.fulfill({ json: [] }));
+});
+
 test('shows the client map', async ({ page }) => {
 	await page.goto('/');
 	await expect(page.getByRole('img', { name: /client municipalities/i })).toBeVisible();
